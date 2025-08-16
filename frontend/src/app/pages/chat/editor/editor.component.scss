@@ -1,0 +1,60 @@
+// @import '../../../../../node_modules/quill/dist/quill.core.css';
+// @import '../../../../../node_modules/quill/dist/quill.snow.css';
+// @import '../../../../../node_modules/quill/dist/quill.bubble.css';
+.form-control-lg {
+    border-radius: .4rem;
+    border-radius: var(--bs-border-radius-lg);
+    font-size: .875rem;
+    min-height: calc(1.5em + 1rem + 2px);
+    min-height: calc(1.5em + 1rem + var(--bs-border-width)* 2);
+    padding: 0px;
+    /* Prevent large pasted content from expanding the input indefinitely */
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+
+.form-control {
+    -webkit-appearance: none;
+    appearance: none;
+    background-clip: padding-box;
+    background-color: #fff;
+    background-color: var(--bs-input-bg);
+    border: 1px solid #eaeaf1;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: .25rem;
+    border-radius: var(--bs-border-radius);
+    color: #495057;
+    color: var(--bs-body-color);
+    display: block;
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 0px;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    width: 100%;
+  }
+  
+  .form-control:focus {
+    background-color: #fff;
+    background-color: var(--bs-input-bg);
+    border-color: #eaeaf1;
+    border-top-color: rgb(234, 234, 241);
+    border-right-color: rgb(234, 234, 241);
+    border-bottom-color: rgb(234, 234, 241);
+    border-left-color: rgb(234, 234, 241);
+    border-color: var(--bs-border-color);
+    box-shadow: 0 0 0 0 #4eac6d40;
+    color: #495057;
+    color: var(--bs-body-color);
+    outline: 0;
+  }
+  #editrToggleBtn{
+    position: absolute;
+    right: 0;
+  }
+
+#msginputField {
+  background: transparent;
+  border: none;
+}

@@ -1,0 +1,13 @@
+
+<div class="d-flex align-items-center audioAttach pr-2">
+  
+  @if(is_play){
+  <button class="btn btn-primary btn-sm" (click)="pause();is_play=false;"><i class="fa fa-solid fa-pause"></i></button>
+  }@else {
+  <button class="btn btn-primary btn-sm" (click)="play();is_play=true;"><i class="fa fa-solid fa-play"></i></button>
+  }
+  <div class="d-flex flex-column">
+    @if(c_seek_time>0){<span>{{c_seek_time}}</span>}
+    <div [id]="messageid+'_audio'" class="audio_wave"></div>
+  </div>
+</div>

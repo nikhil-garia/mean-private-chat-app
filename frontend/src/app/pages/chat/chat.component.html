@@ -1,0 +1,370 @@
+<mat-sidenav-container class="example-container" autosize hasBackdrop="false">
+
+<div class="layout-wrapper d-lg-flex">
+  <!-- before left side menu -->
+  <div class="side-menu flex-lg-column">
+    <div class="navbar-brand-box">
+      <a class="logo logo-dark" routerLink="/chat"><span class="logo-sm"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"><path d="M8.5,18l3.5,4l3.5-4H19c1.103,0,2-0.897,2-2V4c0-1.103-0.897-2-2-2H5C3.897,2,3,2.897,3,4v12c0,1.103,0.897,2,2,2H8.5z M7,7h10v2H7V7z M7,11h7v2H7V11z"></path>
+      </svg></span></a>
+      <a class="logo logo-light" routerLink="/chat"><span class="logo-sm"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"><path d="M8.5,18l3.5,4l3.5-4H19c1.103,0,2-0.897,2-2V4c0-1.103-0.897-2-2-2H5C3.897,2,3,2.897,3,4v12c0,1.103,0.897,2,2,2H8.5z M7,7h10v2H7V7z M7,11h7v2H7V11z"></path></svg></span></a>
+    </div>
+    <div class="flex-lg-column my-0 sidemenu-navigation">
+      <ul role="tablist" class="side-menu-nav nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        @if (chat.isMobile==false) {
+        <li id="pills-user-tab-container" class="nav-item">
+          <a href="javascript:void(0)" id="pills-user-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-user'" matTooltip="Profile" (click)="ActiveTab='pills-user';loadProfileComponent();" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-user" type="button" aria-controls="pills-user" [attr.aria-selected]="ActiveTab==='pills-user' ? true:false"><i class="bx bx-user-circle"></i>
+          </a>
+        </li>
+        }
+        <li id="pills-chat-tab-container" class="nav-item">
+          <a href="javascript:void(0)" id="pills-chat-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-chat'" matTooltip="Chats" (click)="ActiveTab='pills-chat';fetchConvList();is_archive_open=false;" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-chat" type="button" aria-controls="pills-chat" [attr.aria-selected]="ActiveTab==='pills-chat' ? true:false"><i class="bx bx-conversation">
+            @if(chatBadgeTotalUnread>0){
+              <span class="position-absolute translate-middle badge rounded-pill bg-danger">
+                {{(chatBadgeTotalUnread<100) ? chatBadgeTotalUnread : chatBadgeTotalUnread+'+'}}
+                <span class="visually-hidden">unread conversation</span>
+              </span>
+            }
+          </i>
+          </a>
+        </li>
+        <li id="pills-contacts-tab-container" class="nav-item">
+          <a href="javascript:void(0)" id="pills-contacts-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-contacts'" matTooltip="Contacts" (click)="ActiveTab='pills-contacts';loadContactListComponent();" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-contacts" type="button" aria-controls="pills-contacts" [attr.aria-selected]="ActiveTab==='pills-contacts' ? true:false"><i class="bx bxs-user-detail"></i>
+          </a>
+        </li>
+        <li id="pills-calls-tab-container" class="nav-item">
+          <a href="javascript:void(0)" id="pills-calls-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-calls'" matTooltip="Calls" (click)="ActiveTab='pills-calls';loadCalllistComponent();" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-calls" type="button" aria-controls="pills-calls" [attr.aria-selected]="ActiveTab==='pills-calls' ? true:false"><i class="bx bx-phone-call"></i>
+          </a>
+        </li>
+        <li id="pills-bookmark-tab-container" class="nav-item">
+          <a href="javascript:void(0)" id="pills-bookmark-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-bookmark'" matTooltip="Bookmarks" (click)="ActiveTab='pills-bookmark';loadBookmarklistComponent();" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-bookmark" type="button" aria-controls="pills-bookmark" [attr.aria-selected]="ActiveTab==='pills-bookmark' ? true:false"><i class="bx bx-bookmarks"></i>
+          </a>
+        </li>
+        <li id="pills-setting-tab-container" class="nav-item" [hidden]="chat.isMobile">
+          <a href="javascript:void(0)" id="pills-setting-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-setting'" matTooltip="Settings" (click)="ActiveTab='pills-setting';" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-setting" type="button" aria-controls="pills-setting" [attr.aria-selected]="ActiveTab==='pills-setting' ? true:false"><i class="bx bx-cog"></i>
+          </a>
+        </li>
+        <li id="color-mode" class="mt-auto nav-item"><a class="nav-link light-dark nav-link" matTooltipPosition="right" (click)="changeTheme()" matTooltip="{{lightDarkToggleLabel}}">
+          @if (lightDarkToggleLabel=='Light Mode') {
+            <i class='bx bx-sun' id="moon"></i>  
+          }@else {
+            <i class="bx bx-moon" id="moon"></i>
+          }
+        </a>
+        </li>
+        <li class="profile-user-dropdown dropdown nav-item">
+          <a class="bg-transparent nav-link left-top-profile-avatar" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            @if (chat.room.loggedUser.profile_pic) {
+              <img [ngSrc]="chat.room.loggedUser.profile_pic | safeImageUrl" class="profile-user rounded-circle avatar-sm"  alt="" width="36" height="36" loading="lazy"/>
+              @if (chat.room.loggedUser.status) {
+                <span class="user-status" [ngClass]="getUserStatusClass(chat.room.loggedUser.is_online,chat.room.loggedUser.status)"></span>
+              }
+            }@else{
+              <!-- for text avatar -->
+              <div class="avatar-sm">
+                <span class="avatar-title rounded-circle text-uppercase text-white bg-purple" [style.backgroundColor]="chat.room.loggedUser.bgcolor">
+                    <span class="username fs-6">{{chat.room.loggedUser.name | firstChars }}</span>
+                    @if (chat.room.loggedUser.status) {
+                      <span class="user-status" [ngClass]="getUserStatusClass(chat.room.loggedUser.is_online,chat.room.loggedUser.status)"></span>
+                    }
+                </span>
+              </div>
+            }
+          </a>
+          <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" data-bs-popper="static">
+            <button type="button" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="ActiveTab='pills-user';loadProfileComponent();">Profile <i class="bx bx-user-circle text-muted ms-1"></i></button>
+            <button type="button" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="ActiveTab='pills-setting'">Setting<i class="bx bx-cog text-muted ms-1"></i></button>
+            <button tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item">Change Password <i class="bx bx-lock-open text-muted ms-1"></i></button>
+            <button tabindex="0" role="menuitem" class="dropdown-item"></button>
+            <button tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="onLogout()">Log out <i class="bx bx-log-out-circle text-muted ms-1"></i></button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="chat-leftsidebar">  
+    <div class="tab-content" id="v-pills-tabContent">
+      <!-- profile tab content start-->
+      <div class="tab-pane fade" [class.show]="ActiveTab=='pills-user'" [class.active]="ActiveTab=='pills-user'" id="pills-user" [hidden]="ActiveTab!='pills-user'" role="tabpanel" aria-labelledby="pills-user-tab">
+        <!-- lazy loading setting-tab component start -->
+        <ng-template #profileTabContainer></ng-template>
+      </div>
+      <!-- profile tab content end-->
+
+      <!-- chat tab content -->
+      <div class="tab-pane fade" [class.show]="ActiveTab=='pills-chat'" [class.active]="ActiveTab=='pills-chat'" id="pills-chat" *ngIf="ActiveTab=='pills-chat'" role="tabpanel" aria-labelledby="pills-chat-tab">
+        <div>
+          <div class="px-3 pt-4">
+            <div class="d-flex align-items-start">
+              <div class="d-flex flex-grow-1">
+                <h4 class="mb-4">Chats</h4>
+                <p class="ml-6 mb-4">({{chat.room.loggedUser.name}})</p>
+              </div>
+              <div class="flex-shrink-0">
+                <!-- unread component -->
+                @if(initConvLIst){
+                 @defer () {
+                    <app-unread-notification (parentFun)="openInChatBox($event)" (parentUpdateConvUnread)="updateConvUnread($event)" [chat]="chat" (openContactTab_parent)="openContactTab_parent($event)"></app-unread-notification>
+                  }@placeholder {
+                     <i role="button" class="bx bx-bell position-relative fs-4" matTooltip="loading"  aria-expanded="false"></i>
+                  }
+                 }
+              </div>
+              
+            </div>
+            <div class="input-group mb-2"><input id="serachChatUser" [(ngModel)]="search" placeholder="Search here.." type="text" class="form-control bg-light border-0 pe-0 form-control"><button type="button" id="searchbtn-addon" class="btn btn-light"  aria-label="Search here"><i class="bx bx-search align-middle"></i></button></div>
+          </div>
+    
+          <!-- chat room list start -->
+          <div class="chat-room-list simplebar-scrollable-y">
+            <div class="simplebar-wrapper">
+              <div class="simplebar-mask">
+                <div class="simplebar-offset">
+                  <div class="simplebar-content-wrapper">
+                    <div class="simplebar-content">
+                      <!-- mb-3 px-4 mt-4 font-size-11 text-muted text-uppercase -->
+
+                      <!-- for favourite conversation list start -->
+                      @if(initConvLIst){
+                        @if(!is_archive_open && getFilterConv(true)>0){
+                          <div class="simplebar-content-child d-flex align-items-center px-3 mt-4 mb-3">
+                            <h5 class="mb-0 font-size-11 text-muted text-uppercase">Favourites</h5>
+                          </div>
+                          @if (!chat.room.conv_list) {
+                            @if (!chat_conv_list_loading) {
+                              <p class="mx-4">No record found..</p>
+                            } @else if (chat_conv_list_loading==true || chat_conv_list_loading==undefined) {
+                              <div class="chat-skeleton">
+                                <div *ngFor="let user of skeleton; trackBy: trackByIndex" class="chat-item-skeleton">
+                                  <div [class]="currentTHem" class="avatar-skeleton"></div>
+                                  <div class="text-skeleton">
+                                    <div [class]="currentTHem" class="name-skeleton"></div>
+                                    <div [class]="currentTHem" class="time-skeleton"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          } @else if(chat.room.conv_list.length>0){
+                            @defer(){
+                              <app-conversation-list [chat]="chat" [search]="search" [serverPath]="serverPath" (showConvMsg_parent)="showConvMsg($event)" [is_archive_open]="is_archive_open" [getLikeData]="true" (joinCallParent)="onJoinCall($event)"></app-conversation-list>
+                            }@placeholder {
+                              <div class="chat-skeleton">
+                                <div *ngFor="let user of skeleton; trackBy: trackByIndex" class="chat-item-skeleton">
+                                  <div [class]="currentTHem" class="avatar-skeleton"></div>
+                                  <div class="text-skeleton">
+                                    <div [class]="currentTHem" class="name-skeleton"></div>
+                                    <div [class]="currentTHem" class="time-skeleton"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          }
+                        }@else if(!is_archive_open && (!chat.room.conv_list || chat_conv_list_loading==undefined)){
+                          <div class="chat-skeleton">
+                            <div *ngFor="let user of skeleton; trackBy: trackByIndex" class="chat-item-skeleton">
+                              <div [class]="currentTHem" class="avatar-skeleton"></div>
+                              <div class="text-skeleton">
+                                <div [class]="currentTHem" class="name-skeleton"></div>
+                                <div [class]="currentTHem" class="time-skeleton"></div>
+                              </div>
+                            </div>
+                          </div>
+                        }@else if (!is_archive_open && chat_conv_list_loading==false && getFilterConv(true)==0 && getFilterConv(false)==0) {
+                          <!-- Archived conversation list empty state -->
+                          <div class="no-conv-message text-center p-4 w-100">
+                            <div>
+                              <i class="bx bx-archive fs-1 text-muted"></i>
+                              <div class="mt-2 fw-bold">
+                                No conversations found
+                              </div>
+                              <div class="text-muted">
+                                Start a new chat to see your conversations here.
+                              </div>
+                            </div>
+                          </div>
+                        }
+                        <!-- for favourite conversation list end -->
+  
+                        <!-- messages conversation start -->
+                        @if((!is_archive_open && getFilterConv(false)>0) || is_archive_open){
+                          <div class="simplebar-content-child d-flex align-items-center px-3 mt-4 mb-3">
+                            <h5 class="mb-0 font-size-11 text-muted text-uppercase">{{is_archive_open ? 'Archived':'Messages'}} </h5>
+                            <!-- testin ng material  -->
+                            <div class="flex-shrink-0">
+                              <div id="new-message">
+                                <button type="button" class="btn btn-soft-primary btn-xs" (click)="openContactPopup()"  matTooltip="Contact" aria-label="Open contact popup"><i class="bx bx-plus"></i></button>&nbsp;
+                              </div>
+                            </div>
+                          </div>
+                          <!-- chat room list -->
+                          @if (chat.room.conv_list.length>0) {
+                              @defer(){
+                                <app-conversation-list [chat]="chat" [search]="search" [serverPath]="serverPath" (showConvMsg_parent)="showConvMsg($event)" [is_archive_open]="is_archive_open" [getLikeData]="false" (joinCallParent)="onJoinCall($event)"></app-conversation-list>
+                              }@placeholder {
+                                <div class="chat-skeleton">
+                                  <div *ngFor="let user of skeleton; trackBy: trackByIndex" class="chat-item-skeleton">
+                                    <div [class]="currentTHem" class="avatar-skeleton"></div>
+                                    <div class="text-skeleton">
+                                      <div [class]="currentTHem" class="name-skeleton"></div>
+                                      <div [class]="currentTHem" class="time-skeleton"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              }
+                          } @else {
+                            @if (chat_conv_list_loading==true || chat_conv_list_loading==undefined) {
+                              <div class="chat-skeleton">
+                                <div *ngFor="let user of skeleton; trackBy: trackByIndex" class="chat-item-skeleton">
+                                  <div [class]="currentTHem" class="avatar-skeleton"></div>
+                                  <div class="text-skeleton">
+                                    <div [class]="currentTHem" class="name-skeleton"></div>
+                                    <div [class]="currentTHem" class="time-skeleton"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            } @else if (is_archive_open && chat_conv_list_loading==false) {
+                              <!-- Archived conversation list empty state -->
+                              <div class="no-conv-message text-center p-4 w-100">
+                                <div>
+                                  <i class="bx bx-archive fs-1 text-muted"></i>
+                                  <div class="mt-2 fw-bold">
+                                    No Archived conversations found
+                                  </div>
+                                  <div class="text-muted">
+                                    You have no archived conversations yet. Archived chats will appear here once you archive a conversation.
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          }
+                        }
+                        <!-- messages conversation end -->
+                      }@else{
+                        <!-- loading skeleton -->
+                          <div class="simplebar-content-child d-flex align-items-center px-3 mt-4 mb-3">
+                            <h5 class="mb-0 font-size-11 text-muted text-uppercase">Messages</h5>
+                            <!-- testin ng material  -->
+                            <div class="flex-shrink-0">
+                              <div id="new-message">
+                                <button type="button" class="btn btn-soft-primary btn-xs" matTooltip="Contact" aria-label="Open contact popup"><i class="bx bx-plus"></i></button>&nbsp;
+                              </div>
+                            </div>
+                          </div>
+                          <div class="chat-skeleton">
+                            <div *ngFor="let user of skeleton; trackBy: trackByIndex" class="chat-item-skeleton">
+                              <div [class]="currentTHem" class="avatar-skeleton"></div>
+                              <div class="text-skeleton">
+                                <div [class]="currentTHem" class="name-skeleton"></div>
+                                <div [class]="currentTHem" class="time-skeleton"></div>
+                              </div>
+                            </div>
+                          </div>
+                      }
+                      
+                          
+                      @if(is_archive_open){
+                        <h5 class="text-center mb-2"><a class="mb-3 px-4 mt-4 font-size-11 text-primary" type="button" (click)="fetchConvList();is_archive_open=false;chat.room.selectedRoomId=null;">Chats <i class="bx bxs-archive-out align-middle"></i></a></h5>
+                      }@else{
+                        <h5 class="text-center mb-2"><a class="mb-3 px-4 mt-4 font-size-11 text-primary" type="button" (click)="get_archive_data();is_archive_open=true;chat.room.selectedRoomId=null;">Archived Contacts <i class="bx bxs-archive-in align-middle"></i></a></h5>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- chat room list end -->
+    
+          <!-- chat room list api progress  -->
+          @if (isChatroomLoading) {
+            <div class="chat-list-item skeleton">
+              <div class="avatar"></div>
+              <div class="content"></div>
+            </div>
+            <div class="chat-list-item skeleton">
+              <div class="avatar"></div>
+              <div class="content"></div>
+            </div>
+            <div class="chat-list-item skeleton">
+              <div class="avatar"></div>
+              <div class="content"></div>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="tab-pane fade" [class.show]="ActiveTab=='pills-contacts'" [class.active]="ActiveTab=='pills-contacts'" id="pills-contacts" [hidden]="ActiveTab!='pills-contacts'" role="tabpanel" aria-labelledby="pills-contacts-tab">
+        <!-- @defer(){
+          <app-contact-list (openContactPopup_parent)="openContactPopup()" [serverPath_parent]="serverPath"></app-contact-list>
+        } -->
+        <ng-template #contactsListTabContainer></ng-template>
+      </div>
+      <div class="tab-pane fade" [class.show]="ActiveTab=='pills-calls'" [class.active]="ActiveTab=='pills-calls'" id="pills-calls" [hidden]="ActiveTab!='pills-calls'" role="tabpanel" aria-labelledby="pills-calls-tab">
+        <!-- @defer{ -->
+          <!-- <app-call-list [chat]="chat"></app-call-list> -->
+          <ng-template #callListTabContainer></ng-template>
+        <!-- } -->
+      </div>
+      <div class="tab-pane fade" [class.show]="ActiveTab=='pills-bookmark'" [class.active]="ActiveTab=='pills-bookmark'" id="pills-bookmark" [hidden]="ActiveTab!='pills-bookmark'" role="tabpanel" aria-labelledby="pills-bookmark-tab">
+        <!-- @defer(){
+          <app-bookmark [chat]="chat"  (bookMarkparentFun)="getUserStatusClass('','')"></app-bookmark>
+        } -->
+        <ng-template #bookmarkListTabContainer></ng-template>
+      </div>
+      <!-- settings tab content start -->
+      <div class="tab-pane fade" [class.show]="ActiveTab=='pills-setting'" [class.active]="ActiveTab=='pills-setting'" id="pills-setting" [hidden]="ActiveTab!='pills-setting'" role="tabpanel" aria-labelledby="pills-setting-tab">
+        <!-- @defer () {
+          <app-setting-tab [chat]="chat" [localZone]="localZone" [currentTHemColor]="currentTHemColor" [currentTheme_image]="currentTheme_image" [prev_profile]="prev_profile" (changeOnlineStatus_parent)="changeOnlineStatus($event)" (changeThemeColor_parent)="changeThemeColor($event.color,$event.onload)" (changeThemImage_parent)="changeThemImage($event)" (set_profile_pic_parent)="set_profile_pic($event)" #setttingTab></app-setting-tab>
+        } -->
+        <!-- lazy loading setting-tab component start -->
+        <ng-template #settingTabContainer></ng-template>
+        <!-- lazy loading setting-tab component end -->
+
+      </div>
+      <!-- settings tab content end -->
+    </div>
+  </div>
+  <div id="user-chat" #user_chat class="user-chat w-100 overflow-hidden">
+    <!-- for no messages exist -->
+    <div class="user-chat-overlay"></div>
+    @if (chat.room.selectedRoomId==null){
+      <div class="chat-welcome-section">
+        <div class="w-100 justify-content-center row">
+          <div class="col-md-7 col-xxl-5">
+            <div class="p-4 text-center">
+              <div class="avatar-xl mx-auto mb-4">
+                <div class="avatar-title bg-soft-primary rounded-circle">
+                  <i class="bx bxs-message-alt-detail display-4 text-primary m-0"></i>
+                  </div>
+              </div>
+              <h4>Welcome to Cool Chat App</h4>
+              <p class="text-muted mb-4">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo
+                ligula eget dolor. cum sociis natoque penatibus et</p><button type="button"
+                class="btn btn-primary w-lg btn btn-secondary">Get Started</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    <!-- if msg exist -->
+    <!-- @if (chat.room.selectedRoomId){
+      <app-chat-content [chat]="chat" [opened]="opened" [drawer]="drawer" [userChatElement]="userChatElement" [ActiveTab]="ActiveTab" (archive_conv_parent)="archive_conv($event)" (removeUserChat_parent)="removeUserChat()" (bookmark_msg_parent)="bookmark_msg($event)" (openContactPopup_parent)="openContactPopup()" (child_get_sidebardAttachment)="get_sidebardAttachment()" (markConvAsRead_parent)="markConvAsRead_child($event)"></app-chat-content>
+    } -->
+      <!-- for lazy load chat content -->
+      <div [hidden]="!chat.room.selectedRoomId">
+        <ng-template #chatContentContainer></ng-template>
+      </div>
+  </div>
+</div>
+
+<!-- right side nav section for conversation detail start -->
+<mat-sidenav #drawer class="example-sidenav" mode="side" position="end" [(opened)]="opened">
+  <!-- @if(opened){
+    <app-chat-detail-sidebar [drawer]="drawer" [selectedConv]="chat.room.selectedRoomDetail.row" (parentArchiveConv)="archive_conv(chat.room.selectedRoomDetail.row)" (parentConfirmDelete)="childConfirmDelete()"></app-chat-detail-sidebar>
+  } -->
+  <!-- for lazy load chat detail sidebar -->
+  <div [hidden]="!opened">
+    <ng-template #chatDetailsidebarContainer></ng-template>
+  </div>
+</mat-sidenav>
+<!-- right side nav section for conversation detail end -->
+
+</mat-sidenav-container>

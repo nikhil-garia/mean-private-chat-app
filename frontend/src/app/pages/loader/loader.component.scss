@@ -1,0 +1,31 @@
+.circle-loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background-color: black;
+}
+
+.rotating-circle {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  animation: rotate-circle 5s linear infinite;
+}
+
+.icon {
+  position: absolute;
+  font-size: 24px;
+}
+
+.icon:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+.icon:nth-child(2) { top: 50%; left: 100%; transform: translateY(-50%); }
+.icon:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+.icon:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+
+@keyframes rotate-circle {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

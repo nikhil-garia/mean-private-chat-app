@@ -1,0 +1,132 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure Git safe directory
+      run: git config --global --add safe.directory /var/www/mean-stack-app
+
+    - name: Checkout all files
+      run: git checkout .
+
+    - name: Check and install node
+      run: |
+        # Check if Node.js is installed
+        if ! command -v node &> /dev/null
+        then
+          echo "Node.js not found. Installing Node.js 20..."
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+        else
+          echo "Node.js is already installed."
+        fi
+
+    - name: Check and Install PM2
+      run: |
+        if ! command -v pm2 &> /dev/null
+        then
+          echo "PM2 not found, installing..."
+          sudo npm install -g pm2
+        else
+          echo "PM2 is already installed"
+        fi
+
+
+    - name: Check and Install Angular CLI
+      run: |
+        if ! command -v ng &> /dev/null
+        then
+          echo "Angular CLI not found, installing..."
+          sudo npm install -g @angular/cli
+        else
+          echo "Angular CLI is already installed"
+        fi
+
+
+    - name: Update PATH
+      run: |
+        echo 'export PATH=$PATH:$(npm config get prefix)/bin' >> $GITHUB_ENV
+
+    - name: Create project directory
+      run: |
+        sudo mkdir -p /var/www/mean-stack-app
+
+    - name: Set permissions for project directory
+      run: |
+        sudo chown -R $USER:$USER /var/www/mean-stack-app
+        sudo chmod -R 755 /var/www/mean-stack-app
+
+    # - name: Print /var/www directory contents
+    #   run: |
+    #     sudo ls -la /var/www
+
+    - name: Verify project directory existence
+      run: |
+        if [ -d "/var/www/mean-stack-app" ]; then
+          echo "Directory exists";
+        else
+          echo "Directory does not exist";
+        fi
+
+    # - name: Print project directory contents
+    #   run: |
+    #     sudo ls -la /var/www/mean-stack-app
+
+
+    - name: Install dependencies and build frontend
+      run: |
+        cd frontend
+        yarn add package.json
+        ng build --configuration production --optimization --output-hashing=all
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+
+    - name: Install dependencies and restart backend
+      run: |
+        cd backend
+        yarn add package.json
+        pm2 kill
+        pm2 start index.js
+
+    - name: Deploy to Hostinger
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSHKEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+
+          cd /var/www/mean-stack-app
+          # Check if Node.js is installed
+          if ! command -v node &> /dev/null
+          then
+            echo "Node.js not found. Installing Node.js 20..."
+            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          else
+            echo "Node.js is already installed."
+          fi
+          # Install necessary global packages
+          npm install -g yarn @angular/cli pm2
+          # Pull the latest code
+          git pull origin main
+          # Build the frontend
+          cd frontend
+          yarn add package.json
+          ng build --configuration production --optimization --output-hashing=all
+          # Build the backend
+          cd ../backend
+          yarn add package.json
+          # Restart the application
+          pm2 restart all

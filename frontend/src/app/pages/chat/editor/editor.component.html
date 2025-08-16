@@ -1,0 +1,4 @@
+<!-- <quill-editor [(ngModel)]="editorContent" [modules]="editorModules"></quill-editor> -->
+<!-- <div #msginputField id="chat-input" (keydown)="onTyping($event)" placeholder="Type your message..." class="form-control form-control-lg chat-input" (keyup)="msgInputKeyup($event)"></div> -->
+<button type="button" id="editrToggleBtn" mat-button (click)="toggleEditorTool();" matTooltip="Show editor"><i class="fa fa-solid fa-edit"></i></button>
+<div #msginputField id="chat-input" (keydown)="onTyping($event)" (keyup)="msgInputKeyup($event)" placeholder="Type your message..." class="form-control form-control-lg chat-input"></div>

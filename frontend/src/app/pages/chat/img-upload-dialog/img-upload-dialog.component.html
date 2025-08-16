@@ -1,0 +1,80 @@
+<div mat-dialog-title class="bg-primary font-size-16 text-white"><mat-icon>image</mat-icon> 
+  <span class="fs-4">Profile Image Upload</span>  <button type="button" class="btn btn-link float-end" mat-dialog-close><i class="fa fa-times" aria-hidden="true"></i></button></div>
+<mat-dialog-content class="mat-typography">
+  <div class="container">
+    <div class="row" style="margin-top: 10px;">
+        <div class="text-center col-md-8">
+            <h5>Crop Image</h5>
+            <image-cropper 
+            [imageChangedEvent]="imageChangedEvent"
+            [maintainAspectRatio]="true"
+            [containWithinAspectRatio]="containWithinAspectRatio"
+            [aspectRatio]="4 / 4"
+            [resizeToWidth]="256"
+            [cropperMinWidth]="128"
+            [onlyScaleDown]="true"
+            [roundCropper]="false"
+            [canvasRotation]="canvasRotation"
+            [transform]="transform"
+            [alignImage]="'left'"
+            [style.display]="showCropper ? null : 'none'"
+            format="png"
+            (imageCropped)="imageCropped($event)"
+            (imageLoaded)="imageLoaded()"
+            (cropperReady)="cropperReady($event)"
+            (loadImageFailed)="loadImageFailed()">
+          </image-cropper>
+        </div>
+        <div class="text-center col-md-4">
+            <h5>Preview</h5>
+            <img [src]="croppedImage" /> <br>
+            <div class="row mt-2">
+              <div class="text-center col-md-6">
+                <input type="file" #myInput class="text-primary" (change)="fileChangeEvent($event)" />
+              </div>
+              <div class="text-center col-md-6">
+                <button class="btn btn-info" (click)="clear()" matTooltip="Reset all things">Clear</button>
+              </div>
+            </div>
+            <div class="row m-2">
+              <div class="col-md-2">
+                <button (click)="rotateLeft()" class="mr-2 btn btn-dark" matTooltip="Rotate Left"><i class="fa fa-undo" aria-hidden="true"></i></button>
+              </div>
+              <div class="col-md-2">
+                <button (click)="rotateRight()" class="mr-2 btn btn-dark" matTooltip="Rotate Right"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+              </div>
+              <div class="col-md-2">
+                <button (click)="flipHorizontal()" class="mr-2 btn btn-dark" matTooltip="Horizontal Flip" ><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+              </div>
+              <div class="col-md-2">
+                <button (click)="flipVertical()" class="mr-2 btn btn-dark" matTooltip="Vertical Flip"><i class="fa fa-sort-up" aria-hidden="true"></i></button>
+              </div>
+              <div class="col-md-2">
+                <button (click)="toggleContainWithinAspectRatio()" class="mr-2 btn btn-warning" [matTooltip]="containWithinAspectRatio?'Fill Aspect Ratio':'Contain Within Aspect Ratio'">@if(containWithinAspectRatio){<i class="fa fa-expand"></i>}@else{<i class="fa fa-compress"></i>}</button>
+              </div>
+              <div class="col-md-2">
+                <button (click)="resetImage()" class="mr-2 btn btn-warning" matTooltip="Reset"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <input [(ngModel)]="rotation" placeholder="Rotation" class="form-control mr-2" type="number" (keyup)="updateRotation()" /> 
+              </div>
+              <div class="col-md-2">
+                <button (click)="zoomOut()" class="btn btn-success zoom-btn" matTooltip="Zoom Out">-</button>
+              </div>
+              <div class="col-md-2">
+                <button (click)="zoomIn()"class="btn btn-success" matTooltip="Zoom In">+</button>
+              </div>
+            </div>
+            <hr>
+           <button class="btn btn-success text-white" type="button" cdkFocusInitial (click)="UploadProfilePic()" matTooltip="Upload profile image"><i class="fa fa-upload" aria-hidden="true"></i></button>
+        </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<!-- <mat-dialog-actions align="end">
+  <button type="button" class="btn btn-link" mat-dialog-close>Cancel</button>
+  <button *ngIf="" class="btn btn-success text-white" type="button" cdkFocusInitial (click)="submitCreForm()"
+    matTooltip="Create conversation"><i class="bx bxs-send align-middle"></i></button>
+</mat-dialog-actions> -->

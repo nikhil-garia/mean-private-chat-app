@@ -1,0 +1,167 @@
+<div #root id="myRoot"></div>
+<div class="p-0 modal-body">
+  <div class="video-call-container">
+    <!-- Single call view -->
+    <div class="w-100 h-100" [hidden]="!callAccepted || is_group">
+      <div class="remote-stream">
+        <video #remoteVideo id="remote-video" autoplay playsinline></video>
+      </div>
+      <div class="local-stream">
+        <video #localVideoSingle id="local-video" autoplay playsinline muted></video>
+      </div>
+    </div>
+
+    <!-- Group call view -->
+    <div class="w-100 h-100" [hidden]="!callAccepted || !is_group">
+      <div class="group-video-container">
+        <!-- Local video in group call -->
+        <div class="local-video-group">
+          <video #localVideoGroup id="local-video-group" autoplay playsinline muted></video>
+          <div class="local-video-overlay">
+            <span class="local-user-name">You</span>
+            <div class="mute-indicators">
+              <i class="bx bx-microphone-off" *ngIf="isMute"></i>
+              <i class="bx bx-video-off" *ngIf="isMuteVid"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Remote videos container -->
+        <div id="remote-videos" class="remote-videos-container">
+          <!-- Remote video elements will be dynamically added here -->
+        </div>
+        
+        <!-- Remote audios container (hidden) -->
+        <div id="remote-audios" style="display: none;">
+          <!-- Remote audio elements will be dynamically added here -->
+        </div>
+        
+        <!-- Participants list -->
+        <div class="participants-list" *ngIf="joinedParticipants.length > 0">
+          <div class="participant-item" *ngFor="let participant of joinedParticipants; trackBy: trackById">
+            <div class="participant-info">
+              <div class="participant-avatar">
+                <img *ngIf="participant.profile_pic && checkPic_privacy({profilePhotoVisibility: 'public'})" 
+                     [src]="serverPath+'/'+'uploads/profile/'+participant.profile_pic" 
+                     [alt]="participant.fullName">
+                <div *ngIf="!participant.profile_pic" class="avatar-placeholder">
+                  {{participant.fullName | firstChars}}
+                </div>
+              </div>
+              <div class="participant-details">
+                <span class="participant-name">{{participant.fullName}}</span>
+                <div class="participant-status">
+                  <i class="bx bx-microphone-off" *ngIf="participantMuteStatus[participant._id]"></i>
+                  <i class="bx bx-video-off" *ngIf="participantVideoMuteStatus[participant._id]"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call notification view -->
+    @if(!callAccepted){
+      @if (data.videoCall_detail.from.profile_pic && data.videoCall_detail.from.profile_pic!=undefined && checkPic_privacy(data.videoCall_detail.from)) {
+        <img class="videocallModal-bg" [src]="serverPath+'/'+'uploads/profile/'+data.videoCall_detail.from.profile_pic" alt="">
+      }@else{
+        <!-- for text avatar -->
+        <div class="w-100 text-avtar-p-div">
+          <div class="avatar-xl">
+            <span class="avatar-title rounded-circle text-uppercase text-white bg-purple" [style.backgroundColor]="(data.videoCall_detail.from.isme=='yes') ? this.data.intData.room.loggedUser.bgcolor:(this.data.intData.room.selectedRoomDetail.row.is_group==false? this.data.intData.room.selectedRoomDetail.row.bgcolor:'')">
+                <span class="username">{{data.videoCall_detail.from.fullName | firstChars }}</span>
+            </span>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Controls -->
+    <div class="position-absolute start-0 end-0 bottom-0">
+      <div class="text-center">
+        <span *ngIf="is_user_busy">{{is_user_busy_msg}}</span>
+        <div class="d-flex justify-content-center align-items-center text-center">
+          <div class="avatar-md h-auto">
+            <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="toggleMute('audio')">
+              <span class="avatar-title bg-transparent text-muted font-size-20">
+                <i class="bx bx-microphone-off" *ngIf="isMute"></i>
+                <i class="bx bx-microphone" *ngIf="!isMute"></i>
+              </span>
+            </button>
+          </div>
+          <div class="avatar-md h-auto">
+            <button type="button" class="avatar-sm rounded-circle btn btn-light">
+              <span class="avatar-title bg-transparent text-muted font-size-20"
+                ><i class="bx bx-volume-full"></i
+              ></span>
+            </button>
+          </div>
+          <div class="avatar-md h-auto">
+            <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="toggleMute('video')">
+              <span class="avatar-title bg-transparent text-muted font-size-20">
+                <i class="bx bx-video-off" *ngIf="isMuteVid"></i>
+                <i class="bx bx-video" *ngIf="!isMuteVid"></i>
+              </span>
+            </button>
+          </div>
+          <div class="avatar-md h-auto">
+            <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="switchCamera()">
+              <span class="avatar-title bg-transparent text-muted font-size-20"
+                ><i class="bx bx-refresh"></i
+              ></span>
+            </button>
+          </div>
+          <!-- End call for all (group calls only) -->
+          <div class="avatar-md h-auto" *ngIf="is_group">
+            <button type="button" class="avatar-sm rounded-circle btn btn-danger" (click)="endCallForAll()" title="End Call for All">
+              <span class="avatar-title bg-transparent text-white font-size-20">
+                <i class="bx bx-phone-off"></i>
+              </span>
+            </button>
+          </div>
+          <!-- Debug button (only in development) -->
+          <div class="avatar-md h-auto">
+            <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="debugCurrentState()" title="Debug State">
+              <span class="avatar-title bg-transparent text-muted font-size-20">
+                <i class="bx bx-bug"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="mt-4">
+          @if(!open_audio_notification_dialog){
+            <button type="button" class="avatar-md call-close-btn rounded-circle btn btn-danger" (click)="handleDisconnect('end_call')" title="End Call">
+              <span class="avatar-title bg-transparent font-size-24"><i class="fa fa-phone"></i></span>
+            </button>
+          }@else {
+            <button
+              type="button"
+              class="btn btn-success bg-success avatar-md call-close-btn rounded-circle"
+              (click)="handleAccept()">
+              <span class="avatar-title bg-transparent font-size-24"> 
+                <i class="fa fa-phone"></i></span>
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger avatar-md call-close-btn rounded-circle"
+              (click)="handleDeny()">
+              <span class="avatar-title bg-transparent font-size-24"
+                ><i class="fa fa-phone"></i></span>
+            </button>
+          }
+        </div>
+      </div>
+      @if(!callAccepted){
+        <div class="p-4 bg-primary mt-n4">
+          <div class="text-white mt-4 text-center">
+            <h5 class="font-size-18 text-truncate mb-0 text-white">
+              {{getCallStatusLabel()}}
+            </h5>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+

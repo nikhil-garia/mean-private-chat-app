@@ -1,0 +1,10 @@
+.map_,.leaflet-container {
+    width: 300px !important;
+    height: 150px !important;
+}
+.leaflet-bottom.leaflet-right{
+    display: none !important;
+}
+.leaflet-container{
+    z-index: 0;
+}

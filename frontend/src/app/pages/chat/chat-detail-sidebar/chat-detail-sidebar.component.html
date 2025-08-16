@@ -1,0 +1,361 @@
+<div class="user-profile-sidebar d-block">
+  <div class="position-relative">
+    <div class="p-3 border-bottom">
+      <div class="user-profile-img">
+        @if(selectedConv.is_group==true){
+          @if(selectedConv.grp_avatar){
+            <img [src]="'assets/media/'+selectedConv.grp_avatar" class="profile-img rounded" alt="">
+          }@else{
+            <img src="./assets/media/user-dummy-img.jpg" class="profile-img rounded" alt="">
+          }
+        }@else if (selectedConv.is_group==false) {
+          @for (i of selectedConv.participants; track $index) {
+            @if (i.isme=='no' && i.profile_pic && checkPic_privacy(i)) {
+              <img [src]="i.profile_pic | safeImageUrl" class="profile-img rounded" alt="">
+              <!-- <span class="user-status" [ngClass]="i.status=='online' ?'bg-success':''"></span> -->
+            }@else if(i.isme=='no') {
+              <img src="./assets/media/user-dummy-img.jpg" class="profile-img rounded" alt="">
+            }
+          }
+        }
+        <div class="overlay-content rounded">
+          <div class="user-chat-nav p-2">
+            <div class="d-flex w-100">
+              <div class="flex-grow-1">
+                <button type="button" (click)="drawer.toggle()"  matTooltip="Close right side navbar" class="btn nav-btn text-white user-profile-show d-none d-lg-block btn btn-none"><i class="bx bx-x"></i></button>
+                <button type="button" (click)="drawer.toggle()"  matTooltip="Close right side navbar" class="btn nav-btn text-white user-profile-show d-block d-lg-none btn btn-none"><i class="bx bx-left-arrow-alt"></i></button>
+              </div>
+              <div class="flex-shrink-0">
+                <div class="dropdown"><button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                    class="btn nav-btn text-white btn btn-none"><i class="bx bx-dots-vertical-rounded"></i></button>
+                  <div tabindex="-1" role="menu" class="dropdown-menu-end dropdown-menu" aria-hidden="true">
+                    <button to="#" tabindex="0" role="menuitem"
+                      class="d-flex justify-content-between align-items-center d-lg-none user-profile-show dropdown-item">View
+                      Profile <i class="bx bx-user text-muted"></i></button>
+                      <button type="button" (click)="openCall_dialog_parent('audio')" to="#" tabindex="0" role="menuitem" class="d-flex justify-content-between align-items-center d-lg-none dropdown-item">Audio<i class="bx bxs-phone-call text-muted"></i></button>
+                      <button type="button" (click)="openCall_dialog_parent('video')" to="#" tabindex="0" role="menuitem" class="d-flex justify-content-between align-items-center d-lg-none dropdown-item">Video<i class="bx bx-video text-muted"></i></button>
+                      <button to="#" tabindex="0" role="menuitem"
+                      class="d-flex justify-content-between align-items-center dropdown-item" (click)="archive_conv2();drawer.toggle()">{{selectedConv.is_archive=="yes" ? 'Un-Archive':'Archive'}}
+                      <i class="bx bx-archive text-muted"></i></button>
+                      <button to="#" tabindex="0" role="menuitem" class="d-flex justify-content-between align-items-center dropdown-item"  (click)="muteConversation(chat.room.selectedRoomDetail.row.is_muted)">
+                        @if(chat.room.selectedRoomDetail.row.is_muted){
+                          Unmute<i class="bx bx-microphone text-muted"></i>
+                        }@else{
+                          Mute<i class="bx bx-microphone-off text-muted"></i>
+                        }
+                      </button>
+                      <button to="#" tabindex="0"
+                      role="menuitem" class="d-flex justify-content-between align-items-center dropdown-item" (click)="parentConfirmDelete1();drawer.toggle();">Delete<i class="bx bx-trash text-muted"></i></button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-auto p-3">
+            <!-- for group -->
+            @if (selectedConv.is_group==true) {
+              <h5 class="user-name mb-1 text-truncate">{{selectedConv.conv_name}}</h5>
+            }@else if (selectedConv.is_group==false) {
+              @for (i of selectedConv.participants; track $index) {
+                @if (i.isme=='no') {
+                  <h5 class="user-name mb-1 text-truncate">{{i.name}}</h5>
+                  <!-- {{i.status=="online" ? "Active":"Offline"}} -->
+                    <p class="font-size-14 text-truncate mb-0"><i class="bx bxs-circle font-size-10 me-1 ms-0"  [ngClass]="i.status=='away' ? 'text-warning':(i.status=='dnd' ? 'text-danger' : (!i.is_online ? 'text-gray': (i.status=='online' ? 'text-success':'text-gray')) )"></i>{{i.status=='away' ? 'Away':(i.status=='dnd' ? 'Do not disturb' : (!i.is_online ? 'Offline': (i.status=='online' ? 'Online':'')) )}}</p>
+                }
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    @if (loading) {
+      <mat-progress-bar  mode="indeterminate"></mat-progress-bar>
+    }@else { 
+      <div data-simplebar="init" class="p-4 user-profile-desc simplebar-scrollable-y">
+        <div class="simplebar-wrapper" style="margin: -24px;">
+          <div class="simplebar-height-auto-observer-wrapper">
+            <div class="simplebar-height-auto-observer"></div>
+          </div>
+          <div class="simplebar-mask">
+            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+              <div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content"
+                style="height: 100%; overflow: hidden scroll;">
+                <div class="simplebar-content" style="padding: 24px;">
+                  <div class="text-center border-bottom">
+                    <div class="row">
+                      <div class="col-sm col-2 d-lg-flex">
+                        <div class="mb-4"><button type="button" class="btn avatar-sm p-0 btn btn-none"><span
+                              class="avatar-title rounded bg-light text-body"><i
+                                class="bx bxs-message-alt-detail"></i></span></button>
+                          <h5 class="font-size-11 text-uppercase text-muted mt-2">Message</h5>
+                        </div>
+                      </div>
+                      <div class="col-sm col-2 d-lg-flex">
+                        <div class="mb-4"><button type="button"
+                            class="btn avatar-sm p-0 favourite-btn active btn btn-none">
+                            <span class="avatar-title rounded bg-light text-body">
+                              @defer(){
+                                <app-heart-animation [liked]="!selectedConv.is_liked ? false:selectedConv.is_liked" [selectedConv]="chat.room.selectedRoomDetail.row" [chat]="chat"></app-heart-animation>
+                              }@placeholder {
+                                <i class="bx bx-heart"></i>
+                              }
+                            </span></button>
+                          <h5 class="font-size-11 text-uppercase text-muted mt-2">Favourite</h5>
+                        </div>
+                      </div>
+                      <div class="col-sm col-2 d-lg-flex">
+                        <div class="mb-4"><button type="button" (click)="openCall_dialog_parent('audio')" class="btn avatar-sm p-0 btn btn-none"><span
+                              class="avatar-title rounded bg-light text-body"><i
+                                class="bx bxs-phone-call"></i></span></button>
+                          <h5 class="font-size-11 text-uppercase text-muted mt-2">Audio</h5>
+                        </div>
+                      </div>
+                      <div class="col-sm col-2 d-lg-flex">
+                        <div class="mb-4"><button type="button" (click)="openCall_dialog_parent('video')" class="btn avatar-sm p-0 btn btn-none"><span
+                              class="avatar-title rounded bg-light text-body"><i class="bx bx-video"></i></span></button>
+                          <h5 class="font-size-11 text-uppercase text-muted mt-2">Video</h5>
+                        </div>
+                      </div>
+                      <div class="col-sm col-2 d-lg-flex">
+                        <div class="mb-4">
+                          <div class="dropdown">
+                            <button type="button" class="btn avatar-sm p-0 dropdown-toggle btn btn-none"  data-bs-toggle="dropdown" aria-expanded="false">
+                              <span class="avatar-title bg-light text-body rounded"><i class="bx bx-dots-horizontal-rounded"></i></span>
+                            </button>
+                            <div tabindex="-1" role="menu" class="dropdown-menu-end dropdown-menu">
+                              <button type="button" to="#" tabindex="0" role="menuitem"
+                                class=" d-flex justify-content-between align-items-center dropdown-item" (click)="archive_conv2();drawer.toggle();">{{selectedConv.is_archive=="yes" ? 'Un-Archive':'Archive'}}
+                                <i class="bx bx-archive text-muted"></i></button>
+                                <button to="#" tabindex="0" role="menuitem" class=" d-flex justify-content-between align-items-center dropdown-item" (click)="muteConversation(chat.room.selectedRoomDetail.row.is_muted)">
+                                  @if(chat.room.selectedRoomDetail.row.is_muted){
+                                    Unmute<i class="bx bx-microphone text-muted"></i>
+                                  }@else{
+                                    Mute<i class="bx bx-microphone-off text-muted"></i>
+                                  }
+                                </button>
+                                <button to="#" tabindex="0"
+                                role="menuitem"
+                                class=" d-flex justify-content-between align-items-center dropdown-item" (click)="parentConfirmDelete1();drawer.toggle();">Delete<i class="bx bx-trash text-muted"></i></button>
+                            </div>
+                          </div>
+                          <h5 class="font-size-11 text-uppercase text-muted mt-2">More</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-muted pt-4">
+                    <h5 class="font-size-11 text-uppercase">Status :</h5>
+                    <p class="mb-4">
+                      @if (selectedConv.is_group==false) {
+                        @for (i of selectedConv.participants; track $index) {
+                          @if (i.isme=='no') {
+                            {{i.statusMsg}}
+                          }
+                        }
+                      }
+                    </p>
+                  </div>
+                  @if(selectedConv.is_group==true){
+                    <div>
+                      <div class="d-flex">
+                        <div class="flex-grow-1">
+                          <h5 class="font-size-11 text-muted text-uppercase">Members</h5>
+                        </div>
+                        @if(checkAdmin()==true){
+                          <div class="flex-grow-0">
+                            <a class="font-size-12 d-block mb-2" (click)="add_user_conv()">Add</a>
+                          </div>
+                        }
+                      </div>
+                      <ul class="list-unstyled chat-list mx-n4">
+                        @for (i of selectedConv.participants; track $index) {
+                          <li>
+                            <div class="d-flex align-items-center">
+                              <div class="flex-shrink-0 avatar-xs me-2">
+                                @if(i.profile_pic && checkPic_privacy(i)){
+                                  <div class="chat-user-img align-self-center me-2 ms-0"><img [src]="i.profile_pic | safeImageUrl" class="rounded-circle avatar-xs" alt=""></div>
+                                }@else {
+                                  <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">{{i.name | firstChars}}</span>
+                                }
+                              </div>
+                              <div class="flex-grow-1 overflow-hidden">
+                                <p class="text-truncate mb-0">{{i.name}} {{i.isme=='yes' ? '(You)':''}}</p>
+                              </div>
+                              @if(i._id==selectedConv.created_by._id){
+                                <div class="ms-auto"><span class="badge badge-soft-primary rounded p-1 badge bg-secondary">Admin</span></div>
+                              }@else if(this.chat.room.loggedUser.id==selectedConv.created_by._id){
+                                <!-- {{i._id}}=={{this.chat.room.loggedUser.id}} -->
+                                @if(i._id!=this.chat.room.loggedUser.id){
+                                  <a class="font-size-12 d-block mb-2" (click)="remove_user_conv(i._id)">remove</a>
+                                }
+                              }
+                            </div>
+                          </li>
+                        }
+                        <!-- <li><a href="/dashboard">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-shrink-0 avatar-xs me-2">
+                                <div class="chat-user-img align-self-center me-2 ms-0"><img
+                                    src="/static/media/avatar-1.9c8e605558cece65b06c.jpg" class="rounded-circle avatar-xs" alt=""></div>
+                              </div>
+                              <div class="flex-grow-1 overflow-hidden">
+                                <p class="text-truncate mb-0">Carla Serrano</p>
+                              </div>
+                            </div>
+                          </a></li> -->
+                      </ul>
+                    </div>
+                  }
+                  @if(selectedConv.is_group==false){
+                    <hr class="my-4">
+                    <div class="pb-2">
+                      <h5 class="font-size-11 text-uppercase mb-2">Info :</h5>
+                      @for (i of selectedConv.participants; track $index) {
+                        @if (i.isme=='no') {
+                          <div>
+                            <div class="d-flex align-items-end">
+                              <div class="flex-grow-1">
+                                <p class="text-muted font-size-14 mb-1">Name</p>
+                              </div>
+                              <!-- <div class="flex-shrink-0"><button type="button" class="btn btn-sm btn-soft-primary">Edit</button>
+                              </div> -->
+                            </div>
+                            <h5 class="font-size-14">{{i.name}}</h5>
+                          </div>
+                          <div class="mt-4">
+                            <p class="text-muted font-size-14 mb-1">Email</p>
+                            <h5 class="font-size-14">{{i.email}}</h5>
+                          </div>
+                          <div class="mt-4">
+                            <p class="text-muted font-size-14 mb-1">Location</p>
+                            <h5 class="font-size-14 mb-0">California, USA</h5>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                  @if (selectedConv.is_group==false) {
+                    <hr class="my-4">
+                    <div>
+                      <div class="d-flex">
+                        <div class="flex-grow-1">
+                          <h5 class="font-size-11 text-muted text-uppercase">Group in common</h5>
+                        </div>
+                      </div>
+                      <ul class="list-unstyled chat-list mx-n4">
+                        @for (i of common_group; track $index) {
+                          <li><a href="javascript:void(0)">
+                              <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 avatar-xs me-2"><span
+                                    class="avatar-title rounded-circle bg-soft-light text-dark">#</span>
+                                </div>
+                                <div class="flex-grow-1 overflow-hidden">
+                                  <p class="text-truncate mb-0">{{i.conv_name}}</p>
+                                </div>
+                              </div>
+                            </a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  <hr class="my-4">
+                  <div>
+                    <div class="d-flex">
+                      <div class="flex-grow-1">
+                        <h5 class="font-size-11 text-muted text-uppercase">Media</h5>
+                      </div>
+                      <div class="flex-shrink-0"><a class="font-size-12 d-block mb-2" (click)="showAll_media_sidebar()">{{!show_all_media_profile ? 'Show all' : 'Show limit'}}</a></div>
+                    </div>
+                    <div class="profile-media-img">
+                      
+                      @for (a_item of attached_files; track a_item) {
+                        @if(a_item.mimetype!=null && (a_item.mimetype=="video/mp4" || a_item.mimetype=="image/jpeg" || a_item.mimetype=="image/png")){
+                          @if (!show_all_media_profile) {
+                            @if($index<4){
+                              <div class="media-img-list">
+                                <a [href]="serverPath+'/'+a_item.path" target="_blank">
+                                  <img [src]="serverPath+'/'+a_item.path" alt="media" class="img-fluid">
+                                  @if($index==3 && !show_all_media_profile){<div class="bg-overlay">+ {{attached_files.length-($index+1)}}</div>}
+                                </a>
+                              </div>
+                            }
+                          }@else{
+                            <div class="media-img-list">
+                              <a [href]="serverPath+'/'+a_item.path" target="_blank">
+                                <img [src]="serverPath+'/'+a_item.path" alt="media" class="img-fluid">
+                              </a>
+                            </div>
+                          }
+                        }
+                      }
+                      <!-- <div class="media-img-list"><a href="/dashboard"><img
+                            src="/static/media/img-1.94735bdcb4171caaa01e.jpg" alt="media img" class="img-fluid">
+                          <div class="bg-overlay">+ 1</div>
+                        </a></div> -->
+                    </div>
+                  </div>
+                  <hr class="my-4">
+                  <div>
+                    <div>
+                      <h5 class="font-size-11 text-muted text-uppercase mb-3">Attached Files</h5>
+                    </div>
+                    <div>
+                      @for (a_item of attached_files; track a_item) {
+                        @if(a_item.mimetype!=null && (a_item.mimetype=="video/mp4" || a_item.mimetype=="image/jpeg" || a_item.mimetype=="image/png")){
+
+                        }@else if(a_item.mimetype!=null && (a_item.mimetype!="video/mp4" || a_item.mimetype!="image/jpeg")){
+                          <div class="p-2 border mb-2 card">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-shrink-0 avatar-xs ms-1 me-3">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                  <i class="bx bx-file"></i>
+                                </div>
+                              </div>
+                              <div class="flex-grow-1 overflow-hidden">
+                                <h5 class="font-size-14 text-truncate mb-1">{{a_item.originalname}}</h5>
+                                <p class="text-muted font-size-13 mb-0">{{a_item.size | fileSize}}</p>
+                              </div>
+                              <div class="flex-shrink-0 ms-3">
+                                <div class="d-flex gap-2">
+                                  <div class="d-flex align-items-center justify-content-center"><a class="text-muted px-1"
+                                    target="_blank" [href]="a_item.path ? serverPath+'/'+a_item.path:a_item.url"><i class="bx bxs-download"></i></a></div>
+                                  <div class="dropdown"><button type="button" role="button" aria-haspopup="true"
+                                      aria-expanded="false" class="text-muted px-1 btn btn-none"><i
+                                        class="bx bx-dots-horizontal-rounded"></i></button>
+                                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu-end dropdown-menu"
+                                      data-bs-popper="static"><a href="#" tabindex="0" role="menuitem"
+                                        class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Share
+                                        <i class="bx bx-share-alt ms-2 text-muted"></i></a><a href="#" tabindex="0"
+                                        role="menuitem"
+                                        class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Bookmark
+                                        <i class="bx bx-bookmarks text-muted ms-2"></i></a>
+                                      <div tabindex="-1" class="dropdown-divider"></div><a href="#" tabindex="0"
+                                        role="menuitem"
+                                        class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Delete
+                                        <i class="bx bx-trash ms-2 text-muted"></i></a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="simplebar-placeholder" style="width: 376px; height: 1097px;"></div>
+        </div>
+        <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+          <div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+        </div>
+        <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+          <div class="simplebar-scrollbar" style="height: 25px; display: block; transform: translate3d(0px, 32px, 0px);">
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

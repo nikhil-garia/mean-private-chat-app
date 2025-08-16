@@ -1,0 +1,126 @@
+<div class="position-relative">
+	<div class="px-4 pt-4">
+		<div class="d-flex align-items-start">
+			<div class="flex-grow-1">
+				<h4 class="mb-3">Bookmark</h4>
+			</div>
+		</div>
+	</div>
+	<div data-simplebar="init" class="chat-message-list chat-bookmark-list simplebar-scrollable-y">
+		<div class="simplebar-wrapper" style="margin: 0px;">
+			<div class="simplebar-height-auto-observer-wrapper">
+				<div class="simplebar-height-auto-observer"></div>
+			</div>
+			<div class="simplebar-mask">
+				<div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+					<div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content"
+						style="height: auto; overflow: hidden scroll;">
+						<div class="simplebar-content" style="padding: 0px;">
+							<ul class="list-unstyled chat-list min-vh-100">
+								@if(bookmark_data.length>0){
+									@for (row of bookmark_data; track $index) {
+										<li>
+											<div class="d-flex align-items-center">
+												<div class="flex-shrink-0 avatar-xs ms-1 me-3">
+													@if (row['message_detail']['from_udetail']['profile_pic']) {
+													<!-- <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+																			<i class="bx bx-file"></i>
+																		</div> -->
+													<img
+														[src]="serverPath+'/'+'uploads/profile/'+row['message_detail']['from_udetail']['profile_pic']"
+														class="avatar-title bg-primary-subtle text-primary rounded-circle" alt="" />
+														{{row['message_detail']['from_udetail']['status']}}
+													@if (row['message_detail']['from_udetail']['status']) {
+													<!-- <span class="user-status" [ngClass]="getUserStatusClass2(row['message_detail']['from_udetail']['is_online'],row['message_detail']['from_udetail']['status'])"></span> -->
+													}
+													}@else{
+													<!-- for text avatar -->
+													<div class="avatar-xs">
+														<span class="avatar-title rounded-circle text-uppercase text-white bg-purple"
+															[style.backgroundColor]="row['message_detail']['from_udetail']['bgcolor']">
+															<span class="username fs-6">{{row['message_detail']['from_udetail']['fullName'] | firstChars }}</span>
+															@if (row['message_detail']['from_udetail']['status']) {
+															<!-- <span class="user-status" [ngClass]="getUserStatusClass2(row['message_detail']['from_udetail']['is_online'],row['message_detail']['from_udetail']['status'])"></span> -->
+															}
+														</span>
+													</div>
+													}
+												</div>
+												<div class="flex-grow-1 overflow-hidden">
+													<!-- for group message -->
+													@if(row['message_detail']['chat_type']==1){
+													<h5 class="font-size-14 mb-1"><a class="text-truncate p-0" href="javascript:void(0)">
+															@if(row['message_detail']['from']==chat.room.loggedUser.id){
+															You
+															}@else{
+															{{row['message_detail']['from_udetail']['fullName']}}
+															}
+															> <i class="fa fa-users" aria-hidden="true"></i> <span [matTooltip]="row['message_detail']['conversation_detail']['conv_name']">{{row['message_detail']['conversation_detail']['conv_name']}}</span>
+														</a></h5>
+													}
+													<!-- for single chat -->
+													@else{
+													<h5 class="font-size-14 mb-1"><a class="text-truncate p-0" href="javascript:void(0)">
+															@if(row['from']==chat.room.loggedUser.id){
+															You
+															}@else{
+															{{row['message_detail']['from_udetail']['fullName']}}
+															}
+														</a></h5>
+													}
+													<p class="text-muted text-truncate font-size-13 mb-0 d-flex">
+														@if(row['message_detail']['message']){
+															<!-- {{row['message_detail']['message']}} -->
+															<p [innerHTML]="row['message_detail']['message'] | customslice:30"></p>
+														}@else if(row['message_detail']['sticker']){
+															<img [src]="row['message_detail']['sticker']" width="20" alt="" class="bkm-sticker-img rounded border" matTooltip="Sticker">
+														}@else if(row['message_detail']['message']=='' && (row['message_detail']['attachments'])){
+															@if(row['message_detail']['attachments'][0]){
+																file recieved
+																<!-- @for(attach of row['message_detail']['attachments']; track $index){
+																	@if (attach.mimetype=="image/png" || attach.mimetype=="image/jpeg") {
+																		<img [src]="(attach.destination && attach.destination!='') ? serverPath+'/'+attach.path:attach.url" alt="" class="rounded border" matTooltip="Name: {{attach.originalname}} |size: {{attach.size | fileSize }}">
+																	}
+																} -->
+
+															}
+														}
+														<span class="text-muted mb-0">{{row['bookmark_created_at'] | timeAgoConv}}</span>
+													</p>
+													<!-- <p></p> -->
+												</div>
+												<div class="flex-shrink-0 ms-3">
+													<div class="dropdown"><button type="button" role="button" data-bs-toggle="dropdown"
+															aria-expanded="false" class="font-size-16 text-muted px-1 btn btn-none"><i
+																class="bx bx-dots-horizontal-rounded"></i></button>
+														<div class="dropdown-menu-end dropdown-menu"><button tabindex="0" role="menuitem"
+																class="d-flex align-items-center justify-content-between dropdown-item">Open <i
+																	class="bx bx-folder-open ms-2 text-muted"></i></button><button type="button" tabindex="0"
+																role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item">Edit
+																<i class="bx bx-pencil ms-2 text-muted"></i></button>
+															<div tabindex="-1" class="dropdown-divider"></div><button (click)="delBookmark(row['message_id'], row['user_id'])" tabindex="0" role="menuitem"
+																class="d-flex align-items-center justify-content-between dropdown-item">Delete <i
+																	class="bx bx-trash ms-2 text-muted"></i></button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</li>
+									}
+								}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="simplebar-placeholder" style="width: 300px; height: 818px;"></div>
+		</div>
+		<div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+			<div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+		</div>
+		<div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+			<div class="simplebar-scrollbar" style="height: 74px; display: block; transform: translate3d(0px, 0px, 0px);">
+			</div>
+		</div>
+	</div>
+</div>

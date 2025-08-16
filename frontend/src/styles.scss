@@ -1,0 +1,320 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use './common_mixins.scss' as cm; // Use a namespace to avoid name collisions
+
+// ================== Variables ==================
+$brand-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+:root {
+  // Define the RGB values for your custom colors here
+  --bs-purple-rgb: 97, 83, 204;   // Example purple from your violet theme
+  --bs-pink-rgb: 232, 62, 140;      // Example pink from your pink theme
+}
+// ================== Theme Definitions ==================
+$dark-theme-green: mat.define-theme((
+  color: (
+    primary: mat.$green-palette,
+    theme-type: dark,
+  ),
+  typography: (brand-family: $brand-font-family, bold-weight: 900),
+  density: (scale: -1),
+));
+
+$light-theme-green: mat.define-theme((
+  color: (
+    primary: mat.$green-palette,
+    theme-type: light,
+  ),
+  typography: (brand-family: $brand-font-family, bold-weight: 900),
+  density: (scale: -1),
+));
+
+$dark-theme-pink: mat.define-theme((
+  color: (theme-type: dark, primary: mat.$rose-palette),
+));
+
+$light-theme-pink: mat.define-theme((
+  color: (theme-type: light, primary: mat.$rose-palette),
+));
+
+$dark-theme-violet: mat.define-theme((
+  color: (theme-type: dark, primary: mat.$violet-palette),
+));
+
+$light-theme-violet: mat.define-theme((
+  color: (theme-type: light, primary: mat.$violet-palette),
+));
+
+$dark-theme-blue: mat.define-theme((
+  color: (theme-type: dark, primary: mat.$blue-palette),
+));
+
+$light-theme-blue: mat.define-theme((
+  color: (theme-type: light, primary: mat.$blue-palette),
+));
+
+$dark-theme-red: mat.define-theme((
+  color: (theme-type: dark, primary: mat.$red-palette),
+));
+
+$light-theme-red: mat.define-theme((
+  color: (theme-type: light, primary: mat.$red-palette),
+));
+
+$dark-theme-gray: mat.define-theme((
+  color: (theme-type: dark, primary: mat.$cyan-palette),
+));
+
+$light-theme-gray: mat.define-theme((
+  color: (theme-type: light, primary: mat.$cyan-palette),
+));
+
+// ================== Mixins ==================
+@mixin light_theme_mix() {
+  .card-wrapper {
+    color: #2d2d2d;
+    font-family: $brand-font-family;
+  }
+  & {
+    --bs-heading-color: #495057;
+    --bs-body-color: #495057 !important;
+    --bs-body-bg: #f2f2f2;
+    --bs-border-color: #eaeaf1 !important;
+    --bs-secondary-color: #495057bf;
+    --bs-light-rgb: 246, 246, 249;
+    --bs-input-bg: #fff;
+    --bs-chat-primary-bg: #fff;
+    --bs-chat-text-color: #000000;
+    --bs-sidebar-sub-bg: #fff;
+    --bs-badge-color: #3a2626;
+    --mat-menu-container-color: #efedf1;
+    --mat-menu-item-label-text-color: #1a1b1f;
+    --mat-menu-item-icon-color: #1a1b1f;
+    --mdc-dialog-container-color: #fffbff;
+    --mdc-dialog-subhead-color: #201a1b;
+    --mdc-filled-text-field-caret-color: #005cbb;
+    --mdc-filled-text-field-focus-active-indicator-color: #005cbb;
+    --mdc-filled-text-field-focus-label-text-color: #005cbb;
+    --mdc-filled-text-field-disabled-container-color: rgba(26, 27, 31, .04);
+    --mdc-filled-text-field-hover-label-text-color: #44474e;
+    --mdc-filled-text-field-disabled-label-text-color: rgba(26, 27, 31, .38);
+    --mdc-filled-text-field-input-text-color: #1a1b1f;
+    --mdc-filled-text-field-disabled-input-text-color: rgba(26, 27, 31, .38);
+    --mdc-filled-text-field-input-text-placeholder-color: #44474e;
+    --mdc-filled-text-field-error-hover-label-text-color: #410002;
+    --mdc-filled-text-field-error-focus-label-text-color: #ba1a1a;
+    --mdc-filled-text-field-error-label-text-color: #ba1a1a;
+    --mdc-filled-text-field-active-indicator-color: #44474e;
+    --mdc-filled-text-field-disabled-active-indicator-color: rgba(26, 27, 31, .38);
+    --mdc-filled-text-field-hover-active-indicator-color: #1a1b1f;
+    --mdc-filled-text-field-error-active-indicator-color: #ba1a1a;
+    --mdc-filled-text-field-error-focus-active-indicator-color: #ba1a1a;
+    --mdc-filled-text-field-error-hover-active-indicator-color: #410002;
+    --mdc-outlined-text-field-caret-color: #005cbb;
+    --mdc-outlined-text-field-focus-outline-color: #005cbb;
+    --mdc-outlined-text-field-focus-label-text-color: #005cbb;
+    --mdc-outlined-text-field-label-text-color: #44474e;
+    --mdc-outlined-text-field-hover-label-text-color: #1a1b1f;
+    --mdc-outlined-text-field-disabled-label-text-color: rgba(26, 27, 31, .38);
+    --mdc-outlined-text-field-input-text-color: #1a1b1f;
+    --mdc-outlined-text-field-disabled-input-text-color: rgba(26, 27, 31, .38);
+    --mdc-outlined-text-field-input-text-placeholder-color: #44474e;
+    --mdc-outlined-text-field-error-focus-label-text-color: #ba1a1a;
+    --mdc-outlined-text-field-error-label-text-color: #ba1a1a;
+    --mdc-outlined-text-field-error-hover-label-text-color: #410002;
+    --mdc-outlined-text-field-outline-color: #74777f;
+    --mdc-outlined-text-field-disabled-outline-color: rgba(26, 27, 31, .12);
+    --mdc-outlined-text-field-hover-outline-color: #1a1b1f;
+    --mdc-outlined-text-field-error-focus-outline-color: #ba1a1a;
+    --mdc-outlined-text-field-error-hover-outline-color: #410002;
+    --mdc-outlined-text-field-error-outline-color: #ba1a1a;
+    --mat-form-field-focus-select-arrow-color: #005cbb;
+    --mat-form-field-disabled-input-text-placeholder-color: rgba(26, 27, 31, .38);
+    --mat-form-field-state-layer-color: #1a1b1f;
+    --mat-form-field-error-text-color: #ba1a1a;
+    --mat-form-field-select-option-text-color: #1a1b1f;
+    --mat-form-field-select-disabled-option-text-color: rgba(26, 27, 31, .38);
+    --mat-form-field-leading-icon-color: #44474e;
+    --mat-form-field-disabled-leading-icon-color: rgba(26, 27, 31, .38);
+    --mat-form-field-trailing-icon-color: #44474e;
+    --mat-form-field-disabled-trailing-icon-color: rgba(26, 27, 31, .38);
+    --mat-form-field-error-focus-trailing-icon-color: #ba1a1a;
+    --mat-form-field-error-hover-trailing-icon-color: #410002;
+    --mat-form-field-error-trailing-icon-color: #ba1a1a;
+    --mat-form-field-enabled-select-arrow-color: #44474e;
+    --mat-form-field-disabled-select-arrow-color: rgba(26, 27, 31, .38);
+    --mat-form-field-hover-state-layer-opacity: .08;
+    --mdc-filled-text-field-container-color: #e0e2ec;
+    --mdc-filled-text-field-label-text-color: #44474e;
+    --mat-select-enabled-trigger-text-color: rgba(255, 255, 255, 0.87);
+    --mat-option-selected-state-label-text-color: #131c2b;
+    --bs-dropdown-bg2: #fff;
+    --bs-dropdown-link-hover-bg2: #f8f9fa;
+    --bs-body-color-rgb: 73, 80, 87;
+    --reply_msg_bg: #ffffff80;
+    --reply_msg_color: #495057;
+    --bs-secondary-bg: #fff;
+    --mat-tab-header-inactive-hover-label-text-color: #1a1b1f;
+    --mat-switch-unselected-with-icon-handle-horizontal-margin: 0px 4px;
+    --mdc-switch-selected-handle-color: #ffffff;
+    --bs-dark-bg-subtle: #e6ebf5;
+    --bs-light-bg-subtle: #fcfcfd;
+    --bs-accordion-active-bg: var(--bs-light-bg-subtle);
+    --bs-accordion-border-width: var(--bs-border-width);
+    --bs-primary-text-emphasis: #1f452c;
+    --bs-accordion-active-color: var(--bs-primary-text-emphasis);
+    --mat-sidenav-container-background-color: #fef8fc;
+    --mat-sidenav-container-text-color: #3f4948;
+    --mat-sidenav-content-text-color: #3f4948;
+    font-family: $brand-font-family;
+  }
+}
+
+@mixin dark_theme_mix() {
+  .card-wrapper {
+    color: #d0d0d0;
+    font-family: $brand-font-family;
+  }
+  & {
+    --bs-heading-color: #adb5bd;
+    --bs-body-color: #adb5bd !important;
+    --bs-body-bg: #2e2e2e;
+    --bs-border-color: #333 !important;
+    --bs-secondary-color: #adb5bdbf;
+    --bs-light-rgb: 46, 46, 46;
+    --bs-input-bg: #333;
+    --bs-chat-primary-bg: #383838;
+    --bs-chat-text-color: #fffc;
+    --bs-sidebar-sub-bg: #262626;
+    --bs-badge-color: #fff;
+    --mat-menu-container-color: #424242;
+    --mat-menu-item-label-text-color: #e9e0e4;
+    --bs-dropdown-bg2: #333;
+    --bs-dropdown-link-hover-bg2: #383838;
+    --bs-body-color-rgb: 173, 181, 189;
+    --mat-menu-item-icon-color: #8d91a0;
+    --reply_msg_bg: hsla(0, 0%, 100%, .075);
+    --reply_msg_color: #fffc;
+    --bs-secondary-bg-subtle: #303238;
+    --bs-secondary-border-subtle: #494a54;
+    --bs-secondary-text-emphasis: #afb0ba;
+    --bs-secondary-bg: #333;
+    --bs-dark-bg-subtle: #3d3e46;
+    --bs-tertiary-bg: #2b3035;
+    --bs-dropdown-link-active-color: var(--bs-body-color);
+    --bs-light-bg-subtle: #333;
+    --bs-accordion-active-bg: var(--bs-light-bg-subtle);
+    --bs-accordion-border-width: var(--bs-border-width);
+    --bs-primary-text-emphasis: #95cda7;
+    --bs-accordion-active-color: var(--bs-primary-text-emphasis);
+    font-family: $brand-font-family;
+  }
+}
+
+// ================== Theme Classes ==================
+.color-scheme-dark-green {
+  @include mat.all-component-colors($dark-theme-green);
+  @include cm.common_thing(78, 172, 109);
+  @include dark_theme_mix();
+}
+
+.color-scheme-light-green {
+  @include mat.all-component-colors($light-theme-green);
+  @include cm.common_thing(78, 172, 109);
+  @include light_theme_mix();
+}
+
+.color-scheme-dark-pink {
+  @include mat.all-component-colors($dark-theme-pink);
+  @include cm.common_thing(232, 62, 140);
+  @include dark_theme_mix();
+}
+
+.color-scheme-light-pink {
+  @include mat.all-component-colors($light-theme-pink);
+  @include cm.common_thing(232, 62, 140);
+  @include light_theme_mix();
+}
+
+.color-scheme-dark-voilet {
+  @include mat.all-component-colors($dark-theme-violet);
+  @include cm.common_thing(97, 83, 204);
+  @include dark_theme_mix();
+}
+
+.color-scheme-light-voilet {
+  @include mat.all-component-colors($light-theme-violet);
+  @include cm.common_thing(97, 83, 204);
+  @include light_theme_mix();
+}
+
+.color-scheme-dark-blue {
+  @include mat.all-component-colors($dark-theme-blue);
+  @include cm.common_thing(80, 165, 241);
+  @include dark_theme_mix();
+}
+
+.color-scheme-light-blue {
+  @include mat.all-component-colors($light-theme-blue);
+  @include cm.common_thing(80, 165, 241);
+  @include light_theme_mix();
+}
+
+.color-scheme-dark-red {
+  @include mat.all-component-colors($dark-theme-red);
+  @include cm.common_thing(239, 71, 111);
+  @include dark_theme_mix();
+}
+
+.color-scheme-light-red {
+  @include mat.all-component-colors($light-theme-red);
+  @include cm.common_thing(239, 71, 111);
+  @include light_theme_mix();
+}
+
+.color-scheme-dark-gray {
+  @include mat.all-component-colors($dark-theme-gray);
+  @include cm.common_thing(121, 124, 140);
+  @include dark_theme_mix();
+}
+
+.color-scheme-light-gray {
+  @include mat.all-component-colors($light-theme-gray);
+  @include cm.common_thing(121, 124, 140);
+  @include light_theme_mix();
+}
+
+// ================== Global Styles ==================
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: $brand-font-family;
+  font-display: swap;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+}
+
+.font-size-18 {
+  font-size: 18px !important;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  color: var(--bs-heading-color);
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: .5rem;
+  margin-top: 0;
+  font-family: $brand-font-family;
+}
+
+.mat-typography p {
+  margin: 0 0 0px;
+}
+
+.mat-typography {
+  font: 400 14px/20px $brand-font-family !important;
+  color: var(--bs-body-color);
+}

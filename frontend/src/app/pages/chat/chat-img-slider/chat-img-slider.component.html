@@ -1,0 +1,121 @@
+<lightgallery [settings]="settings" [onBeforeSlide]="onBeforeSlide" [ngClass]="{
+              'count-1': attachment.length === 1,
+              'count-2': attachment.length === 2,
+              'count-3': attachment.length === 3,
+              'count-4': attachment.length === 4,
+              'count-more': attachment.length > 4
+            }">
+  @for (item of attachment; track $index) {
+    @if($index < 4) { <!--
+      [attr.data-src]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url"
+      [attr.data-lg-size]="item.mimetype === 'video/mp4' ? '1280-720' : null"
+      [attr.data-poster]="item.mimetype === 'video/mp4' ? './assets/images/video_thumb.png' : null" -->
+      @if(item.mimetype=='image/png' || item.mimetype=='image/jpeg'){
+        <div class="message-img-list"
+          [attr.data-src]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url"> <a
+            class="popup-img"
+            [href]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url">
+            <img [src]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url"
+              alt="{{ item.originalname }}" class="rounded border" matTooltip="Name: {{item.originalname}} |size: {{item.size | fileSize }}">
+
+            @if (attachment.length > 4 && $index === 3) {
+            <div class="more-overlay">
+              <span>+{{ attachment.length - 4 }}</span>
+            </div>
+            }
+          </a>
+
+          @if (!item.destination && item.progress > 0 && item.progress < 110) { <mat-progress-spinner class="example-margin"
+            color="primary" mode="determinate" [value]="item.progress" diameter="30"></mat-progress-spinner>
+            }
+          <!-- option for each image/png link start -->
+          <div class="message-img-link">
+            <ul class="list-inline mb-0">
+              <li color="none" class="list-inline-item dropdown">
+                <a role="button" aria-haspopup="false"
+                  class="btn btn-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="bx bx-dots-horizontal-rounded"></i>
+                </a>
+                <div class="dropdown-menu">
+                  <a [href]="(item.destination && item.destination!='') ? serverPath+'/'+item.path:item.url" download="" tabindex="0" role="menuitem" class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Download<i class="bx bx-download ms-2 text-muted"></i></a>
+                  <a href="javascript:void(0)" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between dropdown-item">Reply <i
+                      class="bx bx-share ms-2 text-muted"></i></a><a href="javascript:void(0)" data-bs-toggle="modal"
+                    data-bs-target=".forwardModal" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between dropdown-item">Forward <i
+                      class="bx bx-share-alt ms-2 text-muted"></i></a><a href="javascript:void(0)" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between dropdown-item">Bookmark <i
+                      class="bx bx-bookmarks text-muted ms-2"></i></a><a href="javascript:void(0)" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between delete-item dropdown-item">Delete
+                    <i class="bx bx-trash ms-2 text-muted"></i></a></div>
+              </li>
+            </ul>
+          </div>
+          <!-- option for each image/png link end -->
+        </div>
+      }@else if (item.mimetype=='video/mp4') {
+        <div class="message-img-list"
+          [attr.data-video]="item.video | json"
+          [attr.data-lg-size]="'1280-720'"
+          [attr.data-poster]="(item.poster!='')? item.poster:'https://img.youtube.com/vi/EIUJfXk3_3w/maxresdefault.jpg'"
+          [attr.data-sub-html]="'<h4>' + item.originalname + ' | size: '+(item.size | fileSize )+'</h4>'">
+          <a class="popup-img"
+            [href]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url">
+            @if (item.mimetype === 'video/mp4') {
+            <!-- <video [poster]="!item.destination ? 'https://img.youtube.com/vi/EIUJfXk3_3w/maxresdefault.jpg' : ''"
+              [src]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url" matTooltip="Name: {{item.originalname}} |size: {{item.size | fileSize }}"></video> -->
+            <img [src]="(item.poster!='')? item.poster:'https://img.youtube.com/vi/EIUJfXk3_3w/maxresdefault.jpg'"
+              alt="{{ item.originalname }}" class="rounded border" matTooltip="Name: {{item.originalname}} |size: {{item.size | fileSize }}">
+            }
+
+            @if (item.length > 4 && $index === 3) {
+            <div class="more-overlay">
+              <span>+{{ item.length - 4 }}</span>
+            </div>
+            }
+          </a>
+
+          @if (!item.destination && item.progress > 0 && item.progress < 110) { <mat-progress-spinner class="example-margin"
+            color="primary" mode="determinate" [value]="item.progress" diameter="30"></mat-progress-spinner>
+            }
+            
+          <!-- option for each image/png link start -->
+          <div class="message-img-link">
+            <ul class="list-inline mb-0">
+              <li color="none" class="list-inline-item dropdown">
+                <a role="button" aria-haspopup="false"
+                  class="btn btn-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="bx bx-dots-horizontal-rounded"></i>
+                </a>
+                <div class="dropdown-menu">
+                  <a [href]="(item.destination && item.destination!='') ? serverPath+'/'+item.path:item.url" download="" tabindex="0" role="menuitem" class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Download<i class="bx bx-download ms-2 text-muted"></i></a>
+                  <a href="javascript:void(0)" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between dropdown-item">Reply <i
+                      class="bx bx-share ms-2 text-muted"></i></a><a href="javascript:void(0)" data-bs-toggle="modal"
+                    data-bs-target=".forwardModal" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between dropdown-item">Forward <i
+                      class="bx bx-share-alt ms-2 text-muted"></i></a><a href="javascript:void(0)" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between dropdown-item">Bookmark <i
+                      class="bx bx-bookmarks text-muted ms-2"></i></a><a href="javascript:void(0)" tabindex="0" role="menuitem"
+                    class=" d-flex align-items-center justify-content-between delete-item dropdown-item">Delete
+                    <i class="bx bx-trash ms-2 text-muted"></i></a></div>
+              </li>
+            </ul>
+          </div>
+          <!-- option for each image/png link end -->
+        </div>
+      }
+    }
+    
+  }
+
+  @for (item of attachment; track $index) {
+    @if ($index >= 4) {
+      <a class="hidden" [href]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url"
+        [attr.data-src]="(item.destination && item.destination !== '') ? serverPath + '/' + item.path : item.url"
+        [attr.data-video]="item.mimetype === 'video/mp4' ? (item.video | json) : null"
+        [attr.data-lg-size]="item.mimetype === 'video/mp4' ? '1280-720' : null"
+        [attr.data-poster]="item.mimetype === 'video/mp4' ? './assets/images/video_thumb.png' : null"
+        [attr.data-sub-html]="item.mimetype === 'video/mp4' ? '<h4>' + item.originalname + '</h4>' : null">
+      </a>
+    }
+  }
+</lightgallery>

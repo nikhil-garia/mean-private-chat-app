@@ -1,0 +1,102 @@
+// Import lightgallery styles
+@import url('https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lightgallery.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lg-zoom.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lg-video.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lg-thumbnail.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lg-transitions.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lg-rotate.min.css');
+
+// Utility class to hide elements
+.hidden {
+  display: none !important;
+}
+
+// Main gallery container
+lightgallery {
+  display: grid;
+  gap: 3px;
+  max-width: 330px;
+
+  // --- Grid layout rules ---
+  // 2, 4, and 5+ images will use a 2-column grid
+  &.count-2, &.count-4, &.count-more {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  // 3 images will be a single row
+  &.count-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  // --- Single image container style ---
+  &.count-1 {
+    max-width: 430px; 
+  }
+}
+
+// Styling for each grid item
+.message-img-list {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+
+  a.popup-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    line-height: 0;
+  }
+
+  img, video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+  }
+
+  // --- Aspect Ratio Handling ---
+  // For MULTIPLE images, enforce a square ratio
+  .count-2 &, .count-3 &, .count-4 &, .count-more & {
+    aspect-ratio: 1 / 1;
+  }
+  
+  // For SINGLE images, let the image's own aspect ratio define the container's shape
+  .count-1 & {
+    aspect-ratio: auto;
+    
+    img, video {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+  }
+}
+
+// Style for the "+N" overlay
+.more-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+// Center the progress spinner
+.mat-mdc-progress-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.message-img-link {
+    bottom: 10px;
+    left: auto;
+    position: absolute;
+    right: 10px;
+}

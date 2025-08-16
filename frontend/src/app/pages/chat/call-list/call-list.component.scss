@@ -1,0 +1,259 @@
+@media (min-width: 1200px) {
+	.h4, h4 {
+			font-size: 1.3125rem;
+	}
+}
+.chat-bookmark-list,
+.chat-call-list {
+	max-height: calc(100vh - 68px);
+}
+
+[data-simplebar] {
+	align-content: flex-start;
+	align-items: flex-start;
+	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	position: relative;
+}
+.simplebar-wrapper {
+	height: inherit;
+	max-height: inherit;
+	max-width: inherit;
+	overflow: hidden;
+	width: inherit;
+}
+.simplebar-height-auto-observer-wrapper {
+	box-sizing: inherit !important;
+	flex-basis: 0;
+	flex-grow: inherit;
+	flex-shrink: 0;
+	float: left;
+	height: 100%;
+	margin: 0;
+	max-height: 1px;
+	max-width: 1px;
+	overflow: hidden;
+	padding: 0;
+	pointer-events: none;
+	position: relative;
+	width: 100%;
+	z-index: -1;
+}
+.simplebar-height-auto-observer, .simplebar-track {
+	overflow: hidden;
+	pointer-events: none;
+	position: absolute;
+}
+.simplebar-height-auto-observer {
+	box-sizing: inherit;
+	display: block;
+	height: 1000%;
+	left: 0;
+	min-height: 1px;
+	min-width: 1px;
+	opacity: 0;
+	top: 0;
+	width: 1000%;
+	z-index: -1;
+}
+.simplebar-mask, .simplebar-offset {
+	bottom: 0;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	top: 0;
+}
+.simplebar-mask {
+	direction: inherit;
+	height: auto !important;
+	left: 0;
+	overflow: hidden;
+	right: 0;
+	width: auto !important;
+	z-index: 0;
+}
+.simplebar-mask, .simplebar-offset {
+	bottom: 0;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	top: 0;
+}
+.simplebar-offset {
+	-webkit-overflow-scrolling: touch;
+	box-sizing: inherit !important;
+	direction: inherit !important;
+	left: 0 !important;
+	resize: none !important;
+	right: 0 !important;
+}
+.simplebar-content-wrapper {
+	box-sizing: border-box !important;
+	direction: inherit;
+	display: block;
+	height: 100%;
+	max-height: 100%;
+	max-width: 100%;
+	overflow: auto;
+	padding: 0 !important;
+	position: relative;
+	scrollbar-width: none;
+	visibility: visible;
+	width: auto;
+}
+.simplebar-content:after, .simplebar-content:before {
+	content: " ";
+	display: table;
+}
+.chat-list {
+	margin: 0;
+}
+.list-inline, .list-unstyled {
+	list-style: none;
+	padding-left: 0;
+}
+.chat-bookmark-list li, .chat-call-list li {
+	border-bottom: 1px solid #eaeaf1;
+	border-bottom: 1px solid var(--bs-border-color);
+	padding: 10px 24px;
+	position: relative;
+}
+.chat-user-img {
+	position: relative;
+}
+.avatar-group {
+	display: flex;
+	flex-wrap: wrap;
+	padding-left: 8px;
+}
+.avatar-group .avatar-group-item {
+	border: 2px solid #fff;
+	border: 2px solid var(--bs-secondary-bg);
+	border-radius: 50%;
+	margin-left: -8px;
+	transition: all .2s;
+}
+.avatar-title {
+	align-items: center;
+	background-color: #4eac6d;
+	background-color: rgba(var(--bs-primary-rgb), 1);
+	color: #fff;
+	display: flex;
+	font-weight: 500;
+	height: 100%;
+	justify-content: center;
+	width: 100%;
+}
+.bg-danger {
+	--bs-bg-opacity: 1;
+	background-color: rgba(239, 71, 111, var(--bs-bg-opacity)) !important;
+	background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
+}
+.bg-light {
+	--bs-bg-opacity: 1;
+	background-color: rgba(246, 246, 249, var(--bs-bg-opacity)) !important;
+	background-color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;
+}
+.text-primary {
+	--bs-text-opacity: 1;
+	color: rgba(78, 172, 109, var(--bs-text-opacity)) !important;
+	color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important;
+}
+.me-2 {
+	margin-right: .5rem !important;
+}
+.avatar-xs {
+	height: 1.8rem;
+	width: 1.8rem;
+}
+.rounded-circle {
+	border-radius: 50% !important;
+}
+img, svg {
+	vertical-align: middle;
+}
+.font-size-12 {
+	font-size: 12px !important;
+}
+.text-muted {
+	--bs-text-opacity: 1;
+	color: #495057bf !important;
+	color: var(--bs-secondary-color) !important;
+}
+.font-size-20 {
+	font-size: 20px !important;
+}
+.btn-link {
+	--bs-btn-font-weight: 400;
+	--bs-btn-color: var(--bs-link-color);
+	--bs-btn-bg: #0000;
+	--bs-btn-border-color: #0000;
+	--bs-btn-hover-color: var(--bs-link-hover-color);
+	--bs-btn-hover-border-color: #0000;
+	--bs-btn-active-color: var(--bs-link-hover-color);
+	--bs-btn-active-border-color: #0000;
+	--bs-btn-disabled-color: #797c8c;
+	--bs-btn-disabled-border-color: #0000;
+	--bs-btn-box-shadow: 0 0 0 #000;
+	--bs-btn-focus-shadow-rgb: 49, 132, 253;
+	text-decoration: none;
+}
+.btn {
+	--bs-btn-padding-x: 1rem;
+	--bs-btn-padding-y: 0.5rem;
+	--bs-btn-font-family: ;
+	--bs-btn-font-size: 0.9375rem;
+	--bs-btn-font-weight: 400;
+	--bs-btn-line-height: 1.5;
+	--bs-btn-color: var(--bs-body-color);
+	--bs-btn-bg: #0000;
+	--bs-btn-border-width: var(--bs-border-width);
+	--bs-btn-border-color: #0000;
+	--bs-btn-border-radius: var(--bs-border-radius);
+	--bs-btn-hover-border-color: #0000;
+	--bs-btn-box-shadow: inset 0 1px 0 #ffffff26, 0 1px 1px rgba(0, 0, 0, .075);
+	--bs-btn-disabled-opacity: 0.65;
+	--bs-btn-focus-box-shadow: 0 0 0 0 rgba(var(--bs-btn-focus-shadow-rgb), .5);
+	background-color: var(--bs-btn-bg);
+	border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+	border-radius: var(--bs-btn-border-radius);
+	color: var(--bs-btn-color);
+	cursor: pointer;
+	display: inline-block;
+	font-family: var(--bs-btn-font-family);
+	font-size: var(--bs-btn-font-size);
+	font-weight: var(--bs-btn-font-weight);
+	line-height: var(--bs-btn-line-height);
+	padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+	text-align: center;
+	transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+	-webkit-user-select: none;
+	user-select: none;
+	vertical-align: middle;
+}
+@media (prefers-reduced-motion: reduce) {
+	.btn {
+			transition: none;
+	}
+}
+.stretched-link:after {
+	bottom: 0;
+	content: "";
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+}
+.text-success {
+	--bs-text-opacity: 1;
+	color: rgba(6, 214, 160, var(--bs-text-opacity)) !important;
+	color: rgba(var(--bs-success-rgb), var(--bs-text-opacity)) !important;
+}
+.svg-green{
+	filter: invert(0.5) sepia(1) saturate(5) hue-rotate(117deg);
+}
+.svg-red{
+	filter: invert(0.5) sepia(1) saturate(5) hue-rotate(344deg);
+}

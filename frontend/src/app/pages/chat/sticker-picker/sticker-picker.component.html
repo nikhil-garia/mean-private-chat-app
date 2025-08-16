@@ -1,0 +1,15 @@
+<div class="mb-0 card">
+  <div class="py-3 card-body">
+    <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden">
+      <div class="swiper-wrapper" style="transition-duration: 0ms; transition-delay: 0ms; transform: translate3d(0px, 0px, 0px);">
+        <div class="swiper-slide swiper-slide-active" style="width: 100%; margin-right: 20px;">
+          <div class="text-center px-2 position-relative">
+            <div class="sticker-picker">
+              <img *ngFor="let sticker of stickers" [src]="sticker.url" (click)="selectSticker(sticker)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+.chat-message-list {
+  // height: calc(100vh - 207px);
+  height: auto;
+  overflow-y: auto;
+}
+.chat-list {
+  margin: 0;
+}
+.list-inline,
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+}
+.chat-list li a {
+  /* color: #495057; */
+  color: var(--bs-body-color);;
+  display: block;
+  font-size: 14px;
+  padding: 5px 17px;
+  transition: all 0.4s;
+}
+.chat-list li.active a {
+  background-color: #4eac6d;
+  background-color: rgba(var(--bs-primary-rgb), 1);
+  color: #fff;
+}
+.chat-list li a:hover {
+  background-color: #4eac6d;
+  background-color: rgba(var(--bs-primary-rgb), .2);
+  // color: #fff;
+  cursor: pointer;
+}
+.chat-list li.active a .badge {
+  background-color: rgba(246, 246, 249, .25) !important;
+  color: #fff !important;
+}
+.chat-list .rounded {
+  border-radius: var(--bs-border-radius) !important;
+}
+.align-items-center {
+  align-items: center !important;
+}
+.d-flex {
+  display: flex !important;
+}
+.chat-user-img {
+  position: relative;
+}
+
+.ms-0 {
+  margin-left: 0 !important;
+}
+.me-2 {
+  margin-right: 0.5rem !important;
+}
+.align-self-center {
+  align-self: center !important;
+}
+.avatar-xs {
+  height: 1.8rem;
+  width: 1.8rem;
+}
+.avatar-sm {
+  height: 2.4rem;
+  width: 2.4rem;
+}
+
+.rounded-circle {
+  border-radius: 50% !important;
+}
+img,
+svg {
+  vertical-align: middle;
+}
+
+.chat-user-img.online .user-status {
+  background-color: #06d6a0;
+}
+.chat-user-img .user-status {
+  background-color: #adb5bd;
+  border: 2px solid #fff;
+  border: 2px solid var(--bs-secondary-bg);
+  border-radius: 50%;
+  bottom: 0;
+  height: 10px;
+  left: auto;
+  position: absolute;
+  right: 0;
+  width: 10px;
+}
+.overflow-hidden {
+  overflow: hidden !important;
+}
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-list li .unread-msg-user {
+  font-weight: 600;
+}
+.avatar-title {
+  align-items: center;
+  background-color: #4eac6d;
+  background-color: rgba(var(--bs-primary-rgb), 1);
+  color: #fff;
+  display: flex;
+  font-weight: 500;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+}
+a {
+  text-decoration: none !important;
+}
+.font-size-11 {
+  font-size: 11px !important;
+}

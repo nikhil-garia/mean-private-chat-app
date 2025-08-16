@@ -1,0 +1,708 @@
+<div class="chat-content d-lg-flex">
+    <div class="w-100 overflow-hidden position-relative sub-chat-content">
+      <!-- chat top bar start -->
+      <div class="p-3 p-lg-4 user-chat-topbar">
+        <div class="align-items-center row">
+          <div class="col-8 col-sm-4">
+            <div class="d-flex align-items-center">
+              <div class="flex-shrink-0 d-block d-lg-none me-2">
+                <a class="user-chat-remove text-muted font-size-24 p-2" (click)="removeUserChat()"><i class="bx bx-chevron-left align-middle"></i></a>
+              </div>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0 chat-user-img align-self-center me-3 ms-0">
+                    <!-- for group -->
+                    @if (chat.room.selectedRoomDetail.row.is_group==true) {
+                      @if(chat.room.selectedRoomDetail.row.grp_avatar){
+                        <img [src]="'assets/media/'+chat.room.selectedRoomDetail.row.grp_avatar" class="rounded-circle avatar-sm" alt="">
+                      }@else {
+                        <div class="avatar-sm align-self-center">
+                          <span class="avatar-title rounded-circle text-uppercase text-white bg-secondary1" [style.backgroundColor]="chat.room.selectedRoomDetail.row.bgcolor">
+                            <span class="username">{{chat.room.selectedRoomDetail.row.conv_name | firstChars }}</span>
+                          </span>
+                        </div>
+                      }
+                    }@else if (chat.room.selectedRoomDetail.row.is_group==false) {
+                      @for (i of chat.room.selectedRoomDetail.row.participants; track $index) {
+                        @if (i.isme=='no' && i.profile_pic && checkPic_privacy(i)) {
+                          <img
+                            [src]="i.profile_pic | safeImageUrl"
+                            class="rounded-circle avatar-sm"
+                            alt=""
+                          />
+                          <span class="user-status" [ngClass]="getUserStatusClass(i.is_online,i.status)"></span>
+                        }@else if(i.isme=='no') {
+                          <!-- <div class="avatar-xs">
+                            <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">
+                                <span class="username">{{i.name | firstChars }}</span>
+                            </span>
+                          </div> -->
+                          <div class="avatar-sm align-self-center">
+                            <span [style.backgroundColor]="chat.room.selectedRoomDetail.row.bgcolor" class="avatar-title rounded-circle text-uppercase text-white">
+                              <span class="username">{{i.name | firstChars}}</span>
+                              <span class="user-status" [ngClass]="getUserStatusClass(i.is_online,i.status)"></span>
+                            </span>
+                          </div>
+                        }
+                      }
+                      <!-- @if(chat.room.selectedRoomDetail.row.grp_avatar){
+                        <img [src]="'assets/media/'+chat.room.selectedRoomDetail.row.grp_avatar" class="rounded-circle avatar-sm" alt="">
+                      }@else {
+                        <div class="avatar-sm align-self-center"><span class="avatar-title rounded-circle text-uppercase text-white bg-secondary"><span class="username"> #</span><span class="user-status"></span></span></div>
+                      } -->
+                    }
+                    
+                    <!-- @if (chat.room.selectedRoomDetail.row.is_group==false) {
+                      <span class="user-status" [ngClass]="chat.room.selectedRoomDetail.row.is_online ?'bg-success':''"></span>
+                    } -->
+                  </div>
+                  <div class="flex-grow-1 overflow-hidden">
+                    <!-- for group -->
+                    @if (chat.room.selectedRoomDetail.row.is_group==true) {
+                      <h6 class="text-truncate mb-0 font-size-18"><a class="user-profile-show text-reset" (click)="drawer.toggle()">{{chat.room.selectedRoomDetail.row.conv_name}}</a></h6>
+                      <!-- show typing indicator for group chat -->
+                      <p class="text-truncate text-muted mb-0"><span>
+                        @if(chat.conv_typingUsers && chat.conv_typingUsers[this.chat.room.selectedRoomId] && chat.conv_typingUsers[this.chat.room.selectedRoomId].length>0){
+                            {{chat.conv_typingUsers[this.chat.room.selectedRoomId]}} is typing<app-typing-dots />
+                        }@else{
+                          {{chat.room.selectedRoomDetail.row.participants.length}} Members
+                        }
+                      </span></p>
+                    <!-- for 1-1 -->
+                    }@else if (chat.room.selectedRoomDetail.row.is_group==false) {
+                      @for (i of chat.room.selectedRoomDetail.row.participants; track $index) {
+                        @if (i.isme=='no') {
+                          <h6 class="text-truncate mb-0 font-size-18"><a class="user-profile-show text-reset" (click)="drawer.toggle()">{{i.name}}</a></h6>
+                          <p class="text-truncate text-muted mb-0"><small>
+                            @if(chat.conv_typing_data && chat.conv_typing_data[this.chat.room.selectedRoomId]){
+                              <p class="mb-0 ctext-content">{{chat.conv_typing_data[this.chat.room.selectedRoomId].from.name}} is typing<app-typing-dots /></p>
+                            }@else{
+                              {{i.status=='away' ? 'Away':(i.status=='dnd' ? 'Do not disturb' : ((!i.is_online || i.is_online==false) ? 'Offline': (i.status=='online' ? 'Online':'')) )}}
+                              @if((!i.is_online || i.is_online==false) && i.lastSeen){
+                                | last seen {{i.lastSeen | timeAgoConv}}
+                              }
+                            }
+                          </small></p>
+                        }
+                      }
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-4 col-sm-8">
+            <ul class="list-inline user-chat-nav text-end mb-0">
+              <li class="list-inline-item  ">
+                <div class="dropdown"><button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                    class="btn nav-btn btn btn-none"><i class="bx bx-search"></i></button>
+                  <div class="dropdown-menu">
+                    <div class="search-box p-2"><input placeholder="Search.." type="text" class="form-control form-control"></div>
+                  </div>
+                </div>
+              </li>
+              <li class="list-inline-item d-none d-lg-inline-block me-2 ms-0">
+                <button type="button" class="btn nav-btn btn btn-none" (click)="openCall_dialog('audio')"><i class="bx bxs-phone-call"></i></button></li>
+              <li class="list-inline-item d-none d-lg-inline-block me-2 ms-0">
+                <button type="button" class="btn nav-btn btn btn-none" (click)="openCall_dialog('video')"><i class="bx bx-video"></i></button></li>
+              <li class="list-inline-item d-none d-lg-inline-block me-2 ms-0">
+                <button type="button" class="btn nav-btn user-profile-show" (click)="drawer.toggle()"><i class="bx bxs-info-circle"></i></button></li>
+              <li class="list-inline-item">
+                <div class="dropdown"><button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                    class="btn nav-btn btn btn-none"><i class="bx bx-dots-vertical-rounded"></i></button>
+                  <div class="dropdown-menu-end dropdown-menu"><button to="#" tabindex="0" role="menuitem"
+                      class="d-flex justify-content-between align-items-center d-lg-none user-profile-show dropdown-item" (click)="drawer.toggle()">View Profile <i class="bx bx-user text-muted"></i></button>
+                      <button type="button" to="#" tabindex="0" role="menuitem" class="d-flex justify-content-between align-items-center d-lg-none dropdown-item" (click)="openCall_dialog('audio')">Audio <i class="bx bxs-phone-call text-muted"></i>
+                      </button><button type="button" to="#" tabindex="0" role="menuitem" class="d-flex justify-content-between align-items-center d-lg-none dropdown-item" (click)="openCall_dialog('video')">Video <i
+                        class="bx bx-video text-muted"></i></button><button type="button" to="#" tabindex="0" role="menuitem"
+                      class="d-flex justify-content-between align-items-center dropdown-item" (click)="archive_conv(chat.room.selectedRoomDetail.row)">{{chat.room.selectedRoomDetail.row.is_archive ? 'Un-Archive':'Archive'}}
+                      <i class="bx bx-archive text-muted"></i></button><button (click)="muteConversation(chat.room.selectedRoomDetail.row.is_muted)" to="#" tabindex="0" role="menuitem"
+                      class="d-flex justify-content-between align-items-center dropdown-item">
+                        @if(chat.room.selectedRoomDetail.row.is_muted){
+                          Unmute<i class="bx bx-microphone text-muted"></i>
+                        }@else{
+                          Mute<i class="bx bx-microphone-off text-muted"></i>
+                        }
+                      </button><button type="button" to="#" tabindex="0"
+                      role="menuitem" class="d-flex justify-content-between align-items-center dropdown-item" (click)="confirmDelete()">Delete <i
+                        class="bx bx-trash text-muted"></i></button></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- chat top bar end -->
+
+      <!-- chat msg list start -->
+      <div data-simplebar="init" class="chat-conversation p-3 p-lg-4 positin-relative simplebar-scrollable-y">
+        <div class="simplebar-wrapper" style="margin: -24px 0px;">
+          <div class="simplebar-height-auto-observer-wrapper">
+          </div>
+          <div class="simplebar-mask">
+            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+              <!-- [infiniteScrollDistance]="scrollDistance" -->
+              <div #scrollWrapper class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: 100%; overflow: hidden scroll;overflow-anchor: none;"
+              infiniteScroll
+              [infiniteScrollUpDistance]="scrollUpDistance"
+              [infiniteScrollThrottle]="loadingThrottle"
+              [scrollWindow]="false"
+              (scrolledUp)="loadMoreMsg()" #chatMsgList_element><div style='clear: both;'></div>
+                <div class="simplebar-content" style="height: calc(100vh - 91px);">
+                  <ul class="list-unstyled chat-msg-list" id="chat-msg-list">
+                    <!-- load more message loader -->
+                    @if(loadingMoreMsg==true && chat_conv_msg_list_loading==false){
+                      <div class="chat-msg-list-loading-spinner">
+                        <mat-spinner [diameter]="20"></mat-spinner>
+                      </div>
+                    }
+                    <!-- chat msg list -->
+                    @if (chat_conv_msg_list_loading==true) {
+                      <div class="chat-msg-list-loading-spinner">
+                        <mat-spinner [diameter]="30"></mat-spinner>
+                      </div>
+                    }@else if (this.chat.room.selectedRoomDetail.msgs && this.chat.room.selectedRoomDetail.msgs.length>0) {
+                      @for (data of this.chat.room.selectedRoomDetail.msgs; track data; let idx = $index){
+                        <span class="coll_date mb-3 date-sticky" [attr.data-date]="data.date" [ngClass]="{ 'active': isActive(data.date) }"><small class="px-5">{{data.date}}</small></span>
+                        @for (msg of data.collection; track $index) {
+                          <!-- Unread Divider -->
+                           @if(msg.from && msg.from.isme!='yes' && $index === getFirstUnreadIndex(data.collection)){
+                             <div class="px-5 text-center my-0" class="divider">Unread Messages</div>
+                           }
+                          @if (msg.eventType && msg.user_info.length>0 && msg.affectedUser_info.length>0){
+                            <span class="coll_date mb-3">
+                              @if(chat.room.loggedUser.id==msg.user_info[0]._id){
+                                {{'You'}} {{msg.eventType =='join'? 'Added':msg.eventType}} {{msg.affectedUser_info[0] ? msg.affectedUser_info[0].fullName:''}}
+                              }@else if(chat.room.loggedUser.id==msg.affectedUser_info[0]._id){
+                                {{msg.user_info[0].fullName ? msg.user_info[0].fullName:''}} {{msg.eventType =='join'? 'Added':msg.eventType}} You
+                              }@else{
+                                {{msg.user_info[0].fullName ? msg.user_info[0].fullName:''}} {{msg.eventType =='join'? 'Added':msg.eventType}} {{msg.affectedUser_info[0].fullName ? msg.affectedUser_info[0].fullName:''}}
+                              }
+                              at &nbsp;<small> {{msg.full_send_datetime | timeAgo }}</small>
+                            </span>
+                          }
+                          @if (msg.is_delete!=1 && !msg.eventType) {
+                          <li #item class="chat-list" [ngClass]="(msg.from.isme=='yes') ? 'right':''" [attr.id]="msg._id">
+                            <div class="conversation-list">
+                              <!-- msg user avatar section start -->
+                              <div class="chat-avatar" *ngIf="msg.from.isme!='yes' && chat.room.selectedRoomDetail.row.is_group">
+                                @if($index === 0 || shouldShowNewGroup(data.collection[$index], data.collection[$index-1])){
+                                  @if (msg.from.profile_pic && checkPic_privacy(msg.from)) {
+                                    <img [src]="msg.from.profile_pic | safeImageUrl" alt="" *ngIf="$index === 0 || shouldShowNewGroup(data.collection[$index], data.collection[$index-1])">
+                                    <!-- <img
+                                      [src]="'assets/media/'+msg.from.profile_pic"
+                                      class="rounded-circle avatar-xs"
+                                      alt=""
+                                    /> -->
+                                  }@else{
+                                    <!-- for text avatar -->
+                                    <div class="avatar-xs">
+                                      <span class="avatar-title rounded-circle text-uppercase text-white bg-purple" [style.backgroundColor]="(msg.from.isme=='yes') ? chat.room.loggedUser.bgcolor:(chat.room.selectedRoomDetail.row.is_group==false? chat.room.selectedRoomDetail.row.bgcolor:'')">
+                                          <span class="username">{{msg.from.name | firstChars }}</span>
+                                      </span>
+                                    </div>
+                                  }
+                                }@else{
+                                  <div class="avatar-xs">
+                                    <span class="avatar-title rounded-circle text-uppercase text-white bg-purple d-none">
+                                        <span class="username"></span>
+                                    </span>
+                                  </div>
+                                }
+                              </div>
+                              <div class="user-chat-content">
+                                <!-- msg top -->
+                                @if(msg.from.isme=='yes' && ($index === 0 || shouldShowNewGroup(data.collection[$index], data.collection[$index-1]) )){
+                                  <div class="conversation-name">
+                                    @if(msg.chat_type==0){
+                                      <span class="me-1 text-success">
+                                        @if(msg.readBy && msg.readBy.length>0){
+                                          <i class="bx bx-check-double bx-check" style="color: #63E6BE;" matTooltip="Message Read.."></i>
+                                        }@else if(msg.deliveredTo && msg.deliveredTo.length>0){
+                                          <i class="bx bx-check-double bx-check" style="color: #979797;" matTooltip="Message delivered."></i>
+                                        }@else if ((msg.is_send && msg.is_send==1) || msg._id!='') {
+                                          <i class="bx bx-check bx-check" style="color: #979797;" matTooltip="Message send."></i>
+                                        } 
+                                      </span>
+                                    }@else if(msg.chat_type==1){
+                                      <span class="me-1 text-success">
+                                        
+                                        @if(msg.readBy && msg.readBy.length>0){
+
+                                        }@else if(msg.deliveredTo && msg.deliveredTo.length>0){
+                                          <i class="bx bx-check-double bx-check" style="color: #979797;" matTooltip="Message delivered."></i>
+                                        }@else if ((msg.is_send && msg.is_send==1) || msg._id!='') {
+                                          <i class="bx bx-check bx-check" style="color: #979797;" matTooltip="Message send."></i>
+                                        } 
+                                      </span>
+                                    }
+                                    <small class="text-muted mb-0 me-2" *ngIf="$index === 0 || shouldShowNewGroup(data.collection[$index], data.collection[$index-1])">{{msg.full_send_datetime | timeAgo }}</small>
+                                  </div>
+                                } @else {
+                                  <div class="conversation-name" *ngIf="$index === 0 || shouldShowNewGroup(data.collection[$index], data.collection[$index-1])">
+                                    @if(chat.room.selectedRoomDetail.row.is_group){
+                                      {{msg.from.name}}
+                                    }
+                                    <small class="text-muted mb-0 ms-2">{{msg.full_send_datetime | timeAgo }}</small>
+                                  </div>
+                                }
+                                <div class="ctext-wrap">
+                                  <div [ngClass]="(msg.message) ? 'ctext-wrap-content': ((msg.location || msg.attachments) ? 'ctext-wrap-location':'')">
+                                    <!-- reply section start -->
+                                    @if(msg.reply_to && msg.reply_to._id){
+                                      <div class="">
+                                        <div class="replymessage-block mb-2 d-flex align-items-start" (click)="scrollToSection(msg.reply_to._id)">
+                                          <div class="flex-grow-1">
+                                            @if(msg.reply_to.from){
+                                              <h5 class="conversation-name">{{(msg.reply_to.from._id==chat.room.loggedUser.id || msg.reply_to.from.id==chat.room.loggedUser.id) ? 'You' : msg.reply_to.from.name}}</h5>
+                                            }
+                                            <p class="mb-0" [innerHTML]="msg.reply_to.message"></p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    }
+                                    <!-- reply section end -->
+
+                                    <!-- attachment in msg box start -->
+                                    <!-- for img and video -->
+                                    <div class="message-img mb-0">
+                                      @if(msg.attachments && msg.attachments.length>0){
+                                         <!-- checking image/video exist in attachment then call child component -->
+                                        @if(checkImgExist(msg.attachments)>0){
+                                          <!-- child compoment to view image and video content using lightgallery -->
+                                          <!-- <app-chat-img-slider [attachment]="msg.attachments"></app-chat-img-slider> -->
+                                          <app-media-gallery [attachments]="msg.attachments"></app-media-gallery>
+                                        }
+                                        @for (attach of msg.attachments; track $index) {
+                                          <!-- for doc pdf zip file-->
+                                          @if(attach && attach!=null){
+                                            @if (attach.mimetype!=null && checkAllowedExtension(attach)) {
+                                              <div class="p-2 border-primary border rounded-3">
+                                                <div class="d-flex align-items-center attached-file">
+                                                  <div class="flex-shrink-0 avatar-sm me-3 ms-0 attached-file-avatar">
+                                                    <!-- <div class="avatar-title bg-primary-subtle text-primary rounded-circle font-size-20"><i
+                                                        class="fa fa-paperclip"></i></div> -->
+                                                    <img width="30" [src]="getIconForFile(attach.originalname)" alt="" srcset="">
+                                                  </div>
+                                                  <div class="flex-grow-1 overflow-hidden">
+                                                    <div class="text-start">
+                                                      <h5 class="font-size-14 mb-1">{{attach.originalname}}</h5>
+                                                      <p class="text-muted text-truncate font-size-13 mb-0">{{attach.size | fileSize}}</p>
+                                                    </div>
+                                                  </div>
+                                                  <div class="flex-shrink-0 ms-4">
+                                                    <div class="d-flex gap-2 font-size-20 d-flex align-items-start">
+                                                      <div><a [href]="attach.path ? serverPath+'/'+attach.path:attach.url"
+                                                          class="text-muted" download="{{attach.path ? serverPath+'/'+attach.path:attach.url}}"><i class="bx bxs-download"></i></a></div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              @if(msg.temp_id!='' && !msg._id && attach.progress>0 && attach.progress<100){
+                                                <mat-progress-spinner class="example-margin" color="primary" mode="determinate" [value]="attach.progress" diameter="25"></mat-progress-spinner>
+                                              }
+                                            }@else if(attach.mimetype!=null && (attach.mimetype=="audio/mpeg" ||  attach.mimetype=="audio/mp3" || attach.mimetype=="audio/wav")){
+                                              @defer{
+                                                <app-waveform [messageid]="msg._id" [attachment]="attach"></app-waveform>
+                                              }
+                                            }
+                                            <!-- @else if(attach.mimetype!=null && (attach.mimetype=="video/mp4" || attach.mimetype=="image/jpeg" || attach.mimetype=="image/png")){
+                                              <app-chat-img-slider [attachment]="msg.attachments"></app-chat-img-slider>
+                                            } -->
+                                          }
+                                          
+                                        }
+                                      }
+                                      @if(msg.location){
+                                        @defer(){
+                                          <app-leatlet-map [location]="msg.location" [messageid]="msg._id+'-'+$index"></app-leatlet-map>
+                                        }@placeholder {
+                                          <div class="map_skeleton"></div>
+                                        }
+                                      }
+                                    </div>
+                                    <!-- attachekd file end -->
+
+                                    @if(msg.sticker){
+                                      <p class="mb-0 ctext-content" [innerHTML]="getInnerHtml(msg.sticker)"></p>
+                                    }
+                                    <!-- Forwarded Message Block -->
+                                    @if(msg.forwarded){
+                                      <div class="replymessage-block mb-2">
+                                          <h5 class="conversation-name">
+                                              Forwarded
+                                              @if(msg.forward_msg_id?.from?.fullName || msg.forward_snapshot?.sender?.name){
+                                                <span>
+                                                    from {{ msg.forward_msg_id?.from?.fullName || msg.forward_snapshot?.sender?.name }}
+                                                </span>
+                                              }
+                                          </h5>
+                                          
+                                          <!-- Forwarded message content -->
+                                          <p class="mb-0 ctext-content msg_html_content quill-content" 
+                                             [innerHTML]="getSanitizedMessage(msg.forward_msg_id?.message || msg.forward_snapshot?.text || '')">
+                                          </p>
+                                    
+                                          <!-- Forwarded attachments -->
+                                          @if(msg.forward_msg_id?.attachments?.length || msg.forward_snapshot?.attachments?.length){
+                                            <div class="mt-2">
+                                              <p class="mb-0 small">
+                                                {{ (msg.forward_msg_id?.attachments || msg.forward_snapshot?.attachments).length }} file(s) attached
+                                              </p>
+                                            </div>
+                                          }
+                                      </div>
+                                    }
+                                    <!-- Normal message content -->
+                                    @if(!msg.forwarded && msg.message){
+                                      <p class="mb-0 ctext-content msg_html_content quill-content" [innerHTML]="getSanitizedMessage(msg.message)"></p>
+                                    }
+
+                                  </div>
+                                  <div class="align-self-start message-box-drop dropdown"><a role="button" aria-haspopup="false" class="btn btn-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
+                                    <div class="dropdown-menu">
+                                      <!-- only for location -->
+                                      @if(msg.location){
+                                        <button type="button" to="#" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="openInGoogleMaps(msg.location)" >Open Map<i class="bx bx-map-alt ms-2 text-muted"></i></button>
+                                      }
+                                      <button type="button" to="#" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="replyMessage(msg)" >Reply<i class="bx bx-share ms-2 text-muted"></i></button>
+                                      <button type="button" to="#" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="openContactPopup(msg)">Forward <i class="bx bx-share-alt ms-2 text-muted"></i></button>
+                                      <button to="#" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="copyMessage(msg.message)">Copy <i class="bx bx-copy text-muted ms-2"></i></button>
+                                      <button to="#" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="bookmark_msg(msg)">Bookmark <i class="bx bx-bookmarks text-muted ms-2"></i></button>
+                                      @if(msg.from.isme=='no'){
+                                        <button to="#" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between dropdown-item" (click)="markAsUnRead(msg._id,data.date)">Mark as Unread <i class="bx bx-message-error text-muted ms-2"></i></button>
+                                        <!-- readBy=={{msg.readBy}}== -->
+                                      }
+                                      @if(msg.from.isme=='yes'){
+                                        <button type="button" tabindex="0" role="menuitem" class="d-flex align-items-center justify-content-between delete-item dropdown-item" (click)="deleteMessage(msg,data.date);msg.is_delete=1">Delete <i class="bx bx-trash text-muted ms-2"></i></button>
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                                @if(msg.from.isme=='yes'){
+                                  <!-- readBy=={{msg.readBy}}==
+                                  deliveredTo=={{msg.deliveredTo}}== -->
+                                  
+                                  <!-- for group chat showiring user read  -->
+                                  @if(msg.chat_type==1){
+                                    @if(msg.readBy && msg.readBy.length>0){
+                                      <div class="ctext-wrap">
+                                      @for (i of msg.readBy; track $index) {
+                                        @if(i._id!=chat.room.loggedUser.id){
+                                          @if(i.profile_pic){
+                                            <img [src]="i.profile_pic | safeImageUrl" class="profile-user rounded-circle avatar-xs readby_img" alt="" matTooltip="Read by: {{i.fullName}}"/>
+                                          }@else{
+                                            <div class="avatar-xs readby_img" matTooltip="Read by: {{i.fullName}}">
+                                              <span class="avatar-title rounded-circle text-uppercase text-white bg-purple" [style.backgroundColor]="(msg.from.isme=='yes') ? chat.room.loggedUser.bgcolor:(chat.room.selectedRoomDetail.row.is_group==false? chat.room.selectedRoomDetail.row.bgcolor:'')">
+                                                  <span class="username">{{i.fullName | firstChars }}</span>
+                                              </span>
+                                            </div>
+                                          }
+                                        }
+                                      }
+                                      </div>
+                                    }
+                                  }
+                                  <!-- <div class="conversation-name">
+                                    @if(msg.chat_type==0){
+                                      <span class="me-1 text-success">
+                                        @if(msg.readBy && msg.readBy.length>0){
+                                          <i class="bx bx-check-double bx-check" style="color: #63E6BE;" matTooltip="Message Read.."></i>
+                                        }@else if(msg.deliveredTo && msg.deliveredTo.length>0){
+                                          <i class="bx bx-check-double bx-check" style="color: #979797;" matTooltip="Message delivered."></i>
+                                        }@else if ((msg.is_send && msg.is_send==1) || msg._id!='') {
+                                          <i class="bx bx-check bx-check" style="color: #979797;" matTooltip="Message send."></i>
+                                        } 
+                                      </span>
+                                    }@else if(msg.chat_type==1){
+                                      <span class="me-1 text-success">
+                                        
+                                        @if(msg.readBy && msg.readBy.length>0){
+
+                                        }@else if(msg.deliveredTo && msg.deliveredTo.length>0){
+                                          <i class="bx bx-check-double bx-check" style="color: #979797;" matTooltip="Message delivered."></i>
+                                        }@else if ((msg.is_send && msg.is_send==1) || msg._id!='') {
+                                          <i class="bx bx-check bx-check" style="color: #979797;" matTooltip="Message send."></i>
+                                        } 
+                                      </span>
+                                    }
+                                    <small class="text-muted mb-0 me-2" *ngIf="$index === 0 || shouldShowNewGroup(data.collection[$index], data.collection[$index-1])">{{msg.full_send_datetime | timeAgo }}</small>
+                                  </div> -->
+                                } @else {
+                                  <!-- <div class="conversation-name">{{msg.from.name}}
+                                    <small class="text-muted mb-0 ms-2">{{msg.full_send_datetime | timeAgo }}</small>
+                                  </div> -->
+                                }
+                              </div>
+                            </div>
+                          </li>
+                          }
+                        }
+                      }
+                    } @else{
+                      <div class="text-center py-5">
+                        <span class="fa fa-stack fa-2x">
+                          <i class="fa fa-comment fa-stack-2x"></i>
+                          <i class="fa fa-empty fa-stack-1x" style="color: tomato;"></i>
+                        </span>
+                        <h5 class="text-muted">No Messages Here Yet...</h5>
+                        <p class="text-muted mb-0">Send a message to start the conversation!</p>
+                      </div>
+                    }
+                  </ul>
+                </div>
+              </div>
+              <button *ngIf="isScrollable" (click)="scrollToBottom2()" class="scroll-to-bottom-btn" matTooltip="Scroll to bottom"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="simplebar-placeholder" style="width: 811px; height: 947px;"></div>
+        </div>
+        <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div>
+        <!-- simplebar-hover -->
+        <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+          <!-- simplebar-visible simplebar-hover -->
+          <div class="simplebar-scrollbar" style="height: 362px;
+          transform: translate3d(0px, 0px, 0px);
+          display: block;"></div>
+        </div>
+      </div>
+      <!-- chat msg list end -->
+
+      <!-- botton input for send msg start-->
+      <div class="chat-input-section p-3 p-lg-4">
+        <!-- send message input row start -->
+        <form id="chatinput-form" class="">
+          <div class="row g-0 align-items-center">
+
+            <!-- attached file preview start -->
+            @if(isAttachedPrevActive && prev_files.length>0){
+              <div class="file_Upload" [ngClass]="isAttachedPrevActive ? 'show' : 'hide'">
+                <span (click)="removeAll_prev_file()" class="fa fa-close selected-media-close" aria-label="Close" matTooltip="Remove all attaached file"></span>
+                @for (file of prev_files; track $index) {
+                  @if(file.originalname){
+                    @if(file.mimetype=="image/png" || file.mimetype=="image/jpeg"){
+                      <!-- image -->
+                      <div class="profile-media-img image_pre d-inline-block position-relative">
+                        <div class="media-img-list" id="remove-image-4"> <a href="#"><img [src]="file.url" alt="avatar-10.jpg" class="img-fluid"  matTooltip="{{file.originalname}} | {{file.size | fileSize}}" /> </a> <i class="fa fa-close image-remove" (click)="removeSelPreve($index)" matTooltip="Remove attaached file"></i> </div>
+                      </div>
+                    }@else if(file.mimetype=="audio/wav"){
+                      <audio controls *ngIf="file.url">
+                        <source [src]="file.url" type="audio/wav">
+                        Your browser does not support the audio tag.
+                    </audio>
+                    }@else{
+                      <!-- file -->
+                      <div class="card p-2 border attchedfile_pre d-inline-block position-relative">
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0 avatar-xs ms-1 me-3">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle"> <i class="fa fa-paperclip"></i>
+                            </div>
+                          </div>
+                          <div class="flex-grow-1 overflow-hidden"> <a href="" id="a"></a>
+                            <h5 class="font-size-14 text-truncate mb-1">{{file.originalname}}</h5> <input type="hidden"
+                              name="downloaddata" value="[object File]">
+                            <p class="text-muted text-truncate font-size-13 mb-0">{{file.size | fileSize}}</p>
+                          </div>
+                          <div class="flex-shrink-0 align-self-start ms-3">
+                            <div class="d-flex gap-2">
+                              <div (click)="removeSelPreve($index)" matTooltip="Remove attaached file"> <i class="fa fa-close text-muted attechedFile-remove" id="remove-attechedFile"></i> </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+              </div>
+            }
+            <!-- attached file preview end  -->
+            <emoji-mart *ngIf="shoEmojiPicker" title="Pick your emoji…" emoji="point_up" [style]="{ position: 'absolute', bottom: '70px', align: 'center' }" (emojiSelect)="addEmoji($event)"></emoji-mart>
+
+            <div class="col-auto">
+              <div class="chat-input-links me-md-2">
+                <div class="links-list-item" id="more-menu" (click)="toggleMore()">
+                  <button type="button" class="btn btn-link text-decoration-none btn-lg waves-effect btn btn-none" matTooltip="More">
+                    <i class="bx bx-dots-horizontal-rounded align-middle"></i>
+                  </button>
+                </div>
+                <div class="links-list-item" id="emoji"><button type="button" id="emoji-btn" class="btn btn-link text-decoration-none btn-lg waves-effect emoji-btn btn btn-none" matTooltip="show emoji picker">
+                  <i class="bx bx-smile align-middle" (click)="shoEmojiPicker=!shoEmojiPicker"></i>
+                  <!-- <i class="fa fa-smile-o"></i> -->
+                  </button>
+                </div>
+                <div class="links-list-item" id="sticker_"><button type="button" id="sticker-btn" class="btn btn-link text-decoration-none btn-lg waves-effect sticker-btn btn btn-none" matTooltip="Show sticker">
+                  <i class="bx bx-sticker align-middle" (click)="showSticker=!showSticker;showSticker? loadStickerComponent():''"></i>
+                  <!-- <i class="fa fa-smile-o"></i> -->
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- input -->
+            <div class="col">
+              <!-- @if(typing){
+                {{typingMessage}}
+              } -->
+              <div class="position-relative">
+                @defer () {
+                  <app-editor [message]="message" (onTyping_parent)="onTyping($event)" (msgInputKeyup_parent)="msgInputKeyup($event)"></app-editor>
+                }@placeholder {
+                  loading content
+                }
+                <!-- <input #msginputField id="chat-input" name="msg" [(ngModel)]="message" (keydown)="onTyping($event)" placeholder="Type your message..." autocomplete="off" type="text" class="form-control form-control-lg chat-input form-control" value="" (keyup)="msgInputKeyup($event)"> -->
+                 
+              </div>
+              <span class="d-none">
+                {{msgText}} 
+              </span>
+            </div>
+            <div class="col-auto">
+              <div class="chat-input-links ms-2 gap-md-1">
+                  <div class="links-list-item d-none d-sm-block" *ngIf="msgText.length<2 && (!prev_files || prev_files.length==0)">
+                    <button type="button" id="audio-btn" class="btn btn-link text-decoration-none btn-lg waves-effect btn btn-none" matTooltip="Voice message"><i class="bx bx-microphone align-middle" aria-hidden="true" (click)="showRecordArea=!showRecordArea;"></i></button>
+                  </div>
+                  <div class="links-list-item" *ngIf="msgText.length>1  || (prev_files && prev_files.length>0)">
+                    <button type="button" (click)="sendMessage(message,chat.room.loggedUser,prev_files)" class="btn btn-primary btn-lg chat-send waves-effect waves-light btn btn-primary">
+                      <i class="bx bxs-send align-middle"></i>
+                    </button>
+                  </div>
+              </div>
+          </div>
+          </div>
+        </form>
+        <!-- send message input row end -->
+
+        <!-- sticker component -->
+        <div id="chatinputStickercollapse" class="chat-input-collapse collapse" [ngClass]="showSticker ? 'show' : ''">
+          <!-- <app-sticker-picker (stickerSelected)="addSticker($event)" class=""></app-sticker-picker> -->
+          <ng-template #stickerPickerContainer></ng-template>
+        </div>
+
+        <!-- voice recorder area start -->
+        <div id="chatinputStickercollapse2" class="chat-input-collapse collapse" [ngClass]="showRecordArea ? 'show' : ''">
+          <div class="mb-0 card">
+            <div class="py-3 card-body">
+              <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden">
+                <div class="swiper-wrapper"
+                  style="transition-duration: 0ms; transition-delay: 0ms; transform: translate3d(0px, 0px, 0px);">
+                  <div class="swiper-slide swiper-slide-active" style="width: 100%; margin-right: 20px;">
+                    <div class="text-center px-2 position-relative d-flex justify-content-center align-items-center">
+                      <div >
+                        <button  mat-flat-button (click)="startRecording()" *ngIf="(!this.isRecording || this.isRecordingPause) && !audioUrl" matTooltip="click to start recording.."><i class="fa fa-microphone" aria-hidden="true"></i></button>
+                        <button  mat-flat-button (click)="pauseRecording()" *ngIf="this.isRecording && !this.isRecordingPause" matTooltip="Pause recording"><i class="fa fa-pause" aria-hidden="true"></i></button>
+                        <button  mat-flat-button (click)="stopRecording()" *ngIf="this.isRecording" matTooltip="Stop recording"><i class="fa fa-stop" aria-hidden="true"></i></button>
+                        <button  mat-flat-button (click)="attachAudio()" *ngIf="audioUrl">Attach Recording</button>
+                      </div>
+                      @if(this.isRecording && !this.isRecordingPause){
+                        <img src="https://cdn.dribbble.com/users/2058104/screenshots/4257296/voice_loaderrr.gif" alt="" width="50" height="50">
+                      }
+                      
+                      <audio controls *ngIf="audioUrl">
+                          <source [src]="audioUrl" type="audio/wav">
+                          Your browser does not support the audio tag.
+                      </audio>
+                      <button  mat-flat-button (click)="deleteRecording()" *ngIf="audioUrl" matTooltip="Delete recording"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- voice recorder area end -->
+
+        <!-- more area start -->
+        <div id="chatinputmorecollapse" class="chat-input-collapse collapse" [ngClass]="isMoreActive ? 'show' : ''">
+          <div class="mb-0 card">
+            <div class="py-3 card-body">
+              <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden">
+                <div class="swiper-wrapper"
+                  style="transition-duration: 0ms; transition-delay: 0ms; transform: translate3d(0px, 0px, 0px);">
+                  <div class="swiper-slide swiper-slide-active" style="width: 137.667px; margin-right: 20px;">
+                    <div class="text-center px-2 position-relative">
+                      <div><input id="attachedfile-input" #attachedfileInput multiple="" type="file" class="d-none form-control"  (change)="previewFile($event)"><label for="attachedfile-input" class="avatar-sm mx-auto stretched-link form-label"><span class="avatar-title font-size-18 bg-soft-primary text-primary rounded-circle"><i class="bx bx-paperclip"></i></span></label>
+                      </div>
+                      <h5 class="font-size-11 text-uppercase mt-2  mb-0 text-body text-truncate">Attached</h5>
+                    </div>
+                  </div>
+                  <div class="swiper-slide swiper-slide-next" style="width: 137.667px; margin-right: 20px;">
+                    <div class="text-center px-2 position-relative">
+                      <div><input type="file" class="d-none form-control" accept="image/*" capture="camera" id="cameraInput" name="cameraInput" (change)="previewFile($event)">
+                        <label for="cameraInput" class="avatar-sm mx-auto stretched-link form-label">
+                        <div class="avatar-title font-size-18 bg-soft-primary text-primary rounded-circle"><i
+                            class="bx bxs-camera"></i></div></label>
+                      </div>
+                      <h5 class="font-size-11 text-uppercase mt-2 mb-0 text-body text-truncate">Camera</h5>
+                    </div>
+                  </div>
+                  <div class="swiper-slide" style="width: 137.667px; margin-right: 20px;">
+                    <div class="text-center px-2 position-relative">
+                      <div><input id="attached-gallery-input" accept="image/png, image/jpeg" multiple="" type="file"
+                          class="d-none form-control" (change)="previewFile($event)"><label for="attached-image-input"
+                          class="avatar-sm mx-auto stretched-link cursor-pointer form-label"><span
+                            class="avatar-title font-size-18 bg-soft-primary text-primary rounded-circle">
+                            <i class="bx bx-images"></i></span></label></div>
+                      <h5 class="font-size-11 text-uppercase mt-2 mb-0 text-body text-truncate">Gallery</h5>
+                    </div>
+                  </div>
+                  <div class="swiper-slide" style="width: 137.667px; margin-right: 20px;">
+                    <div class="text-center px-2">
+                      <div>
+                        <input id="attached-audio-input" accept="audio/*" multiple="" type="file"
+                        class="d-none form-control" (change)="previewFile($event)"/>
+                        <label for="attached-audio-input" class="avatar-sm mx-auto stretched-link cursor-pointer form-label">
+                          <span class="avatar-title font-size-18 bg-soft-primary text-primary rounded-circle"><i
+                            class="bx bx-headphone"></i></span></label>
+                      </div>
+                      <h5 class="font-size-11 text-uppercase mt-2 mb-0 text-body text-truncate">Audio</h5>
+                    </div>
+                  </div>
+                  <div class="swiper-slide" style="width: 137.667px; margin-right: 20px;">
+                    <div class="text-center px-2">
+                      <div class="avatar-sm mx-auto" (click)="shareLocation()">
+                        <div class="avatar-title font-size-18 bg-soft-primary text-primary rounded-circle"><i
+                            class="bx bx-current-location"></i></div>
+                      </div>
+                      <h5 class="font-size-11 text-uppercase mt-3 mb-0 text-body text-truncate">Location</h5>
+                    </div>
+                  </div>
+                  <div class="swiper-slide" style="width: 137.667px; margin-right: 20px;">
+                    <div class="text-center px-2">
+                      <div class="avatar-sm mx-auto">
+                        <div class="avatar-title font-size-18 bg-soft-primary text-primary rounded-circle"><i
+                            class="bx bxs-user-circle"></i></div>
+                      </div>
+                      <h5 class="font-size-11 text-uppercase mt-3 mb-0 text-body text-truncate"  (click)="openContactPopup()"><a
+                          class="text-body stretched-link" data-bs-toggle="modal" data-bs-target=".contactModal"
+                          href="javascript:void(0)">Contacts</a></h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- more area end -->
+         
+        <!-- reply popup start -->
+        <div class="chat-input-collapse replyCollapse collapse" [ngClass]="isReaplyActive ? 'show' : ''">
+          <div class="mb-0 card">
+              <div class="py-3 card-body">
+                  <div class="replymessage-block mb-0 d-flex align-items-start">
+                      <div class="flex-grow-1">
+                        @if(chat.room.selectedRoomDetail.newMessage.collection.reply_msg){
+                          <h5 class="conversation-name">{{chat.room.selectedRoomDetail.newMessage.collection.reply_msg.from.name}}</h5>
+                          <p class="mb-0"  [innerHTML]="chat.room.selectedRoomDetail.newMessage.collection.reply_msg.message"><span class="reply_date">{{nsend_date}}</span></p>
+                        }
+                      </div>
+                      <div class="flex-shrink-0"><button type="button" (click)="removeRepply()" class="btn btn-sm btn-link mt-n2 me-n3 font-size-18"><i class="bx bx-x align-middle"></i></button></div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!-- reply popup end -->
+      </div>
+      <!-- botton input for send msg end-->
+
+    </div>
+  </div>

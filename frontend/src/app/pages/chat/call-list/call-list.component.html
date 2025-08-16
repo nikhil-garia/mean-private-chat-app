@@ -1,0 +1,145 @@
+<div class="position-relative">
+	<div class="px-4 pt-4">
+		<div class="d-flex align-items-start">
+			<div class="flex-grow-1">
+				<h4 class="mb-3">Calls</h4>
+			</div>
+		</div>
+	</div>
+	<div data-simplebar="init" class="chat-message-list chat-call-list simplebar-scrollable-y">
+		<div class="simplebar-wrapper" style="margin: 0px;">
+			<div class="simplebar-height-auto-observer-wrapper">
+				<div class="simplebar-height-auto-observer"></div>
+			</div>
+			<div class="simplebar-mask">
+				<div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+					<div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content"
+						style="height: auto; overflow: hidden scroll;">
+						<div class="simplebar-content" style="padding: 0px;">
+							<ul class="list-unstyled chat-list">
+								@for(row of call_list; track $index){
+									<li>
+										<div class="d-flex align-items-center">
+											<div class="chat-user-img flex-shrink-0 me-2">
+												<!-- for single chat image -->
+                        @if(!row['is_group']){
+                          @if(row['from_id'] && row['from_id']['_id']!=chat.room.loggedUser.id){
+                            @if (row['from_id']['profile_pic'] && checkPic_privacy(row['from_id'])) {													
+                              <img [ngSrc]="serverPath+'/'+'uploads/profile/'+row['from_id']['profile_pic']" class="rounded-circle avatar-xs" alt="" width="36" height="36" loading="lazy" >
+                            }@else{
+                              <!-- for text avatar -->
+                              <div class="avatar-xs">
+                                <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">
+                                  <span class="username">{{row['from_id']['fullName'] | firstChars }}</span>
+                                </span>
+                              </div>
+                            }
+                          }@else if(row['to_id'] && row['to_id']['_id']!=chat.room.loggedUser.id){
+                            <!-- for single image -->
+                            @if (row['to_id']['profile_pic'] && checkPic_privacy(row['to_id'])) {
+                              <img [ngSrc]="serverPath+'/'+'uploads/profile/'+row['to_id']['profile_pic']" class="rounded-circle avatar-xs" alt="" width="36" height="36"  loading="lazy">
+                            }@else{
+                              <!-- for text avatar -->
+                              <div class="avatar-xs">
+                                <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">
+                                  <span class="username">{{row['to_id']['fullName'] | firstChars }}</span>
+                                </span>
+                              </div>
+                            }
+                          }
+                        }@else{
+                          <!-- for group chat image -->
+                          <!-- @if(row['conv_detail']['grp_avatar']){											
+                            <img [ngSrc]="serverPath+'/'+'uploads/profile/'+row['conv_detail']['grp_avatar']" class="rounded-circle avatar-xs" alt="" width="36" height="36" loading="lazy" >
+                          } -->
+                          <!-- for text avatar -->
+                          <div class="avatar-xs">
+                            <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">
+                              <span class="username">{{row['conv_detail']['conv_name'] | firstChars }}</span>
+                            </span>
+                          </div>
+                        }
+											</div>
+											<div class="flex-grow-1 overflow-hidden">
+												<!-- for single chat caller full name  -->             
+                        @if(!row['is_group']){
+                          @if(row['from_id'] && row['from_id']['_id']!=chat.room.loggedUser.id){
+                            <p class="text-truncate mb-0" [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? 'svg-red':''">{{row['from_id']['fullName']}}</p>
+                          }@else if(row['to_id'] && row['to_id']['_id']!=chat.room.loggedUser.id){
+                            <p class="text-truncate mb-0" [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? 'svg-red':''">{{row['to_id']['fullName']}}</p>
+                          }
+                        }@else {
+												  <!-- for group chat name-->
+                           @if(row['conv_detail']){
+                             <p class="text-truncate mb-0" [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? 'svg-red':''">
+                               @if(row['from_id'] && row['from_id']['_id']==chat.room.loggedUser.id){
+                                 {{row['conv_detail']['conv_name']}}
+                               }@else{
+                                 {{row['from_id']['fullName']}} from "{{row['conv_detail']['conv_name']}}"
+                               }
+                             </p>
+                           }
+                        }
+												<div class="text-muted font-size-12 text-truncate">
+													<!-- <i class="ri-arrow-left-down-fill text-success align-bottom me-1"></i> -->
+														
+                          <!-- for outgoing call -->
+													@if(row['from_id']['_id']==chat.room.loggedUser.id){
+                            @if(row['verdict']=='Missed'){
+                              <img class="align-bottom me-1 mb-1"  [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? '':'svg-green'" matTooltip="outgoing call" ngSrc="./assets/images/outgoing-missed-call2.png" width="15" height="15" alt="" srcset="">
+                            }@else {
+                              <img class="align-bottom me-1 mb-1"  [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? 'svg-red':'svg-green'" matTooltip="outgoing call" ngSrc="./assets/images/ri--arrow-right-up-line.svg" width="15" height="15" alt="" srcset="">
+                            }
+													}@else {
+                            <!-- for incoming call -->
+                            @if(row['verdict']=='Missed'){
+                              <img class="align-bottom me-1 mb-1"  [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? 'svg-red':'svg-green'" matTooltip="Incoming call" ngSrc="./assets/images/incoming-missed-call.svg" width="15" height="15" alt="" srcset="">
+                            }@else{
+                              <img class="align-bottom me-1 mb-1"  [ngClass]="(row['verdict']=='Missed' || row['verdict']=='Denied')? 'svg-red':'svg-green'" matTooltip="Incoming call" ngSrc="./assets/images/ri--arrow-left-down-fill.svg" width="15" height="15" alt="" srcset="">
+                            }
+													}
+                          @if(row['verdict']=='Missed' || row['verdict']=='Denied'){
+                            {{row['verdict']}}
+                          }
+													{{row['created_at'] | timeAgoConv}}
+													<!-- 5 May, 2016, 06:216:21 AM -->
+												</div>
+											</div>
+											<div class="flex-shrink-0 ms-3">
+												<div class="d-flex align-items-center gap-3">
+                          @if(row['startedAt']){
+                            <div>
+                              <h5 class="mb-0 font-size-12 text-muted">{{getDuration(row['startedAt'],row['endedAt'])}}
+                                <!-- 5:37 -->
+                              </h5>
+                            </div>
+                          }
+													<div>
+														<button type="button" class="p-0 font-size-20 stretched-link btn btn-link">
+															@if(row['call_type']=="video"){
+																<i class="bx bx-video align-middle"></i>
+															}@else{
+																<i class="bx bxs-phone-call align-middle"></i>
+															}
+														</button></div>
+												</div>
+											</div>
+										</div>
+									</li>
+								}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="simplebar-placeholder" style="width: 300px; height: 2521px;"></div>
+		</div>
+		<div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+			<div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+		</div>
+		<div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+			<div class="simplebar-scrollbar" style="height: 25px; display: block; transform: translate3d(0px, 0px, 0px);">
+			</div>
+		</div>
+	</div>
+</div>

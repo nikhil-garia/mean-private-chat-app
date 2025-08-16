@@ -1,0 +1,6 @@
+# for turn server
+TURN_SECRET=your_static_auth_secret
+TURN_REALM=yourdomain.com
+TURN_HOST=your.public.ip.address
+
+add this in your backend environment file

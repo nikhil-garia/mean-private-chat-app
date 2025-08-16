@@ -1,0 +1,50 @@
+<div mat-dialog-title class="bg-primary font-size-16 text-white"><mat-icon>contacts</mat-icon> Contact</div>
+<mat-dialog-content class="mat-typography">
+  <!-- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" fitInkBarToContent>
+    <mat-tab label="Contact"> -->
+      <!-- <mat-slide-toggle [(ngModel)]="isGroup" (change)="contact_search='';selectedContact=''">Want to create group?</mat-slide-toggle> -->
+      <!-- @if(isGroup){ -->
+        <!-- contact list with single selection -->
+        <!-- according start -->
+        <mat-accordion>
+          <mat-expansion-panel [expanded]="0"  (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Select Members</mat-panel-title>
+              <mat-panel-description>
+                <!-- Currently I am {{panelOpenState ? 'open' : 'closed'}} -->
+                Options selected: {{item.selectedOptions.selected.length}}
+                <mat-icon>account_circle</mat-icon>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <!-- expansion content -->
+      
+            <!-- search input  -->
+            <div class="input-group mb-2"><input id="serachChatUser" [(ngModel)]="contact_search" placeholder="Search {{isGroup ? 'group member':'contact'}} here.." type="text" class="form-control bg-light border-0 pe-0 form-control"><button type="button" id="contactSearchbtn-addon" class="btn btn-light"><i class="bx bx-search align-middle"></i></button></div>
+            
+            <mat-selection-list #item [multiple]="true" (selectionChange)="onSelection($event, item, 'multiple')">
+              @for (group of filteredItems | sortBy:'first'; track group) {
+                @if(group.collection.length>0){
+                  <div class="contact-list-title">{{ group.first }}</div>
+                }
+                @for (item of group.collection | searchContact :'fullName':contact_search; track item) {
+                  <mat-list-option [value]="item">
+                    <h5 class="font-size-14 m-0">{{item.fullName}} ({{item.email}})</h5>
+                  </mat-list-option>
+                }
+              }
+            </mat-selection-list>
+            <div class="rounded p-4 text-center" *ngIf="contact_search.length>0 && totalItems==0"><i class="bx bx-info-circle fs-1 mb-3"></i><div>No results found for "{{contact_search}}".</div></div>
+          </mat-expansion-panel>
+        </mat-accordion>
+        <!-- according end -->
+      <!-- } -->
+      <!-- selected contact list = {{selectedContact}} -->
+    <!-- </mat-tab>
+  </mat-tab-group> -->
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="btn btn-link" mat-dialog-close>Cancel</button>
+  <button class="btn btn-success text-white" type="button" cdkFocusInitial (click)="submitCreForm()"  matTooltip="Add user"><i class="bx bxs-send align-middle"></i></button>
+  <!-- <button mat-button color="primary" class="btn btn-primary text-white" type="button" cdkFocusInitial
+        matTooltip=""><i class="bx bxs-send align-middle"></i></button> -->
+</mat-dialog-actions>

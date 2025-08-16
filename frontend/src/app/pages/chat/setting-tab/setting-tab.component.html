@@ -1,0 +1,389 @@
+<div class="position-relative">
+  <div class="user-profile-img">
+    <img class="profile-img profile-foreground-img" alt="" ngSrc="/assets/media/img.jpg" style="height: 160px;" fill>
+    <div class="overlay-content">
+      <div>
+        <div class="user-chat-nav p-3">
+          <div class="d-flex w-100 align-items-center">
+            <div class="flex-grow-1">
+              <h5 class="text-white mb-0">Settings</h5>
+            </div>
+            <div class="flex-shrink-0">
+              <div class="avatar-xs p-0 rounded-circle profile-photo-edit" id="change-cover"><input
+                  id="profile-foreground-img-file-input" type="file" accept="image/png, image/jpeg"
+                  class="profile-foreground-img-file-input"><label for="profile-foreground-img-file-input"
+                  class="profile-photo-edit avatar-xs form-label"><span
+                    class="avatar-title rounded-circle bg-light text-body"><i class="bx bxs-pencil"></i></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center p-3 p-lg-4 border-bottom pt-2 pt-lg-2 mt-n5 position-relative">
+    <div class="mb-3 profile-user">
+      <!-- <img class="rounded-circle avatar-lg img-thumbnail user-profile-image" alt="user-profile" src="/assets/media/avatar-1.9c8e605558cece65b06c.jpg"> -->
+      @if (chat.room.loggedUser.profile_pic) {
+      <img class="rounded-circle avatar-lg img-thumbnail user-profile-image" alt="user-profile"
+        [ngSrc]="chat.room.loggedUser.profile_pic | safeImageUrl" width="60" height="60">
+      @if (chat.room.loggedUser.status) {
+      <!-- <span class="user-status" [ngClass]="getUserStatusClass(chat.room.loggedUser.is_online,chat.room.loggedUser.status)"></span> -->
+      }
+      }@else{
+      <!-- for text avatar -->
+      <div class="rounded-circle avatar-lg img-thumbnail">
+        <span class="avatar-title rounded-circle text-uppercase text-white bg-purple"
+          [style.backgroundColor]="chat.room.loggedUser.bgcolor">
+          <span class="username">{{chat.room.loggedUser.name | firstChars }}</span>
+          @if (chat.room.loggedUser.status) {
+          <!-- <span class="user-status" [ngClass]="getUserStatusClass(chat.room.loggedUser.is_online,chat.room.loggedUser.status)"></span> -->
+          }
+        </span>
+      </div>
+      }
+      <div class="avatar-xs p-0 rounded-circle profile-photo-edit"><input id="profile-img-file-input"
+          #attachedprofileInput type="file" (change)="previewFile($event,'profile')" class="profile-img-file-input"
+          accept="image/png, image/jpeg"><label for="profile-img-file-input"
+          class="profile-photo-edit avatar-xs form-label"><span
+            class="avatar-title rounded-circle bg-light text-body"><i class="bx bxs-camera"></i></span></label></div>
+    </div>
+    <h5 class="font-size-16 mb-1 text-truncate">{{chat.room.loggedUser.name}}</h5>
+    <div class="d-inline-block dropdown"><a role="button" class="text-muted d-block dropdown-toggle"
+        data-bs-toggle="dropdown" aria-expanded="false"><i class="bx bxs-circle font-size-10 align-middle text-success"
+          [ngClass]="!chat.room.loggedUser.is_online ? '': (chat.room.loggedUser.status=='online' ? 'text-success':(chat.room.loggedUser.status=='away' ? 'text-warning':'text-danger'))"></i>
+        {{!chat.room.loggedUser.is_online ? 'Offline': (chat.room.loggedUser.status=='online' ?
+        'Online':(chat.room.loggedUser.status=='away' ? 'Away':'Do not disturb'))}}
+        <!-- <i class="fa fa-regular fa-chevron-down"></i> -->
+        <!-- <i class="mdi mdi-chevron-down"></i> -->
+      </a>
+      <div tabindex="-1" role="menu" class="dropdown-menu"><button type="button" (click)="changeOnlineStatus('online')"
+          tabindex="0" role="menuitem" class="dropdown-item"><i
+            class="bx bxs-circle text-success font-size-10 me-1 align-middle"></i> Active</button><button type="button"
+          (click)="changeOnlineStatus('away')" tabindex="0" role="menuitem" class="dropdown-item"><i
+            class="bx bxs-circle text-warning font-size-10 me-1 align-middle"></i>
+          Away</button><button type="button" (click)="changeOnlineStatus('dnd')" tabindex="0" role="menuitem"
+          class="dropdown-item"><i class="bx bxs-circle text-danger font-size-10 me-1 align-middle"></i> Do
+          not disturb</button></div>
+    </div>
+  </div>
+  <div data-simplebar="init" class="user-setting simplebar-scrollable-y">
+    <div class="simplebar-wrapper" style="margin: 0px;">
+      <div class="simplebar-height-auto-observer-wrapper">
+        <div class="simplebar-height-auto-observer"></div>
+      </div>
+      <div class="simplebar-mask">
+        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+          <div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content"
+            style="height: auto; overflow: hidden scroll;">
+            <div class="simplebar-content" style="padding: 0px;">
+              <div id="settingprofile" class="accordion accordion-flush">
+                <div class="accordion-item">
+                  <div class="accordion-header" id="headerpersonalinfo"><button type="button"
+                      class="accordion-button font-size-14 fw-medium collapsed btn btn-none" data-bs-toggle="collapse"
+                      data-bs-target="#personalinfo"><i class="text-muted me-3 bx bxs-user"></i> Personal Info</button>
+                  </div>
+                  <div id="personalinfo" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                      
+                      @if(!editableName){
+                        <div class="float-end"><button type="button" (click)="editableName=true" class="btn btn-soft-primary btn-sm btn btn-none" matTooltip="Edit Name"><i class="bx bxs-pencil align-middle"></i></button></div>
+                      }
+                      <div>
+                        <p class="text-muted mb-1">Name</p>
+                        @if(!editableName){
+                          <h5 class="font-size-14">{{chat.room.loggedUser.name}}</h5>
+                        }@else {
+                          <input type="text" name="" [(ngModel)]="chat.room.loggedUser.name">
+                          <div class="float-end"><button type="button" (click)="updateName(chat.room.loggedUser.name)" class="btn btn-soft-primary btn-sm btn btn-none" matTooltip="Update Name">Update</button></div>
+
+                        }
+                      </div>
+                      <div class="mt-4">
+                        <p class="text-muted mb-1">Email</p>
+                        <h5 class="font-size-14">{{chat.room.loggedUser.email}}</h5>
+                      </div>
+                      <div class="mt-4">
+                        <p class="text-muted mb-1">Location</p>
+                        <h5 class="font-size-14 mb-0">California, USA</h5>
+                      </div>
+                      <div class="mt-4">
+                        <p class="text-muted mb-1">Timezone</p>
+                        <h5 class="font-size-14 mb-0">{{localZone}}</h5>
+                      </div>
+                      @if(!editableStatus){
+                        <div class="float-end mt-4"><button type="button" (click)="editableStatus=true" class="btn btn-soft-primary btn-sm btn btn-none" matTooltip="Edit Status"><i class="bx bxs-pencil align-middle"></i></button></div>
+                      }
+                      <div class="mt-4">
+                        <p class="text-muted mb-1">Status</p>
+                        @if(!editableStatus){
+                          <h5 class="font-size-14 mb-0">{{statusMsg}}</h5>
+                        }@else {
+                          <textarea name="" id="" col="10" [(ngModel)]="statusMsg"></textarea>
+                          <div class="float-end"><button type="button" (click)="updateStatus(statusMsg)" class="btn btn-soft-primary btn-sm btn btn-none" matTooltip="Update Status">Update</button></div>
+
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header" id="headerpersonalinfo"><button type="button"
+                      class="accordion-button font-size-14 fw-medium collapsed btn btn-none" data-bs-toggle="collapse"
+                      data-bs-target="#ac_themes"><i class="text-muted me-3 bx bxs-adjust-alt"></i> Themes</button>
+                  </div>
+                  <div id="ac_themes" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                      <div>
+                        <h5 class="mb-3 font-size-11 text-muted text-uppercase">Choose Theme
+                          Color :</h5>
+                        <div class="d-flex align-items-center flex-wrap gap-2 theme-btn-list theme-color-list">
+                          <!-- <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio1" [checked]="currentTHemColor=='' ? 'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio1"><span
+                                class="avatar-title rounded-circle theme-btn bg-primary-custom bgcolor-radio1"
+                                id="color-bgcolor-radio1" (click)="changeThemeColor('')"></span></label>
+                          </div> -->
+                          <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio2" [checked]="currentTHemColor=='blue'?'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio2"><span
+                                class="avatar-title rounded-circle theme-btn bg-info bgcolor-radio2"
+                                id="color-bgcolor-radio2" (click)="changeThemeColor('blue')"></span></label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio3" [checked]="currentTHemColor=='voilet'?'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio3"><span
+                                class="avatar-title rounded-circle theme-btn bg-purple bgcolor-radio3"
+                                id="color-bgcolor-radio3" (click)="changeThemeColor('voilet')"></span></label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio4" [checked]="currentTHemColor=='pink'?'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio4"><span
+                                class="avatar-title rounded-circle theme-btn bg-pink bgcolor-radio4"
+                                id="color-bgcolor-radio4" (click)="changeThemeColor('pink')"></span></label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio5" [checked]="currentTHemColor=='red'?'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio5"><span
+                                class="avatar-title rounded-circle theme-btn bg-danger bgcolor-radio5"
+                                id="color-bgcolor-radio5" (click)="changeThemeColor('red')"></span></label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio6" [checked]="currentTHemColor=='gray'?'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio6"><span
+                                class="avatar-title rounded-circle theme-btn bg-secondary bgcolor-radio6"
+                                id="color-bgcolor-radio6" (click)="changeThemeColor('gray')"></span></label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input theme-color" type="radio" name="bgcolor-radio"
+                              id="bgcolor-radio7" [checked]="currentTHemColor=='green'?'checked':''">
+                            <label class="form-check-label avatar-xs" for="bgcolor-radio7"><span
+                                class="avatar-title rounded-circle theme-btn bg-success bgcolor-radio7"
+                                id="color-bgcolor-radio7" (click)="changeThemeColor('green')"></span></label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mt-4 pt-2">
+                        <h5 class="mb-3 font-size-11 text-muted text-uppercase">Choose Theme
+                          Image :</h5>
+                        <div class="d-flex align-items-center flex-wrap gap-2 theme-btn-list theme-btn-list-img">
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio1"
+                              [checked]="currentTheme_image=='pattern-01.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio1" (click)="changeThemImage(1)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-1 bgimg-radio1"
+                                id="image-bgimg-radio1"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio2"
+                              [checked]="currentTheme_image=='pattern-02.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio2" (click)="changeThemImage(2)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-2 bgimg-radio2"
+                                id="image-bgimg-radio2"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio3"
+                              [checked]="currentTheme_image=='pattern-03.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio3" (click)="changeThemImage(3)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-3 bgimg-radio3"
+                                id="image-bgimg-radio3"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio4"
+                              [checked]="currentTheme_image=='pattern-04.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio4" (click)="changeThemImage(4)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-4 bgimg-radio4"
+                                id="image-bgimg-radio4"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio5"
+                              [checked]="currentTheme_image=='pattern-05.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio5" (click)="changeThemImage(5)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-5 bgimg-radio5"
+                                id="image-bgimg-radio5"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio6"
+                              [checked]="currentTheme_image=='pattern-06.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio6" (click)="changeThemImage(6)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-6 bgimg-radio6"
+                                id="image-bgimg-radio6"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio7"
+                              [checked]="currentTheme_image=='pattern-07.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio7" (click)="changeThemImage(7)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-7 bgimg-radio7"
+                                id="image-bgimg-radio7"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio8"
+                              [checked]="currentTheme_image=='pattern-08.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio8" (click)="changeThemImage(8)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-8 bgimg-radio8"
+                                id="image-bgimg-radio8"></span></label></div>
+                          <div class="form-check"><input class="form-check-input theme-img" type="radio"
+                              name="bgimg-radio" id="bgimg-radio9"
+                              [checked]="currentTheme_image=='pattern-09.png'?'checked':''"><label
+                              class="form-check-label avatar-xs" for="bgimg-radio9" (click)="changeThemImage(9)"><span
+                                class="avatar-title rounded-circle theme-btn bg-pattern-9 bgimg-radio9"
+                                id="image-bgimg-radio9"></span></label></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header" id="headerpersonalinfo"><button type="button"
+                      class="accordion-button font-size-14 fw-medium collapsed btn btn-none" data-bs-toggle="collapse"
+                      data-bs-target="#ac_privacy"><i class="text-muted me-3 bx bxs-lock"></i> Privacy</button></div>
+                  <div id="ac_privacy" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item py-3 px-0 pt-0">
+                          <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 overflow-hidden">
+                              <h5 class="font-size-13 mb-0 text-truncate">Profile photo
+                              </h5>
+                            </div>
+                            <div class="flex-shrink-0 ms-2"><select class="form-select form-select-sm" [(ngModel)]="selectedVisibility" (change)="updateVisibility()">
+                                <option value="everyone">Everyone</option>
+                                <option value="contacts">Contacts</option>
+                                <option value="nobody">Nobody</option>
+                              </select></div>
+                          </div>
+                        </li>
+                        <li class="list-group-item py-3 px-0">
+                          <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 overflow-hidden">
+                              <h5 class="font-size-13 mb-0 text-truncate">Last seen</h5>
+                            </div>
+                            <div class="flex-shrink-0 ms-2">
+                              <div class="form-check form-switch"><input type="checkbox" class="form-check-input"
+                                  id="privacy-lastseenSwitch" checked=""><label class="form-check-label"
+                                  for="privacy-lastseenSwitch"></label></div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="list-group-item py-3 px-0">
+                          <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 overflow-hidden">
+                              <h5 class="font-size-13 mb-0 text-truncate">Status</h5>
+                            </div>
+                            <div class="flex-shrink-0 ms-2"><select class="form-select form-select-sm">
+                                <option value="everyone">Everyone</option>
+                                <option value="nobody">Nobody</option>
+                                <option value="selected">Selected</option>
+                              </select></div>
+                          </div>displayStatus
+                        </li>
+                        <li class="list-group-item py-3 px-0">
+                          <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 overflow-hidden">
+                              <h5 class="font-size-13 mb-0 text-truncate">Read receipts
+                              </h5>
+                            </div>
+                            <div class="flex-shrink-0 ms-2">
+                              <div class="form-check form-switch"><input type="checkbox" class="form-check-input"
+                                  id="privacy-readreceiptSwitch" checked=""><label class="form-check-label"
+                                  for="privacy-readreceiptSwitch"></label></div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="list-group-item py-3 px-0 pb-0">
+                          <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 overflow-hidden">
+                              <h5 class="font-size-13 mb-0 text-truncate">Groups</h5>
+                            </div>
+                            <div class="flex-shrink-0 ms-2"><select class="form-select form-select-sm">
+                                <option value="everyone">Everyone</option>
+                                <option value="nobody">Nobody</option>
+                                <option value="selected">Selected</option>
+                              </select></div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header" id="headerpersonalinfo"><button type="button"
+                      class="accordion-button font-size-14 fw-medium collapsed btn btn-none" data-bs-toggle="collapse"
+                      data-bs-target="#ac_security"><i class="text-muted me-3 bx bxs-check-shield"></i>
+                      Security</button></div>
+                  <div id="ac_security" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item p-0">
+                          <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 overflow-hidden">
+                              <h5 class="font-size-13 mb-0 text-truncate">Show security
+                                notification</h5>
+                            </div>
+                            <div class="flex-shrink-0 ms-2">
+                              <div class="form-check form-switch"><input type="checkbox" class="form-check-input"
+                                  id="security-notificationswitch"><label class="form-check-label"
+                                  for="security-notificationswitch"></label></div>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header" id="headerpersonalinfo"><button type="button"
+                      class="accordion-button font-size-14 fw-medium collapsed btn btn-none" data-bs-toggle="collapse"
+                      data-bs-target="#ac_help"><i class="text-muted me-3 bx bxs-help-circle"></i> Help</button></div>
+                  <div id="ac_help" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item py-3 px-0 pt-0">
+                          <h5 class="font-size-13 mb-0"><a class="text-body d-block" href="/dashboard">FAQs</a></h5>
+                        </li>
+                        <li class="list-group-item py-3 px-0">
+                          <h5 class="font-size-13 mb-0"><a class="text-body d-block" href="/dashboard">Contact</a></h5>
+                        </li>
+                        <li class="list-group-item py-3 px-0 pb-0">
+                          <h5 class="font-size-13 mb-0"><a class="text-body d-block" href="/dashboard">Terms &amp;
+                              Privacy policy</a></h5>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="simplebar-placeholder" style="width: 300px; height: 558px;"></div>
+    </div>
+    <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+      <div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+    </div>
+    <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+      <div class="simplebar-scrollbar" style="height: 25px; display: block; transform: translate3d(0px, -9px, 0px);">
+      </div>
+    </div>
+  </div>
+</div>

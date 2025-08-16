@@ -1,0 +1,289 @@
+// ==========================================================================
+// Media Gallery Component Styles
+// ==========================================================================
+@use "sass:math"; // Import the Sass math module
+
+// --------------------------------------------------------------------------
+// Variables & Mixins
+// --------------------------------------------------------------------------
+
+// -- Variables --
+$grid-gap: 4px;
+$grid-border-radius: 12px;
+$viewer-bg-color: rgba(0, 0, 0, 0.85);
+$control-bg-color: rgba(0, 0, 0, 0.3);
+$control-hover-bg-color: rgba(255, 255, 255, 0.2);
+$text-color: white;
+$thumbnail-border-color: white;
+$z-index-viewer: 1000;
+
+// -- Mixins --
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// FIX: Updated to use math.div() for Sass division
+@mixin play-icon($size: 48px, $border-width: 16px) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: $size;
+  height: $size;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  @include flex-center;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: math.div($border-width, 1.6) 0 math.div($border-width, 1.6) $border-width;
+    border-color: transparent transparent transparent $text-color;
+    margin-left: math.div($border-width, 4);
+  }
+}
+
+// --------------------------------------------------------------------------
+// Base Component Host
+// --------------------------------------------------------------------------
+
+:host {
+  display: block;
+  max-width: 350px;
+  font-family: Arial, sans-serif;
+}
+
+// ==========================================================================
+// Grid View
+// ==========================================================================
+
+.media-grid {
+  display: grid;
+  gap: $grid-gap;
+  border-radius: $grid-border-radius;
+  overflow: hidden;
+  cursor: pointer;
+
+  // Grid layout variations based on item count
+  &.grid-count-1 .grid-item { max-height: 250px; }
+  &.grid-count-2 { grid-template-columns: 1fr 1fr; aspect-ratio: 2 / 1; }
+  &.grid-count-3 {
+    grid-template-columns: 1fr 1fr;
+    aspect-ratio: 1.5 / 1;
+    .grid-item:first-child { grid-row: span 2; }
+  }
+  &.grid-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; aspect-ratio: 1 / 1; }
+}
+
+.grid-item {
+  position: relative;
+  overflow: hidden;
+  background-color: #f0f0f0;
+
+  > img, .video-container {
+    width: 100%;
+    height: 100%;
+  }
+  
+  img, video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.video-container .play-icon {
+  @include play-icon(48px, 16px);
+}
+
+.more-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: $text-color;
+  font-size: 2rem;
+  font-weight: bold;
+  @include flex-center;
+}
+
+// ==========================================================================
+// Viewer (Lightbox) View
+// ==========================================================================
+
+.viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: $viewer-bg-color;
+  color: $text-color;
+  z-index: $z-index-viewer;
+  display: flex;
+  flex-direction: column;
+}
+
+// --- Viewer Header ---
+.viewer-header {
+  width: 100%;
+  padding: 8px 15px;
+  background: $control-bg-color;
+  box-sizing: border-box;
+  display: grid; // Use Grid for true centering
+  grid-template-columns: 1fr auto 1fr; // Left spacer, center content, right controls
+  align-items: center;
+  gap: 15px;
+
+  .viewer-title {
+    grid-column: 2; // Place title in the center column
+    justify-self: center; // Center it within the column
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0; 
+  }
+
+  .header-controls-right {
+    grid-column: 3; // Place controls in the right column
+    justify-self: end; // Align to the far right
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .viewer-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+// --- Viewer Content ---
+.viewer-content {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.media-wrapper {
+  flex-grow: 1;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  @include flex-center;
+
+  img, video {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 4px;
+  }
+
+  img {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  // Panning cursor states
+  &.is-pannable img { cursor: grab; }
+  &.is-panning img { cursor: grabbing; }
+}
+
+// --- Viewer Footer ---
+.viewer-footer {
+  width: 100%;
+  min-height: 60px;
+  padding: 5px;
+  background: $control-bg-color;
+  box-sizing: border-box;
+  @include flex-center;
+}
+
+// --- Responsive Overrides ---
+@media (orientation: portrait) {
+  .media-wrapper {
+    padding: 10px;
+
+    img {
+      height: auto;
+      width: auto;
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+}
+
+.thumbnail-strip {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 2px 0;
+}
+
+.thumbnail-item {
+  width: 45px;
+  height: 35px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.6;
+  transition: opacity 0.2s, border-color 0.2s;
+  position: relative;
+
+  &:hover { opacity: 1; }
+  &.active { border-color: $thumbnail-border-color; opacity: 1; }
+
+  img, video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.video-thumb .play-icon-small {
+  @include play-icon(20px, 8px);
+}
+
+// --- Common Viewer Controls ---
+.icon-btn {
+  background: none;
+  border: none;
+  color: $text-color;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  @include flex-center;
+
+  &:hover {
+    background-color: $control-hover-bg-color;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: ($z-index-viewer + 1);
+  background-color: rgba(0,0,0,0.4);
+
+  &.prev-btn { left: 20px; }
+  &.next-btn { right: 20px; }
+}

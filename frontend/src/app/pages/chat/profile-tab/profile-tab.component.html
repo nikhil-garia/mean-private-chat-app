@@ -1,0 +1,200 @@
+<div class="position-relative">
+  <div class="user-profile-img"><img ngSrc="/assets/media/img.jpg" class="profile-img" alt="" style="height: 160px;"
+      fill loading="lazy">
+    <div class="overlay-content">
+      <div>
+        <div class="user-chat-nav p-2 ps-3">
+          <div class="d-flex w-100 align-items-center">
+            <div class="flex-grow-1">
+              <h5 class="text-white mb-0">My Profile</h5>
+            </div>
+            <div class="flex-shrink-0">
+              <div class="dropdown"><button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                  class="btn nav-btn text-white btn btn-none "><i class="bx bx-dots-vertical-rounded"></i></button>
+                <div class="dropdown-menu-start dropdown-menu">
+                  <a href="#" tabindex="0" role="menuitem"
+                    class="d-flex align-items-center justify-content-between dropdown-item">Info <i
+                      class="bx bx-info-circle ms-2 text-muted"></i></a>
+                  <a href="javascript:void(0)" (click)="gotosetting('pills-setting');" tabindex="0" role="menuitem"
+                    class="d-flex align-items-center justify-content-between dropdown-item">Setting
+                    <i class="bx bx-cog text-muted ms-2"></i></a>
+                  <div tabindex="-1" class="dropdown-divider"></div>
+                  <a href="#" tabindex="0" role="menuitem"
+                    class="d-flex align-items-center justify-content-between dropdown-item">Help <i
+                      class="bx bx-help-circle ms-2 text-muted"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center p-3 p-lg-4 border-bottom pt-2 pt-lg-2 mt-n5 position-relative">
+    <div class="mb-lg-3 mb-2 d-flex justify-content-center">
+      @if (chat.room.loggedUser.profile_pic) {
+      <img [ngSrc]="chat.room.loggedUser.profile_pic | safeImageUrl"
+        class="rounded-circle avatar-lg img-thumbnail" alt="" width="60" height="60" loading="lazy" />
+      @if (chat.room.loggedUser.status) {
+      <span class="user-status"
+        [ngClass]="getUserStatusClass(chat.room.loggedUser.is_online,chat.room.loggedUser.status)"></span>
+      }
+      }@else{
+      <!-- for text avatar -->
+      <div class="rounded-circle avatar-lg img-thumbnail">
+        <span class="avatar-title rounded-circle text-uppercase text-white bg-purple"
+          [style.backgroundColor]="chat.room.loggedUser.bgcolor">
+          <span class="username">{{chat.room.loggedUser.name | firstChars }}</span>
+          @if (chat.room.loggedUser.status) {
+          <span class="user-status"
+            [ngClass]="getUserStatusClass(chat.room.loggedUser.is_online,chat.room.loggedUser.status)"></span>
+          }
+        </span>
+      </div>
+      }
+    </div>
+    <h5 class="font-size-16 mb-1 text-truncate">{{chat.room.loggedUser.name}}</h5>
+    <p class="text-muted font-size-14 text-truncate mb-0">Front end Developer</p>
+  </div>
+  <div data-simplebar="init" class="p-4 profile-desc simplebar-scrollable-y">
+    <div class="simplebar-wrapper" style="margin: -24px;">
+      <div class="simplebar-height-auto-observer-wrapper">
+        <div class="simplebar-height-auto-observer"></div>
+      </div>
+      <div class="simplebar-mask">
+        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+          <div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content"
+            style="height: 100%; overflow: hidden scroll;">
+            <div class="simplebar-content" style="padding: 24px;">
+              <div class="text-muted">
+                <p class="mb-4">{{chat.room.loggedUser.statusMsg}}</p>
+              </div>
+              <div>
+                <div class="d-flex py-2">
+                  <div class="flex-shrink-0 me-3"><i class="bx bx-user align-middle text-muted"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <p class="mb-0">{{chat.room.loggedUser.name}}</p>
+                  </div>
+                </div>
+                <div class="d-flex py-2">
+                  <div class="flex-shrink-0 me-3"><i class="bx bx-message-rounded-dots align-middle text-muted"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <p class="mb-0">{{chat.room.loggedUser.email}}</p>
+                  </div>
+                </div>
+                <div class="d-flex py-2">
+                  <div class="flex-shrink-0 me-3"><i class="bx bx-location-plus align-middle text-muted"></i></div>
+                  <div class="flex-grow-1">
+                    <p class="mb-0">California, USA</p>
+                  </div>
+                </div>
+                <div class="d-flex py-2">
+                  <div class="flex-shrink-0 me-3"><i class="bx bx-timer align-middle text-muted"></i></div>
+                  <div class="flex-grow-1">
+                    <p class="mb-0">{{localZone}}</p>
+                  </div>
+                </div>
+              </div>
+              <hr class="my-4">
+              <div>
+                <div class="d-flex">
+                  <div class="flex-grow-1">
+                    <h5 class="font-size-11 text-muted text-uppercase">Media</h5>
+                  </div>
+                  <div class="flex-shrink-0"><a class="font-size-12 d-block mb-2" (click)="showAll_media_profile()">
+                      {{!show_all_media_profile ? 'Show all' : 'Show limit'}}</a>
+                  </div>
+                </div>
+                <div class="profile-media-img">
+                  @for(a_item of all_attached_files; track $index){
+                  @if(a_item.mimetype!=null && (a_item.mimetype=="video/mp4" || a_item.mimetype=="image/jpeg" ||
+                  a_item.mimetype=="image/png")){
+                  @if (!show_all_media_profile) {
+                  @if($index<3){ <div class="media-img-list">
+                    <a [href]="serverPath+'/'+a_item.path" target="_blank">
+                      <img [ngSrc]="serverPath+'/'+a_item.path" alt="media img" class="img-fluid" width="68" height="76"
+                        loading="lazy">
+                      @if($index==2 && !show_all_media_profile){<div class="bg-overlay">+
+                        {{all_attached_files.length-($index+1)}}</div>}
+                    </a>
+                </div>
+                }
+                }@else{
+                <div class="media-img-list">
+                  <a [href]="serverPath+'/'+a_item.path" target="_blank">
+                    <img [ngSrc]="serverPath+'/'+a_item.path" alt="media img" class="img-fluid" width="68" height="76"
+                      loading="lazy">
+                  </a>
+                </div>
+                }
+                }
+                }
+              </div>
+            </div>
+            <hr class="my-4">
+            <div>
+              <div>
+                <h5 class="font-size-11 text-muted text-uppercase mb-3">Attached Files</h5>
+              </div>
+              <div>
+
+                @for(a_item of all_attached_files; track $index){
+                @if(a_item.mimetype!=null && (a_item.mimetype!="video/mp4" && a_item.mimetype!="image/jpeg" &&
+                a_item.mimetype!="image/png")){
+                <div class="p-2 border mb-2 card">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 avatar-xs ms-1 me-3">
+                      <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                        <i class="bx bx-file"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                      <h5 class="font-size-14 text-truncate mb-1">{{a_item.originalname}}
+                      </h5>
+                      <p class="text-muted font-size-13 mb-0">{{a_item.size | fileSize}}</p>
+                    </div>
+                    <div class="flex-shrink-0 ms-3">
+                      <div class="d-flex gap-2">
+                        <div class="d-flex align-items-center justify-content-center"><a class="text-muted px-1"
+                            target="_blank" [href]="a_item.path ? serverPath+'/'+a_item.path:a_item.url"
+                            download="{{a_item.path ? serverPath+'/'+a_item.path:a_item.url}}"><i
+                              class="bx bxs-download"></i></a></div>
+                        <div class="dropdown"><button type="button" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false" class="text-muted px-1 btn btn-none"><i
+                              class="bx bx-dots-horizontal-rounded"></i></button>
+                          <div class="dropdown-menu-end dropdown-menu"><a href="#" tabindex="0" role="menuitem"
+                              class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Share
+                              <i class="bx bx-share-alt ms-2 text-muted"></i></a><a href="#" tabindex="0"
+                              role="menuitem"
+                              class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Bookmark
+                              <i class="bx bx-bookmarks text-muted ms-2"></i></a>
+                            <div tabindex="-1" class="dropdown-divider"></div><a href="#" tabindex="0" role="menuitem"
+                              class="dropdown-item d-flex align-items-center justify-content-between dropdown-item">Delete
+                              <i class="bx bx-trash ms-2 text-muted"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                }
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="simplebar-placeholder" style="width: 300px; height: 750px;"></div>
+  </div>
+  <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+    <div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+  </div>
+  <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+    <div class="simplebar-scrollbar" style="height: 25px; display: block; transform: translate3d(0px, 0px, 0px);">
+    </div>
+  </div>
+</div>
+</div>

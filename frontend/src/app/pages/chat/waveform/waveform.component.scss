@@ -1,0 +1,21 @@
+.audio_wave {
+  width: 100%;
+  height: 70px;
+}
+.audioAttach button{
+  box-shadow: none;
+  font-size: 22px;
+  height: 23px;
+  padding: 0;
+  width: 23px;
+  background-color: rgba(78, 172, 109, 0.9019607843);
+    background-color: rgba(var(--bs-primary-rgb), 0.9);
+    border-color: rgba(78, 172, 109, 0.9019607843);
+    border-color: rgba(var(--bs-primary-rgb), 0.9);
+}
+.audioAttach button i{
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

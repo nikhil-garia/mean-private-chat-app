@@ -1,0 +1,7 @@
+<input
+id="toggle-heart"
+type="checkbox"
+[checked]="liked"
+(change)="onHeartChange($event)"
+/>
+<label for="toggle-heart" aria-label="like">❤</label>

@@ -1,0 +1,159 @@
+<div class="dropdown">
+  <!-- <button type="button" class="btn btn-soft-primary btn-xs  position-relative" > -->
+    <i role="button" class="bx bx-bell position-relative fs-4" id="unread_notifi_icon" (click)="getUnreadMessage()" matTooltip="click here to show notification"  data-bs-toggle="dropdown" aria-expanded="false">
+      @if(chat.unread.total_unread_count>0){
+        <span class="position-absolute translate-middle badge rounded-pill bg-danger">
+          {{(chat.unread.total_unread_count<100) ? chat.unread.total_unread_count : chat.unread.total_unread_count+'+'}}
+          <span class="visually-hidden">unread messages</span>
+        </span>
+      }
+  </i>
+  <!-- </button> -->
+  <!-- <button class="btn btn-soft-primary btn-xs" mat-icon-button aria-label="Example icon-button with a menu" matTooltip="click here to show notification" (click)="getUnreadMessage()" data-bs-toggle="dropdown" aria-expanded="false"><mat-icon [matBadge]="chat.unread.total_unread_count" matBadgeColor="warn" aria-hidden="false">notifications_none</mat-icon></button> -->
+  <ul class="dropdown-menu" id="unread_menu_list">
+    @if(unread_msg && unread_msg.length>0){
+      @for (um of unread_msg | sortByDate: 'send_datetime': 'desc'; track $index) {
+        <!-- new ui -->
+        <mat-card class="notification-card" (click)="openInChatBox(um.conversation_id._id)" style="min-width: 300px;">
+          <div class="notification-header">
+            <!-- Avatar -->
+            <ng-container>
+              <!-- Single Chat -->
+              @if(!um.conversation_id.is_group){
+              <ng-container>
+                @if (um.from.profile_pic && checkPic_privacy(um.from)) {
+                <div class="avatar">
+                  <img [src]="um.from.profile_pic | safeImageUrl" alt="{{ um.from.fullName }}" />
+                </div>
+                }@else {
+                  <div class="avatar">{{ um.from.fullName.charAt(0).toUpperCase() }}</div>
+                  @if (um.from.status) {
+                  <span class="user-status" [ngClass]="(um.from.status=='online') ? 'bg-success':''"></span>
+                  }
+                }
+              </ng-container>
+              }@else{
+              <!-- Group Chat -->
+              <ng-container>
+                <div class="avatar group-avatar">
+                  <mat-icon>group</mat-icon>
+                </div>
+              </ng-container>
+              }
+            </ng-container>
+
+            <!-- Name and Time Row -->
+             <div class="d-flex flex-column flex-grow-1">
+               <div class="info-row">
+                 <span class="name">
+                   @if(!um.conversation_id.is_group){
+                     {{ um.from.fullName }}
+                   }@else{
+                     {{ um.conversation_id.conv_name }} - {{ um.from.fullName }}
+                   }
+                 </span>
+                 <span class="time">{{ um.send_datetime | timeAgoConv }}</span>
+               </div>
+               <div class="message-block">
+                 @if(um.forwarded && um.forward_msg_id){
+                   <div class="message-body">
+                     <span class="fw-bold">Forwarded:</span>
+                     <span [innerHTML]="um.forward_msg_id.message | customslice:30"></span>
+                   </div>
+                 }
+                 @if(um.message && um.message!=''){
+                   <div class="message-body" [innerHTML]="um.message | customslice:30"></div>
+                 }
+                 @else if(um.sticker && um.sticker!=''){
+                   <div class="message-body">
+                     <img [src]="um.sticker" width="10" alt="">
+                   </div>
+                 }
+                 @else if(um.attachments && um.attachments.length>0){
+                   <div class="message-body">
+                     @if (um.attachments[0].mimetype!=null && um.attachments[0].mimetype=="application/pdf") {
+                     PDF recieved
+                     }@else if(um.attachments[0].mimetype!=null && um.attachments[0].mimetype=="video/mp4"){
+                     Video recieved
+                     }@else if(um.attachments[0].mimetype!=null && (um.attachments[0].mimetype=="image/jpeg" ||
+                     um.attachments[0].mimetype=="image/png")){
+                     Image recieved
+                     }@else if(um.attachments[0].mimetype!=null && (um.attachments[0].mimetype=="audio/mpeg")){
+                     Audio recieved
+                     }
+                   </div>
+                 }
+               </div>
+             </div>
+          </div>
+        
+        </mat-card>
+      }
+    }
+    @if(unread_notifications && unread_notifications.length>0){
+      @for (un of unread_notifications | sortByDate: 'createdAt': 'desc'; track $index) {
+        <!-- for connection request -->
+        @if(un.type=='connection_request'){
+            <mat-card class="notification-card" (click)="openContactDialog(un._id)" style="min-width: 300px;">
+            <div class="card-content  align-items-start">
+              @if (un.senderId.profile_pic && checkPic_privacy(un.senderId)) {
+                <img mat-card-avatar class="avatar" width="30" [src]="un.senderId.profile_pic | safeImageUrl" alt="Photo of a Shiba Inu">
+              }@else {
+                <div class="avatar">
+                  <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">
+                      <span class="username">{{un.senderId.fullName | firstChars }}</span>
+                      @if (un.senderId.status) {
+                        <span class="user-status" [ngClass]="(un.senderId.status=='online') ? 'bg-success':''"></span>
+                      }
+                  </span>
+                </div>
+              }
+  
+              <div class="details">
+                
+                <span class="d-flex justify-content-between">
+                  <h4>{{ un.senderId.fullName }}</h4>
+                  <p class="timestamp">{{ un.createdAt | timeAgoConv }}</p>
+                </span>
+                <p class="message">{{un.message}}</p>
+              </div>
+            </div>
+  
+            <mat-card-actions align="end">
+              <button mat-flat-button color="primary" (click)="onAccept(un.connectionId)">Accept</button>
+              <button mat-stroked-button color="warn" (click)="onReject(un.connectionId)">Reject</button>
+            </mat-card-actions>
+            </mat-card>
+          }@else if(un.type=='connection_accepted'){
+            <mat-card class="notification-card" (click)="openContactTab(un._id)" style="min-width: 300px;">
+              <div class="card-content align-items-start">
+                @if (un.senderId.profile_pic && checkPic_privacy(un.senderId)) {
+                  <img mat-card-avatar class="avatar" width="40" height="40" [src]="un.senderId.profile_pic | safeImageUrl" alt="User avatar">
+                }@else {
+                  <div class="avatar">
+                    <span class="avatar-title rounded-circle text-uppercase text-white bg-purple">
+                        <span class="username">{{un.senderId.fullName | firstChars }}</span>
+                        @if (un.senderId.status) {
+                          <span class="user-status" [ngClass]="(un.senderId.status=='online') ? 'bg-success':''"></span>
+                        }
+                    </span>
+                  </div>
+                }
+    
+                <div class="details">
+                  <div class="d-flex justify-content-between">
+                    <h5 class="fw-semibold">{{ un.senderId.fullName }}</h5>
+                    <p class="timestamp text-muted">{{ un.createdAt | timeAgoConv }}</p>
+                  </div>
+                  <p class="message text-muted">{{un.message}}</p>
+                </div>
+              </div>
+            </mat-card>
+          }
+      }
+    }
+    @if(!unread_notifications && !unread_msg) {
+      <li><a class="dropdown-item"><p>No Notification..</p></a></li>
+    }
+  </ul>
+</div>

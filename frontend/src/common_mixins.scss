@@ -1,0 +1,22 @@
+@mixin common_thing($r, $g, $b){
+    // --bs-primary-rgb: $r, $g, $b;
+    & {
+      --bs-primary-rgb: #{$r}, #{$g}, #{$b};
+      --bs-success-rgb:6,214,160;
+      --bs-bg-opacity:1;
+      --bs-light:#2e2e2e;
+      --bs-border-radius-lg: 0.4rem;
+      --bs-border-width: 1px;
+      --bs-font-sans-serif: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+      --bs-body-font-family:var(--bs-font-sans-serif);
+      --bs-btn-bg: #f6f6f9;
+      --bs-btn-color: #fff;
+      --bs-btn-color2: #fff;
+      --bs-link-color-rgb: 78, 172, 109;
+      --bs-sidebar-menu-item-color: #878a92;
+      --bs-link-hover-color-rgb: 105,184,131; //for bootstrap dropdown
+      --bs-sidebar-bg: #2e2e2e; //sidebar bg
+      --bs-highlight-bg: #fcf8e3;
+      --mat-sidenav-container-width:380px;  
+    }
+  }

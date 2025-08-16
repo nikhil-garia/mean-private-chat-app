@@ -1,0 +1,206 @@
+<div mat-dialog-title class="bg-primary font-size-16 text-white">
+  @if(isForward){
+    {{'Share this Message'}}
+  }@else{
+    <mat-icon>contacts</mat-icon>Contact
+  }
+</div>
+<mat-dialog-content class="mat-typography">
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" (selectedTabChange)="tabChanged($event);selectedContact=''">
+    @if(!isForward){
+      <mat-tab label="Explore">
+        <!-- Add search input -->
+        <div class="input-group mb-2">
+          <input id="searchUser" 
+                 [formControl]="user_searchControl"
+                 placeholder="Search users by name or email..." 
+                 type="text" 
+                 class="form-control bg-light border-0 pe-0 form-control">
+        </div>
+
+        <div class="user-list-scroll" #userListScrollDiv (scroll)="onUserListScroll($event)">
+          <mat-list role="list" id="exp1">
+            @for (item of allUser_list; track item._id) {
+              @if(data.intData.room.loggedUser.id!=item._id){
+                <mat-list-item role="listitem" [title]="item.email">
+                  <div class="d-flex">
+                    <img mat-list-avatar [src]="item.profile_pic" alt="{{item.fullName}} avatar" class="custom-avatar" />
+                    <div matListItemTitle>{{item.fullName}}</div>
+                    <button matButton="outlined"
+                            (click)="addContact(item._id)" 
+                            matTooltip="Add contact"
+                            *ngIf="!item.is_contact">
+                      Send Request
+                    </button>
+                  </div>
+                </mat-list-item>
+              }
+            }
+            <div *ngIf="isLoadingMore" class="text-center py-2">
+              loading
+              <mat-spinner diameter="24"></mat-spinner>
+            </div>
+            <div *ngIf="allLoaded && allUser_list.length > 0" class="text-center text-muted py-2" style="font-size: 12px;">
+              No more users to load.
+            </div>
+            <div *ngIf="!isLoadingMore && allUser_list.length === 0" class="text-center text-muted py-2" style="font-size: 12px;">
+              No users found.
+            </div>
+          </mat-list>
+        </div>
+      </mat-tab>
+      <mat-tab label="Contact">
+        <mat-slide-toggle [(ngModel)]="isGroup" (change)="contact_search='';selectedContact=''">Want to create group?</mat-slide-toggle>
+        @if(isGroup){
+          <div class="mb-4">
+            <label for="addgroupname-input" class="form-label form-label">Group Name</label>
+            <input [(ngModel)]="groupName" id="addgroupname-input" placeholder="Enter Group Name" type="text" class="form-control form-control" value="">
+          </div>
+          <div>
+            <label for="addgroupname-input" class="form-label form-label">Group Members</label>
+          </div>
+          <!-- contact list with single selection -->
+          <!-- according start -->
+          <mat-accordion>
+            <mat-expansion-panel [expanded]="0"  (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>Select Members</mat-panel-title>
+                <mat-panel-description>
+                  <!-- Currently I am {{panelOpenState ? 'open' : 'closed'}} -->
+                  Options selected: {{item.selectedOptions.selected.length}}
+                  <mat-icon>account_circle</mat-icon>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <!-- expansion content -->
+        
+              <!-- search input  -->
+              <div class="input-group mb-2"><input id="serachChatUser" [(ngModel)]="contact_search" placeholder="Search {{isGroup ? 'group member':'contact'}} here.." type="text" class="form-control bg-light border-0 pe-0 form-control"><button type="button" id="contactSearchbtn-addon" class="btn btn-light"><i class="bx bx-search align-middle"></i></button></div>
+              
+              <mat-selection-list #item [multiple]="true" (selectionChange)="onSelection($event, item, 'multiple')">
+                @for (group of filteredItems | sortBy:'first'; track group) {
+                  @if(group.collection.length>0){
+                    <div class="contact-list-title">{{ group.first }}</div>
+                  }
+                  @for (item of group.collection | searchContact :'fullName':contact_search; track item) {
+                    <mat-list-option [value]="item">
+                      <h5 class="font-size-14 m-0">{{item.fullName}} ({{item.email}})</h5>
+                    </mat-list-option>
+                  }
+                }
+              </mat-selection-list>
+              <div class="rounded p-4 text-center" *ngIf="contact_search.length>0 && totalItems==0"><i class="bx bx-info-circle fs-1 mb-3"></i><div>No results found for "{{contact_search}}".</div></div>
+            </mat-expansion-panel>
+          </mat-accordion>
+          <!-- according end -->
+        }@else if(isGroup==false){
+          <!-- search input  -->
+          <div class="input-group mb-2"><input id="serachChatUser" [(ngModel)]="contact_search" placeholder="Search {{isGroup ? 'group member':'contact'}} here.." type="text" class="form-control bg-light border-0 pe-0 form-control"><button type="button" id="contactSearchbtn-addon" class="btn btn-light"><i class="bx bx-search align-middle"></i></button></div>
+
+          <div class="d-flex align-items-center px-1" *ngIf="totalItems>0"><div class="flex-grow-1"><h4 class=" font-size-11 text-muted text-uppercase">Contacts</h4></div></div>
+          
+          <!-- show selected option -->
+          <p>Option selected: {{item.selectedOptions.hasValue() ? item.selectedOptions.selected[0].value.fullName+' ('+item.selectedOptions.selected[0].value.email+')' : 'None'}}</p>
+
+          <mat-selection-list #item [multiple]="false" (selectionChange)="onSelection($event, item, 'single')">
+            @for (group of (filteredItems || []) | sortBy:'first'; track group) {
+              @if(group.collection.length>0){
+                <div class="contact-list-title">{{ group.first }}</div>
+              }
+              @for (item of group.collection | searchContact :'fullName':contact_search; track item) {
+                <mat-list-option [value]="item">
+                  <h5 class="font-size-14 m-0">{{item.fullName}} ({{item.email}})</h5>
+                </mat-list-option>
+              }
+            }
+          </mat-selection-list>
+          <div class="rounded p-4 text-center" *ngIf="contact_search.length>0 && totalItems==0"><i class="bx bx-info-circle fs-1 mb-3"></i><div>No results found for "{{contact_search}}".</div></div>
+        }
+        <!-- selected contact list = {{selectedContact}} -->
+      </mat-tab>
+      <mat-tab label="Requested Contact">
+        <mat-list role="list">
+          @for (item of contact_req; track $index;) {
+          <mat-list-item role="listitem">{{item.initiator.fullName}} ({{item.initiator.email}}) <button mat-stroked-button
+              color="success" (click)="acceptReq(item._id)"
+              matTooltip="Accept the request">Accept</button></mat-list-item>
+          }
+        </mat-list>
+      </mat-tab>
+    }
+    @if(isForward){
+      <mat-tab>
+        <!-- <mat-slide-toggle [(ngModel)]="isGroup" (change)="contact_search='';selectedContact=''">Want to create group?</mat-slide-toggle> -->
+        <!-- @if(isGroup){ -->
+         <!-- {{data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.from.isme=="yes"}} -->
+          <div class="replymessage-block mb-2"><h5 class="conversation-name">
+            @if(data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.from.isme=="yes"){
+              You
+            }@else{
+              {{data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.from.name}}
+            }
+          </h5>
+          @if(data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.attachments.length>0){
+            <p class="mb-0">
+              {{data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.attachments.length}} file attached
+            </p>
+          }
+          @if(data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.message){
+            <p class="mb-0 ctext-content msg_html_content quill-content" [innerHTML]="getSanitizedMessage(data.intData.room.selectedRoomDetail.newMessage.collection.forward_msg.message)"></p>
+          }
+          <!-- <p class="mb-0">
+            Hey, I'm going to meet a friend of mine at the department store. I have to buy some presents for my parents 🎁
+          </p> -->
+        </div>
+          <textarea class="form-control" placeholder="Type your message..." rows="2"></textarea><hr>
+          <!-- <div>
+            <label for="addgroupname-input" class="form-label form-label">Group Members</label>
+          </div> -->
+          <!-- contact list with single selection -->
+          <!-- according start -->
+          <mat-accordion>
+            <mat-expansion-panel [expanded]="0"  (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>Select Members</mat-panel-title>
+                <mat-panel-description>
+                  <!-- Currently I am {{panelOpenState ? 'open' : 'closed'}} -->
+                  Options selected: {{item.selectedOptions.selected.length}}
+                  <mat-icon>account_circle</mat-icon>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <!-- expansion content -->
+        
+              <!-- search input  -->
+              <div class="input-group mb-2"><input id="serachChatUser" [(ngModel)]="contact_search" placeholder="Search {{isGroup ? 'group member':'contact'}} here.." type="text" class="form-control bg-light border-0 pe-0 form-control"><button type="button" id="contactSearchbtn-addon" class="btn btn-light"><i class="bx bx-search align-middle"></i></button></div>
+              
+              <mat-selection-list #item [multiple]="true" (selectionChange)="onSelection($event, item, 'multiple')">
+                @for (group of filteredItems | sortBy:'first'; track group) {
+                  @if(group.collection.length>0){
+                    <div class="contact-list-title">{{ group.first }}</div>
+                  }
+                  @for (item of group.collection | searchContact :'fullName':contact_search; track item) {
+                    <mat-list-option [value]="item">
+                      <h5 class="font-size-14 m-0">{{item.fullName}} ({{item.email}})</h5>
+                    </mat-list-option>
+                  }
+                }
+              </mat-selection-list>
+              <div class="rounded p-4 text-center" *ngIf="contact_search.length>0 && totalItems==0"><i class="bx bx-info-circle fs-1 mb-3"></i><div>No results found for "{{contact_search}}".</div></div>
+            </mat-expansion-panel>
+          </mat-accordion>
+          <!-- according end -->
+        <!-- } -->
+        <!-- selected contact list = {{selectedContact}} -->
+      </mat-tab>
+    }
+  </mat-tab-group>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="btn btn-link" mat-dialog-close>Cancel</button>
+  @if(this.isForward){
+    <button class="bg-primary btn btn-success text-white" type="button" cdkFocusInitial (click)="forwardMsg()"  matTooltip="Forward message"><i class="bx bxs-send align-middle"></i></button>
+  }@else{
+    <button *ngIf="showCrateConvBtn" class="bg-primary btn btn-success text-white" type="button" cdkFocusInitial (click)="submitCreForm()"  matTooltip="Create conversation"><i class="bx bxs-send align-middle"></i></button>
+  }
+  <!-- <button mat-button color="primary" class="btn btn-primary text-white" type="button" cdkFocusInitial
+        matTooltip=""><i class="bx bxs-send align-middle"></i></button> -->
+</mat-dialog-actions>

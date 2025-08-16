@@ -1,0 +1,150 @@
+{
+	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+	"version": 1,
+	"newProjectRoot": "projects",
+	"projects": {
+		"auth-angular17j": {
+			"projectType": "application",
+			"schematics": {
+				"@schematics/angular:component": {
+					"style": "scss"
+				}
+			},
+			"root": "",
+			"sourceRoot": "src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular-devkit/build-angular:application",
+					"options": {
+						"allowedCommonJsDependencies": [
+						   "rxjs-compat",
+						   "lodash",
+						   "long",
+						   "protobufjs/minimal",
+						   "pako/lib/deflate.js",
+              			   "howler",
+              			   "localforage",
+						   "quill",
+						   "quill-delta",
+						   "mediasoup-client"
+						],
+						"outputPath": {
+							"base": "dist/auth-angular17j",
+							"browser": ""
+						},
+						"index": "src/index.html",
+						"browser": "src/main.ts",
+						"polyfills": [],
+						"tsConfig": "tsconfig.app.json",
+						"assets": [
+							"src/favicon.ico",
+							"src/assets"
+						],
+						"styles": [
+							"@angular/material/prebuilt-themes/purple-green.css",
+							"node_modules/font-awesome/css/font-awesome.min.css",
+							"node_modules/bootstrap/dist/css/bootstrap.min.css",
+							"node_modules/boxicons/css/boxicons.min.css",
+							"src/styles.scss"
+						],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles","node_modules"
+              ]
+            },
+						"scripts": [
+							"node_modules/jquery/dist/jquery.min.js",
+							"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+							"node_modules/boxicons/dist/boxicons.js"
+						],
+            "sourceMap": true
+					},
+					"configurations": {
+						"production": {
+							"optimization": {
+								"scripts": true,
+								"styles": {
+									"minify": true,
+									"inlineCritical": true
+								},
+								"fonts": true
+							},
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "10mb",
+									"maximumError": "12mb"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "200kb",
+									"maximumError": "100kb"
+								}
+							],
+							"outputHashing": "all",
+							"sourceMap": false,
+							"aot": true,
+							"fileReplacements": [
+							  {
+								"replace": "src/environments/environment.ts",
+								"with": "src/environments/environment.prod.ts"
+							  }
+							]
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true,
+							"outputPath": {
+								"base": "dist/auth-angular17j",
+								"browser": ""
+							}
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular-devkit/build-angular:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "auth-angular17j:build:production"
+						},
+						"development": {
+							"buildTarget": "auth-angular17j:build:development"
+						}
+					},
+					"defaultConfiguration": "development",
+					"options": {
+						"proxyConfig": "src/proxyconfig/proxy.conf.json"
+					}
+				},
+				"extract-i18n": {
+					"builder": "@angular-devkit/build-angular:extract-i18n",
+					"options": {
+						"buildTarget": "auth-angular17j:build"
+					}
+				},
+				"test": {
+					"builder": "@angular-devkit/build-angular:karma",
+					"options": {
+						"polyfills": [],
+						"tsConfig": "tsconfig.spec.json",
+						"assets": [
+							"src/favicon.ico",
+							"src/assets"
+						],
+						"styles": [
+              "@angular/material/prebuilt-themes/purple-green.css",
+              "src/styles.scss"
+            ],
+						"scripts": []
+					}
+				}
+			}
+		}
+  },
+  "cli": {
+    "analytics": false
+  }
+}

@@ -1,0 +1,264 @@
+<div class="dropdown">
+  <button type="button"
+          class="btn btn-link p-0 border-0 bg-transparent"
+          id="unread_notifi_icon"
+          (click)="getUnreadMessage()"
+          matTooltip="Click here to show notifications"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          aria-label="Notifications">
+    <i class="bx bx-bell position-relative fs-4"></i>
+    @if(chat.unread.total_unread_count > 0){
+      <span class="position-absolute translate-middle badge rounded-pill bg-danger"
+            role="status"
+            [attr.aria-label]="chat.unread.total_unread_count + ' unread notifications'">
+        {{(chat.unread.total_unread_count < 100) ? chat.unread.total_unread_count : '99+'}}
+      </span>
+    }
+  </button>
+
+  <div class="dropdown-menu notification-dropdown" 
+       id="unread_menu_list"
+       role="menu"
+       aria-label="Notifications menu">
+    <div class="notification-header">
+      <h6 class="notification-title" role="heading" aria-level="2">Notifications</h6>
+    </div>
+
+    @if(hasNotificationsForToday()) {
+      <div class="notification-section" role="region" aria-label="Today's notifications">
+        <h6 class="section-title">Today</h6>
+        @for (item of getTodayMessages(); track item._id) {
+          <ng-container *ngTemplateOutlet="messageItemTemplate; context: {$implicit: item}"></ng-container>
+        }
+        @for (item of getTodayConnectionRequests(); track item._id) {
+          <ng-container *ngTemplateOutlet="connectionItemTemplate; context: {$implicit: item}"></ng-container>
+        }
+      </div>
+    }
+
+    @if(hasNotificationsForYesterday()) {
+      <div class="notification-section" role="region" aria-label="Yesterday's notifications">
+        <h6 class="section-title">Yesterday</h6>
+        @for (item of getYesterdayMessages(); track item._id) {
+          <ng-container *ngTemplateOutlet="messageItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+        @for (item of getYesterdayConnectionRequests(); track item._id) {
+          <ng-container *ngTemplateOutlet="connectionItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+      </div>
+    }
+
+    @if(hasNotificationsForThisWeek()) {
+      <div class="notification-section" role="region" aria-label="This week's notifications">
+        <h6 class="section-title">This Week</h6>
+        @for (item of getThisWeekMessages(); track item._id) {
+          <ng-container *ngTemplateOutlet="messageItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+        @for (item of getThisWeekConnectionRequests(); track item._id) {
+          <ng-container *ngTemplateOutlet="connectionItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+      </div>
+    }
+
+    @if(hasNotificationsForThisMonth()) {
+      <div class="notification-section" role="region" aria-label="This month's notifications">
+        <h6 class="section-title">This Month</h6>
+        @for (item of getThisMonthMessages(); track item._id) {
+          <ng-container *ngTemplateOutlet="messageItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+        @for (item of getThisMonthConnectionRequests(); track item._id) {
+          <ng-container *ngTemplateOutlet="connectionItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+      </div>
+    }
+
+    @if(hasNotificationsForThisYear()) {
+      <div class="notification-section" role="region" aria-label="This year's notifications">
+        <h6 class="section-title">This Year</h6>
+        @for (item of getThisYearMessages(); track item._id) {
+          <ng-container *ngTemplateOutlet="messageItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+        @for (item of getThisYearConnectionRequests(); track item._id) {
+          <ng-container *ngTemplateOutlet="connectionItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+      </div>
+    }
+
+    @if(hasNotificationsForYearBefore()) {
+      <div class="notification-section" role="region" aria-label="Older notifications">
+        <h6 class="section-title">Year Before</h6>
+        @for (item of getYearBeforeMessages(); track item._id) {
+          <ng-container *ngTemplateOutlet="messageItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+        @for (item of getYearBeforeConnectionRequests(); track item._id) {
+          <ng-container *ngTemplateOutlet="connectionItemTemplate; context: {$implicit: item, isPast: true}"></ng-container>
+        }
+      </div>
+    }
+
+    @if(!hasAnyNotifications()) {
+      <div class="empty-state" role="status" aria-label="No notifications">
+        <mat-icon class="empty-icon" aria-hidden="true">notifications_none</mat-icon>
+        <p class="empty-message">No notifications yet</p>
+      </div>
+    }
+  </div>
+</div>
+
+<ng-template #messageItemTemplate let-um let-isPast="isPast">
+  <div class="notification-item message-item"
+       role="menuitem"
+       tabindex="0"
+       (click)="openInChatBox(um.conversation_id._id)"
+       (keydown.enter)="openInChatBox(um.conversation_id._id)"
+       (keydown.space)="openInChatBox(um.conversation_id._id)"
+       [attr.aria-label]="'Message from ' + um.from.fullName + ' - ' + (um.message || 'New message')">
+    <div class="notification-icon">
+      @if (!isPast) {
+        <mat-icon class="icon-message" aria-hidden="true">chat_bubble</mat-icon>
+      } @else {
+        <div class="avatar-circle" [ngClass]="{'yesterday': true, 'last-week': isPast}">
+          @if (um.from.profile_pic && checkPic_privacy(um.from)) {
+            <img [src]="um.from.profile_pic | safeImageUrl"
+                 [alt]="um.from.fullName + ' profile picture'"
+                 class="avatar-image">
+          }@else {
+            <span class="avatar-initial" aria-hidden="true">
+              {{um.from.fullName | firstChars }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="notification-content">
+      <div class="notification-meta">
+        <span class="sender-name">
+          @if(!um.conversation_id.is_group){
+            @if(isPast) { New Message from } {{ um.from.fullName }}
+          }@else{
+            {{ um.conversation_id.conv_name }} - {{ um.from.fullName }}
+          }
+        </span>
+        <span class="notification-time">{{ um.send_datetime | timeAgoConv }}</span>
+      </div>
+
+      <div class="notification-message">
+        @if(um.forwarded && um.forward_msg_id){
+          <span class="message-prefix">Forwarded:</span>
+          <span [innerHTML]="um.forward_msg_id.message | customslice:50"></span>
+        }
+        @else if(um.message && um.message !== ''){
+          <span [innerHTML]="um.message | customslice:50"></span>
+        }
+        @else if(um.sticker && um.sticker !== ''){
+          <span class="attachment-type">Sticker</span>
+        }
+        @else if(um.attachments && um.attachments.length > 0){
+          @if (um.attachments[0].mimetype === "application/pdf") {
+            <span class="attachment-type">📄 PDF received</span>
+          }@else if(um.attachments[0].mimetype === "video/mp4"){
+            <span class="attachment-type">🎥 Video received</span>
+          }@else if(um.attachments[0].mimetype === "image/jpeg" || um.attachments[0].mimetype === "image/png"){
+            <span class="attachment-type">📷 Image received</span>
+          }@else if(um.attachments[0].mimetype === "audio/mpeg"){
+            <span class="attachment-type">🎵 Audio received</span>
+          }
+        } @else if(isPast) {
+          <span class="attachment-type">New message</span>
+        }
+      </div>
+    </div>
+
+    <mat-icon class="chevron-icon" aria-hidden="true">chevron_right</mat-icon>
+  </div>
+</ng-template>
+
+<ng-template #connectionItemTemplate let-un let-isPast="isPast">
+  @if(un.type === 'connection_request'){
+    <div class="notification-item connection-item"
+         role="menuitem"
+         tabindex="0"
+         [attr.aria-label]="'Connection request from ' + un.senderId.fullName">
+      <div class="notification-icon">
+        <div class="avatar-circle" [ngClass]="{'yesterday': isPast, 'last-week': isPast}">
+          @if (un.senderId.profile_pic && checkPic_privacy(un.senderId)) {
+            <img [src]="un.senderId.profile_pic | safeImageUrl"
+                 [alt]="un.senderId.fullName + ' profile picture'"
+                 class="avatar-image">
+          }@else {
+            <span class="avatar-initial" aria-hidden="true">
+              {{un.senderId.fullName | firstChars }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="notification-content">
+        <div class="notification-meta">
+          <span class="sender-name">{{ un.senderId.fullName }}</span>
+          <span class="notification-time">{{ un.createdAt | timeAgoConv }}</span>
+        </div>
+
+        <div class="notification-message">
+          <span class="connection-message">🤝 {{ un.senderId.fullName }} sent you a friend request</span>
+        </div>
+
+        <div class="connection-actions">
+          <button mat-flat-button
+                  color="primary"
+                  class="action-btn accept-btn"
+                  (click)="onAccept(un.connectionId, $event)"
+                  [attr.aria-label]="'Accept connection request from '+ un.senderId.fullName">
+            Accept
+          </button>
+          <button mat-stroked-button
+                  color="warn"
+                  class="action-btn reject-btn"
+                  (click)="onReject(un.connectionId, $event)"
+                  [attr.aria-label]="'Reject connection request from ' + un.senderId.fullName">
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  @else if(un.type === 'connection_accepted'){
+    <div class="notification-item connection-accepted-item"
+         role="menuitem"
+         tabindex="0"
+         (click)="openContactTab(un._id)"
+         (keydown.enter)="openContactTab(un._id)"
+         (keydown.space)="openContactTab(un._id)"
+         [attr.aria-label]="'Connection accepted by ' + un.senderId.fullName">
+      <div class="notification-icon">
+        <div class="avatar-circle" [ngClass]="{'yesterday': isPast, 'last-week': isPast}">
+          @if (un.recipientId.profile_pic && checkPic_privacy(un.recipientId)) {
+            <img [src]="un.recipientId.profile_pic | safeImageUrl"
+                 [alt]="un.recipientId.fullName + ' profile picture'"
+                 class="avatar-image">
+          }@else {
+            <span class="avatar-initial" aria-hidden="true">
+              {{un.recipientId.fullName | firstChars }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="notification-content">
+        <div class="notification-meta">
+          <!-- show recipient name how accepted you request -->
+          <span class="sender-name">{{ un.recipientId.fullName }}</span>
+          <span class="notification-time">{{ un.createdAt | timeAgoConv }}</span>
+        </div>
+
+        <div class="notification-message">
+          <span class="connection-message">✅ {{ un.message }}</span>
+        </div>
+      </div>
+
+      <mat-icon class="chevron-icon" aria-hidden="true">chevron_right</mat-icon>
+    </div>
+  }
+</ng-template>

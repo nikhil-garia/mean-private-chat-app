@@ -1,0 +1,212 @@
+<!-- <div mat-dialog-title class="bg-primary font-size-16 text-white">
+  <mat-icon> my_location</mat-icon> Share Location
+</div> -->
+<mat-dialog-content class="mat-typography">
+    <div class="text-center p-4 pb-0">
+      <!-- Show group name if group call -->
+      <div *ngIf="is_group" class="mb-2">
+        <span class="font-size-18 text-primary">{{ data.audioCall_detail.groupName || data.intData.room.selectedRoomDetail.row.conv_name || 'Group Call' }}</span>
+      </div>
+      <!-- Calling label -->
+      <div *ngIf="!open_audio_dialog && !is_user_busy" class="mb-2">
+        <span class="font-size-16 text-primary">{{ getCallStatusLabel() }}</span>
+      </div>
+      <div class="avatar-xl mx-auto mb-4">
+        @if(!is_group){
+          @if (data.audioCall_detail.from.profile_pic && data.audioCall_detail.from.profile_pic!=undefined && checkPic_privacy(data.audioCall_detail.from)) {
+            <img class="img-thumbnail rounded-circle" [src]="data.audioCall_detail.from.profile_pic | safeImageUrl" alt="">
+          }@else{
+            <!-- for text avatar -->
+            <div class="avatar-xl">
+              <span class="avatar-title rounded-circle text-uppercase text-white bg-purple" [style.backgroundColor]="(data.audioCall_detail.from.isme=='yes') ? this.data.intData.room.loggedUser.bgcolor:(this.data.intData.room.selectedRoomDetail.row.is_group==false? this.data.intData.room.selectedRoomDetail.row.bgcolor:'')">
+                  <span class="username">{{data.audioCall_detail.from.fullName | firstChars }}</span>
+              </span>
+            </div>
+          }
+        }@else{
+          <!-- for text avatar -->
+          <div class="avatar-xl">
+            <span class="avatar-title rounded-circle text-uppercase text-white bg-purple" [style.backgroundColor]="this.data.intData.room.selectedRoomDetail.row.bgcolor">
+                <span class="username">{{(data.audioCall_detail.groupName || data.intData.room.selectedRoomDetail.row.conv_name) | firstChars }}</span>
+            </span>
+          </div>
+        }
+        <!-- <img
+          [src]="serverPath+'/'+'uploads/profile/'+data.audioCall_detail.from.profile_pic"
+          alt=""
+          class="img-thumbnail rounded-circle"
+        /> -->
+        <!-- {{data.audioCall_detail.from.profile_pic}} -->
+      </div>
+      <span *ngIf="is_user_busy">{{is_user_busy_msg}}</span>
+      <div class="control-row mt-4">
+        <div class="avatar-md h-auto control-tile">
+          <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="showAudio=true;toggleMute();">
+            <span class="avatar-title bg-transparent text-muted font-size-20">
+              <i class="bx bx-microphone-off" *ngIf="isMute"></i>
+              <i class="bx bx-microphone" *ngIf="!isMute"></i>
+            </span>
+          </button>
+          <div class="control-title">{{!isMute ? 'Mute':'Unmute'}}</div>
+        </div>
+        <div class="avatar-md h-auto control-tile">
+          <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="toggleOutputMode()" title="Switch Output">
+            <span class="avatar-title bg-transparent text-muted font-size-20">
+              <i class="bx" [class.bx-headphone]="outputMode==='headset'" [class.bx-volume-full]="outputMode==='speaker'"></i>
+            </span>
+          </button>
+          <div class="control-title">{{ outputMode==='headset' ? 'Headset' : 'Speaker' }}</div>
+          <div class="control-caption" [title]="currentOutputLabel">{{ currentOutputLabel || 'Default output' }}</div>
+        </div>
+        <div class="avatar-md h-auto control-tile">
+          <button type="button" class="avatar-sm rounded-circle btn btn-light" (click)="toggleMicrophoneInput()" title="Switch Microphone">
+            <span class="avatar-title bg-transparent text-muted font-size-20">
+              <i class="bx" [class.bx-headphone]="isHeadsetMic" [class.bx-microphone]="!isHeadsetMic"></i>
+            </span>
+          </button>
+          <div class="control-title">Switch Mic</div>
+          <div class="control-caption" [title]="currentInputLabel">{{ currentInputLabel || 'Default microphone' }}</div>
+        </div>
+        <div class="avatar-md h-auto control-tile">
+          <button type="button" class="avatar-sm rounded-circle btn btn-light">
+            <span class="avatar-title bg-transparent text-muted font-size-20"
+              ><i class="bx bx-user-plus"></i
+            ></span>
+          </button>
+          <div class="control-title">Add New</div>
+        </div>
+        <!-- <mat-slider min="0" max="100000" step="1000" showTickMarks discrete [displayWith]="formatLabel">
+          <input matSliderThumb>
+        </mat-slider> -->
+      </div>
+      <div class="mt-4">
+        @if(!open_audio_notification_dialog){
+          <button
+            type="button"
+            class="btn btn-danger avatar-md call-close-btn rounded-circle btn btn-danger"
+            (click)="handleDisconnect('end_call')">
+            <span class="avatar-title bg-transparent font-size-24"
+              >
+              <!-- <i class="mdi mdi-phone-hangup"></i> -->
+            <!-- <i class="fa fa-solid fa-phone-hangup"></i> -->
+            <i class="fa fa-phone"></i>
+          </span>
+          </button>
+        }@else {
+          <button
+            type="button"
+            class="btn btn-success avatar-md call-close-btn rounded-circle"
+            (click)="handleAccept()">
+            <span class="avatar-title bg-transparent font-size-24"
+              > 
+              <!-- <i class="fa-solid fa-circle-phone"></i> -->
+              <i class="fa fa-phone"></i>
+            </span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger avatar-md call-close-btn rounded-circle"
+            (click)="handleDeny()">
+            <span class="avatar-title bg-transparent font-size-24">
+              <!-- <i class="mdi mdi-phone-hangup"></i> -->
+              <i class="fa fa-phone"></i>
+            </span>
+          </button>
+        }
+      </div>
+      <div *ngIf="is_group && isInitiator && data.audioCall_detail.from._id === data.intData.room.loggedUser.id" class="avatar-md h-auto">
+        <button type="button" class="avatar-sm rounded-circle btn btn-danger"
+                (click)="endCallForAll()">
+          <span class="avatar-title bg-transparent font-size-24">
+            <i class="fa fa-phone-slash"></i>
+          </span>
+        </button>
+        <h5 class="font-size-11 text-uppercase text-muted mt-2">End Call for All</h5>
+      </div>
+    </div>
+    <div class="p-4 bg-soft-primary mt-n4">
+      <div class="mt-4 text-center">
+        <h5 class="font-size-18 mb-0 text-truncate">{{data.audioCall_detail.from.fullName}}</h5>
+      </div>
+    </div>
+    @if(showAudio){
+      <audio src="" [hidden]="showAudio" controls id="local-audio"></audio>
+      <audio src="" [hidden]="showAudio" controls autoplay id="remote-audio"></audio>
+    }
+    <!-- Remote Audio Streams -->
+     @if(is_group){
+       <div class="p-4">
+         <h5 class="font-size-16 mb-3 text-primary">Participants ({{joinedParticipants.length}})</h5>
+         <div class="participant-list">
+          <!-- {{joinedParticipants | json}} -->
+           <div *ngFor="let participant of joinedParticipants; trackBy: trackById" 
+                class="participant-item d-flex align-items-center mb-3 p-3 rounded" 
+                [class.bg-light]="participant._id === currentUserId" 
+                [class.border]="participant._id === currentUserId" 
+                [class.border-primary]="participant._id === currentUserId"
+                [class.speaking]="isParticipantSpeaking(participant._id)">
+             <div style="position: relative;">
+               <img *ngIf="participant.profile_pic" class="rounded-circle me-3" width="48" height="48" [src]="participant.profile_pic | safeImageUrl" alt="" />
+               <span *ngIf="!participant.profile_pic" class="avatar-title rounded-circle text-uppercase text-white bg-purple me-3" style="width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;">
+                 {{participant.fullName | firstChars}}
+               </span>
+               <!-- Mute overlay -->
+               <span *ngIf="participant._id === currentUserId ? isMute : participantMuteStatus[participant._id]"
+                     style="position: absolute; top: 0; left: 0; width: 48px; height: 48px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                 <i class="bx bx-microphone-off text-white font-size-18"></i>
+               </span>
+               <!-- Speaking indicator -->
+               <span *ngIf="isParticipantSpeaking(participant._id) && !(participant._id === currentUserId ? isMute : participantMuteStatus[participant._id])"
+                     style="position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; background: #28a745; border-radius: 50%; border: 2px solid white; animation: pulse 1.5s infinite;"></span>
+             </div>
+             <div class="flex-grow-1">
+               <div class="d-flex align-items-center">
+                 <span class="font-size-14 font-weight-medium me-2">
+                   {{participant.fullName}}
+                   <span *ngIf="participant._id === currentUserId" class="text-primary">(You)</span>
+                   <span *ngIf="isInitiator && participant._id === currentUserId" class="badge bg-success ms-1">Host</span>
+                 </span>
+                 <span class="ms-auto">
+                   <i class="bx font-size-16"
+                      [class.bx-microphone-off]="participant._id === currentUserId ? isMute : participantMuteStatus[participant._id]"
+                      [class.bx-microphone]="participant._id === currentUserId ? !isMute : !participantMuteStatus[participant._id]"
+                      [class.text-danger]="participant._id === currentUserId ? isMute : participantMuteStatus[participant._id]"
+                      [class.text-success]="participant._id === currentUserId ? !isMute : !participantMuteStatus[participant._id]"
+                      [attr.title]="(participant._id === currentUserId ? isMute : participantMuteStatus[participant._id]) ? 'Muted' : 'Unmuted'"></i>
+                 </span>
+               </div>
+               <!-- Audio level indicator -->
+               <div class="mt-2">
+                 <div class="audio-level-bar" [class.active]="isParticipantSpeaking(participant._id)">
+                   <div class="audio-level-fill" [style.width.%]="getAudioLevel(participant._id)"></div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Audio Controls Section -->
+         <div class="mt-4 p-3 bg-light rounded">
+           <h6 class="font-size-14 mb-3">Audio Controls</h6>
+           <div class="d-flex justify-content-between align-items-center">
+             <div class="d-flex align-items-center">
+               <label class="me-2 font-size-12">Master Volume:</label>
+               <input type="range" class="form-range" min="0" max="100" value="50" 
+                      style="width: 100px;" (input)="setMasterVolume($event)">
+             </div>
+             <div class="d-flex align-items-center">
+               <button class="btn btn-sm btn-outline-secondary me-2" (click)="toggleAllAudio()">
+                 <i class="bx" [class.bx-volume-full]="!allAudioMuted" [class.bx-volume-mute]="allAudioMuted"></i>
+                 {{allAudioMuted ? 'Unmute All' : 'Mute All'}}
+               </button>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Hidden audio elements container -->
+         <div id="remote-audios" style="display: none;">
+           <!-- Remote audio elements will be dynamically added here -->
+         </div>
+       </div>
+     }
+  </mat-dialog-content>

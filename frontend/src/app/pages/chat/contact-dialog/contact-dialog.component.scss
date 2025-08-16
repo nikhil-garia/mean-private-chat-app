@@ -1,0 +1,160 @@
+
+.btn-light {
+    background-color: #f6f6f9;
+    background-color: var(--bs-light);
+    border-color: #f6f6f9;
+    border-top-color: rgb(246, 246, 249);
+    border-right-color: rgb(246, 246, 249);
+    border-bottom-color: rgb(246, 246, 249);
+    border-left-color: rgb(246, 246, 249);
+    border-color: var(--bs-light);
+    // color:var(--bs-btn-color);
+  }
+  .btn {
+    --bs-btn-padding-x: 1rem;
+    --bs-btn-padding-y: 0.5rem;
+    --bs-btn-font-family: ;
+    --bs-btn-font-size: 0.9375rem;
+    --bs-btn-font-weight: 400;
+    --bs-btn-line-height: 1.5;
+    --bs-btn-color: var(--bs-body-color);
+    // --bs-btn-bg: #0000;
+    --bs-btn-border-width: var(--bs-border-width);
+    --bs-btn-border-color: #0000;
+    --bs-btn-border-radius: var(--bs-border-radius);
+    --bs-btn-hover-border-color: #0000;
+    --bs-btn-box-shadow: inset 0 1px 0 #ffffff26, 0 1px 1px rgba(0,0,0,.075);
+    --bs-btn-disabled-opacity: 0.65;
+    --bs-btn-focus-box-shadow: 0 0 0 0 rgba(var(--bs-btn-focus-shadow-rgb),.5);
+    background-color: var(--bs-btn-bg);
+    border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+  }
+.form-control {
+    -webkit-appearance: none;
+    appearance: none;
+    background-clip: padding-box;
+    background-color: #fff;
+    background-color: var(--bs-input-bg);
+    border: 1px solid #eaeaf1;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: .25rem;
+    border-radius: var(--bs-border-radius);
+    color: #495057;
+    color: var(--bs-body-color);
+    display: block;
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: .5rem 1rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    width: 100%;
+}
+.form-control:focus {
+    background-color: #fff;
+    background-color: var(--bs-input-bg);
+    border-color: #eaeaf1;
+    border-color: var(--bs-border-color);
+    box-shadow: 0 0 0 0 #4eac6d40;
+    color: #495057;
+    color: var(--bs-body-color);
+    outline: 0;
+}
+label {
+    font-weight: 500;
+}
+.input-group {
+    align-items: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    width: 100%;
+}
+.contact-list-title {
+    color: #4eac6d;
+    color: rgba(var(--bs-primary-rgb), 1);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 24px;
+    position: relative;
+}
+.contact-list-title:after {
+    background-color: #eaeaf1;
+    background-color: var(--bs-border-color);
+    content: "";
+    height: 1px;
+    left: 50px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+#contactSearchbtn-addon {
+    background-color: rgba(var(--bs-light-rgb), .75);
+    color: var(--bs-btn-color);
+    border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+    position: absolute;
+    right: 0px;    z-index: 5;
+}
+.font-size-11 {
+    font-size: 11px !important;
+}
+.text-muted {
+    --bs-text-opacity: 1;
+    color: #495057bf !important;
+    color: var(--bs-secondary-color) !important;
+}
+.mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+    // justify-content: flex-end;
+}
+.mdc-switch__track::after, .mdc-switch__track::before {
+    border-width: var(--mat-switch-track-outline-width);
+    border-color: var(--mat-switch-track-outline-color);
+}
+.mat-mdc-slide-toggle .mdc-switch--unselected .mdc-switch__handle:has(.mdc-switch__icons) {
+    // margin: var(--mat-switch-unselected-with-icon-handle-horizontal-margin);
+    margin:0px 4px !important;
+}
+
+
+// forward message
+.replymessage-block {
+    background-color: #4eac6d1a;
+    background-color: rgba(var(--bs-primary-rgb), .1);
+    border-left: 2px solid #4eac6d;
+    border-left: 2px solid rgba(var(--bs-primary-rgb), 1);
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 8px;
+    padding: 12px 20px;
+    text-align: left;
+}
+.replymessage-block .conversation-name {
+    color: #4eac6d;
+    color: rgba(var(--bs-primary-rgb), 1);
+    font-size: 15px;
+}
+#exp1{
+    .custom-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%; /* keep it circular */
+      object-fit: cover;  /* optional: crop nicely */
+      margin-right: 5px;
+    }
+    mat-list-item {
+      display: flex !important;
+      align-items: center !important;
+      height: auto !important;
+      max-height: 100px;
+    }
+    
+    mat-list-item button {
+      margin-left: auto;
+    }
+}
+.user-list-scroll {
+    height: 324px; // or whatever fits your design
+    overflow-y: auto;
+}

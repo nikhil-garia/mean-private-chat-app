@@ -1,0 +1,169 @@
+<div class="chat-message-list">
+    <ul class="list-unstyled chat-list chat-user-list">
+      <li matRipple *ngFor="let conv of chat.room.conv_list | sortByDate: 'last_msg_date': 'desc' | conversationFilter:getLikeData:is_archive_open | searchConv:search; let idx = index;"  [attr.data-index]="idx" [class.active]="conv._id === chat.room.selectedRoomId">
+        @if(!conv.is_temp){
+          <a [ngClass]="(conv.unread_cov_count && conv.unread_cov_count>0) ? 'unread-msg-user' : ''" href="javascript:void(0);">
+            <div class="d-flex align-items-start">
+              <div class="chat-user-img align-self-center me-2 ms-0"  (click)="showConvMsg(conv);">
+                @if (conv.is_group) {
+                  @if (conv.grp_avatar) {
+                    <img [ngSrc]="'assets/media/'+conv.grp_avatar" class="rounded-circle" [ngClass]="!chat.isMobile ? 'avatar-xs':'avatar-sm'" alt="" width="28" height="28" loading="lazy"/>
+                  }@else{
+                    <!-- for text avatar -->
+                    <div class="" [ngClass]="!chat.isMobile ? 'avatar-xs':'avatar-sm'">
+                      <span class="avatar-title rounded-circle text-uppercase text-white bg-purple1" [style.backgroundColor]="conv.bgcolor">
+                          <span class="username">{{conv.conv_name | firstChars }}</span>
+                      </span>
+                    </div>
+                  }
+                } @else {
+                    @for (i of conv.participants; track $index) {
+                      @if (i.isme=='no' && i.profile_pic && checkPic_privacy(i)) {
+                        <img [ngSrc]="i.profile_pic | safeImageUrl" class="rounded-circle" alt="" width="28" height="28" loading="lazy" [ngClass]="!chat.isMobile ? 'avatar-xs':'avatar-sm'"/>
+                        @if (i.status) {
+                          <span class="user-status" [ngClass]="getUserStatusClass(i.is_online,i.status)"></span>
+                        }
+                      }@else if(i.isme=='no') {
+                        <div class=""  [ngClass]="!chat.isMobile ? 'avatar-xs':'avatar-sm'">
+                          <span class="avatar-title rounded-circle text-uppercase text-white bg-purple1" [style.backgroundColor]="conv.bgcolor">
+                              <span class="username">{{i.name | firstChars }}</span>
+                              @if (i.status) {
+                                <span class="user-status" [ngClass]="getUserStatusClass(i.is_online,i.status)"></span>
+                              }
+                          </span>
+                        </div>
+                      }
+                    }
+                }
+              </div>
+              <!-- for unread count stat -->
+              <div class="overflow-hidden"  (click)="showConvMsg(conv);">
+                @if (conv.is_group === true){
+                  <p class="text-truncate mb-0">{{conv.conv_name | customslice : 20 }} {{conv.userstatus}}</p>
+                  <!-- show users is typing in group -->
+                  @if(chat.conv_typingUsers && chat.conv_typingUsers[conv._id] && chat.conv_typingUsers[conv._id].length>0){
+                    <h5 class="font-size-11 mb-0">{{chat.conv_typingUsers[conv._id]}} is typing<app-typing-dots /></h5>
+                  }@else{
+                    <p class="font-size-11 mb-0 d-flex">
+                      <!-- showing sender name -->
+                      @if(conv.last_msg_row && conv.last_msg_row.from==chat.room.loggedUser.id){
+                        {{'You: '}}
+                      }@else if(conv.last_msg_row && conv.last_msg_row.fromUser ){
+                         @if(conv.last_msg_row.fromUser.fullName){
+                           {{conv.last_msg_row.fromUser.fullName ? conv.last_msg_row.fromUser.fullName+':&nbsp;':''}}
+                          }@else if(conv.last_msg_row.fromUser.name){
+                           {{conv.last_msg_row.fromUser.name ? conv.last_msg_row.fromUser.name+':&nbsp;':''}}
+                         }
+                      }
+                      @if(conv && conv.last_msg_row && conv.last_msg_row.forwarded){
+                        <div class="d-flex align-items-center">
+                          <i class="bx bx-share font-size-16 me-1"></i>
+                          <span class="text-truncate mb-0" [innerHTML]="getSanitizedMessage(conv.last_msg_row.forward_snapshot?.text || conv.last_msg_row.forward_msg_id?.message || 'Forwarded message') | customslice:20"></span>
+                        </div>
+                      }@else if(conv && conv.last_message){
+                        @if(conv.last_message!=''){
+                          <p [innerHTML]="conv.last_message | customslice:20"></p>
+                        }
+                      }@else if(conv.last_msg_row && conv.last_msg_row.sticker && conv.last_msg_row.sticker!=''){
+                        <h5 class="text-left w-100 mb-0">
+                        <img [src]="conv.last_msg_row.sticker" width="10" alt="" loading="lazy">
+                        </h5>
+                      }@else if(conv.last_msg_row && conv.last_msg_row.attachments && conv.last_msg_row.attachments.length>0){
+                        <h5 class="font-size-11 mb-0">
+                          @if (conv.last_msg_row.attachments[0].mimetype!=null && conv.last_msg_row.attachments[0].mimetype=="application/pdf") {
+                            PDF
+                          }@else if(conv.last_msg_row.attachments[0].mimetype!=null && conv.last_msg_row.attachments[0].mimetype=="video/mp4"){
+                            Video
+                          }@else if(conv.last_msg_row.attachments[0].mimetype!=null && (conv.last_msg_row.attachments[0].mimetype=="image/jpeg" || conv.last_msg_row.attachments[0].mimetype=="image/png")){
+                            Image
+                          }@else if(conv.last_msg_row.attachments[0].mimetype!=null && (conv.last_msg_row.attachments[0].mimetype=="audio/mpeg")){
+                            Audio
+                          }
+                        </h5>
+                      }
+                    </p>
+                  }
+                } @else {
+                  @for (i of conv.participants; track $index) {
+                    @if (i.isme=='no') {
+                      <p class="text-truncate mb-0">{{i.name}}</p>
+                      <!-- {{chat.conv_typing_data[conv._id]}} -->
+                      
+                      <!-- show users is typing in single chat -->
+                      @if(chat.conv_typing_data && chat.conv_typing_data[conv._id]){
+                        <p class="font-size-11 mb-0">{{chat.conv_typing_data[conv._id].from.name}} is typing<app-typing-dots />.</p>
+                      }@else{
+                        <p class="font-size-11 mb-0 d-flex">
+                          @if(conv.last_msg_row && conv.last_msg_row.from==chat.room.loggedUser.id){
+                            {{'You:'}}
+                            @if(conv.last_msg_row.chat_type==0){
+                              <span class="me-1 text-success">
+                                @if(conv.last_msg_row.readBy && conv.last_msg_row.readBy.length>0){
+                                  <i class="bx bx-check-double bx-check" style="color: #63E6BE;" matTooltip="Message Read.."></i>
+                                }@else if(conv.last_msg_row.deliveredTo && conv.last_msg_row.deliveredTo.length>0){
+                                  <i class="bx bx-check-double bx-check" style="color: #979797;" matTooltip="Message delivered."></i>
+                                }@else if ((conv.last_msg_row.is_send && conv.last_msg_row.is_send==1) || conv.last_msg_row._id!='') {
+                                  <i class="bx bx-check bx-check" style="color: #979797;" matTooltip="Message send."></i>
+                                } 
+                              </span>
+                            }
+                          }@else if(conv.last_msg_row && conv.last_msg_row.fromUser ){
+                            <!-- showing sender name -->
+                             @if(conv.last_msg_row.fromUser.fullName){
+                               {{conv.last_msg_row.fromUser.fullName ? conv.last_msg_row.fromUser.fullName+':&nbsp;':''}}
+                              }@else if(conv.last_msg_row.fromUser.name){
+                               {{conv.last_msg_row.fromUser.name ? conv.last_msg_row.fromUser.name+':&nbsp;':''}}
+                             }
+                          }
+                          @if(conv && conv.last_msg_row && conv.last_msg_row.forwarded){
+                            <div class="d-flex align-items-center">
+                              <i class="bx bx-share font-size-16 me-1"></i>
+                              <span class="text-truncate mb-0" [innerHTML]="getSanitizedMessage(conv.last_msg_row.forward_snapshot?.text || conv.last_msg_row.forward_msg_id?.message || 'Forwarded message') | customslice:20"></span>
+                            </div>
+                          }@else if(conv && conv.last_message){
+                            @if(conv.last_message!=''){
+                              <p [innerHTML]="conv.last_message | customslice:20"></p>
+                            }
+                          }@else if(conv.last_msg_row && conv.last_msg_row.sticker && conv.last_msg_row.sticker!=''){
+                              <h5 class="text-left w-100 mb-0">
+                              <img [src]="conv.last_msg_row.sticker" width="10" alt="" loading="lazy">
+                              </h5>
+                          }@else if(conv.last_msg_row && conv.last_msg_row.attachments && conv.last_msg_row.attachments.length>0){
+                            <!-- <h5 class="text-left w-100 mb-0"> -->
+                              @if (conv.last_msg_row.attachments[0].mimetype!=null && conv.last_msg_row.attachments[0].mimetype=="application/pdf") {
+                                PDF
+                              }@else if(conv.last_msg_row.attachments[0].mimetype!=null && conv.last_msg_row.attachments[0].mimetype=="video/mp4"){
+                                Video
+                              }@else if(conv.last_msg_row.attachments[0].mimetype!=null && (conv.last_msg_row.attachments[0].mimetype=="image/jpeg" || conv.last_msg_row.attachments[0].mimetype=="image/png")){
+                                Image
+                              }@else if(conv.last_msg_row.attachments[0].mimetype!=null && (conv.last_msg_row.attachments[0].mimetype=="audio/mpeg")){
+                                Audio
+                              }
+                            <!-- </h5> -->
+                          }
+                        </p>
+                      }
+                    }
+                  }
+                }
+                
+              </div>
+              <div class="ms-auto text-center">
+                <span class="font-size-11">{{conv.last_msg_date | timeAgoConv}}</span>
+                @if (conv.unread_cov_count && conv.unread_cov_count>0 && !conv.is_muted) {
+                  <br/><span class="badge bg-dark-subtle text-reset rounded p-1">{{conv.unread_cov_count}}</span>
+                }@else if(conv.is_muted){
+                  <br/><i class="bx bx-microphone-off text-muted"></i>
+                }
+                
+                <!-- Join Call Banner -->
+                @if(conv.ongoing_call){
+                  <button class="btn btn-success btn-sm ms-2" (click)="joinCall(conv)">Join Call</button>
+                }
+              </div>
+            </div>
+          </a>
+        }
+      </li>
+    </ul>
+  </div>

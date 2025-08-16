@@ -1,0 +1,64 @@
+<div mat-dialog-title class="bg-primary font-size-16 text-white">{{isGroup ? 'Create New Group':'Contacts'}}</div>
+<mat-dialog-content class="mat-typography">
+  <!-- form -->
+  <br>
+  <mat-slide-toggle [(ngModel)]="isGroup">Want to create gruop?</mat-slide-toggle>
+  <br />
+  <br />
+  @if (isGroup) {
+  <mat-form-field class="example-form-field">
+    <mat-label>Group Name</mat-label>
+    <input matInput type="text" [(ngModel)]="groupName" />
+    @if (value) {
+    <button matSuffix mat-icon-button aria-label="Clear" (click)="value = ''">
+      <mat-icon>close</mat-icon>
+    </button>
+    }
+  </mat-form-field><br>
+  <!-- for select multiple user start -->
+  <mat-form-field class="example-chip-list">
+    <mat-label>Select contacts</mat-label>
+    <mat-chip-grid #chipGrid aria-label="Fruit selection">
+      @for (fruit of fruits; track fruit) {
+      <mat-chip-row (removed)="remove(fruit)">
+        <img matChipAvatar src="https://material.angular.io/assets/img/examples/shiba1.jpg"
+          alt="Photo of a Shiba Inu" />
+        {{ fruit }}
+        <button matChipRemove [attr.aria-label]="'remove ' + fruit">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+      }
+    </mat-chip-grid>
+    <input placeholder="search contact" #fruitInput [formControl]="fruitCtrl" [matChipInputFor]="chipGrid"
+      [matAutocomplete]="auto" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      (matChipInputTokenEnd)="add($event)" />
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+      @for (fruit of filteredFruits | async; track fruit.fullName) {
+      @if (fruit._id!==selfUserData.userid) {
+      <mat-option [value]="fruit._id">
+        <img matChipAvatar src="https://material.angular.io/assets/img/examples/shiba1.jpg" width="20"
+          alt="Photo of a Shiba Inu" />
+        {{ fruit.fullName }} ({{fruit.email}})</mat-option>
+      }
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <!-- for select multiple user end -->
+  }@else{
+  <mat-form-field class="single_chat_list">
+    <mat-label>Select</mat-label>
+    <mat-select [(ngModel)]="singleConvSelUser">
+      @for (item of allUser_list; track $index) {
+      @if (item._id!==selfUserData.userid) {
+      <mat-option value="{{item._id}}">{{item.fullName}} ({{item.email}})</mat-option>
+      }
+      }
+    </mat-select>
+  </mat-form-field>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="btn btn-link" mat-dialog-close>Cancel</button>
+  <button class="btn btn-primary text-white" type="button" cdkFocusInitial (click)="submitCreForm()"><i class="bx bxs-send align-middle"></i></button>
+</mat-dialog-actions>
