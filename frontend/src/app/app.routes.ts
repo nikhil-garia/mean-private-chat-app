@@ -25,12 +25,6 @@ export const routes: Routes = [
         canActivate: [loginGuard]
     },
     {
-        path: 'reset-password',
-        loadComponent: () => import('./pages/reset-password/reset-password.component').then((l) => l.ResetPasswordComponent),
-        title: 'Reset Password',
-        canActivate: [loginGuard]
-    },
-    {
         path: 'chat',
         loadComponent: () => import('./pages/chat/chat.component').then((l) => l.ChatComponent),
         title: 'Chat',
