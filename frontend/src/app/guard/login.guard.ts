@@ -7,10 +7,9 @@ export const loginGuard: CanActivateFn = (route, state) => {
   const isLoggedIn = !!localStorage.getItem('auth_token'); // Example check using a token in localStorage
   // console.log('login_guard isLoggedIn='+isLoggedIn);
   
-  if (isLoggedIn) {
+  if (isLoggedIn && route.routeConfig?.path !== 'forgot-password') {
     _router.navigate(['chat']);
     return false;
-  } else {
-    return true;
   }
+  return true;
 };

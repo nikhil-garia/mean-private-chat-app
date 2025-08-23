@@ -539,6 +539,88 @@ module.exports = {
     });
   },
 
+  // Forgot password - generate reset token
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await UserModel.findOne({ email });
+      if (!user) {
+        // For security reasons, don't reveal if email exists or not
+        return res.status(200).json({ 
+          message: "If the email exists, a password reset link has been sent" 
+        });
+      }
+
+      // Generate reset token (using crypto for simplicity)
+      const crypto = require('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      
+      // Set token expiration (1 hour from now)
+      const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+
+      // Save token to user
+      user.resetToken = resetToken;
+      user.resetTokenExpires = resetTokenExpires;
+      await user.save();
+
+      // In a real application, you would send an email here
+      // For now, we'll log the token and return it for testing
+      console.log(`Password reset token for ${email}: ${resetToken}`);
+      
+      return res.status(200).json({ 
+        message: "If the email exists, a password reset link has been sent",
+        resetToken: resetToken // Remove this in production - only for testing
+      });
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return res.status(500).json({ message: "Error processing request" });
+    }
+  },
+
+  // Reset password with token
+  resetPassword: async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      // Find user with valid reset token
+      const user = await UserModel.findOne({
+        resetToken: token,
+        resetTokenExpires: { $gt: Date.now() }
+      });
+
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      // Hash new password
+      user.password = await bcrypt.hash(newPassword, 10);
+      
+      // Clear reset token fields
+      user.resetToken = undefined;
+      user.resetTokenExpires = undefined;
+      
+      await user.save();
+
+      return res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return res.status(500).json({ message: "Error resetting password" });
+    }
+  }
+
 };
 
 function getRandomInt(min, max) {

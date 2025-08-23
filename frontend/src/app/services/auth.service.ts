@@ -55,4 +55,23 @@ export class AuthService {
       return user;
     }));
   }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<any>(this.serverPath + '/api/v1/forgot-password', { email }, httpOptions).pipe(
+      map(response => {
+        return response;
+      })
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(this.serverPath + '/api/v1/reset-password', { 
+      token, 
+      newPassword 
+    }, httpOptions).pipe(
+      map(response => {
+        return response;
+      })
+    );
+  }
 }

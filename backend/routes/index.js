@@ -19,6 +19,10 @@ routes.post('/logout',userCon.logOut);
 routes.post('/users',ensureAuthenticated,userCon.getUsers);
 routes.post('/isLoggedinUser',userCon.isLoggedinUser);
 
+// password reset
+routes.post('/forgot-password',userCon.forgotPassword);
+routes.post('/reset-password',userCon.resetPassword);
+
 // friend/Contacts
 routes.post('/get-contacts',ensureAuthenticated,userCon.getContacts);
 routes.post('/get-contacts-req',ensureAuthenticated,userCon.getContactRequest);
