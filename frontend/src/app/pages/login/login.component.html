@@ -1,4 +1,4 @@
-<div class="login-container">
+<div class="login-container" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
   <div class="login-card shadow-lg">
     <!-- Logo/Brand Section -->
     <div class="brand-section">
@@ -65,11 +65,11 @@
           <span class="checkbox-mark"></span>
           <span class="checkbox-label">Remember me</span>
         </label>
-        <a href="#" class="forgot-link">Forgot Password?</a>
+        <a routerLink="/forgot-password" class="forgot-link">Forgot Password?</a>
       </div>
 
       <!-- Login Button -->
-      <button class="login-btn gradient-bg" type="submit" [disabled]="loginLoading">
+      <button class="login-btn" type="submit" [disabled]="loginLoading" style="background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);">
         <div class="btn-content" [class.loading]="loginLoading">
           <span class="btn-text" *ngIf="!loginLoading">Sign In</span>
           <span class="btn-text" *ngIf="loginLoading">Signing In...</span>
@@ -97,7 +97,7 @@
 
     <!-- Footer -->
     <div class="login-footer">
-      <p>Don't have an account? <a href="/register" class="register-link">Create one</a></p>
+      <p>Don't have an account? <a routerLink="/register" class="register-link">Create one</a></p>
     </div>
   </div>
 

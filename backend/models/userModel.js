@@ -67,6 +67,14 @@ const UserSchema = new Schema({
   statusMsg:{
     type:String,
     maxlength: 100, // limit for better performance
+  },
+  resetToken: {
+    type: String,
+    default: null
+  },
+  resetTokenExpires: {
+    type: Date,
+    default: null
   }
 });
 UserSchema.index({ email: 1 }); // Ensures email lookup is fast
