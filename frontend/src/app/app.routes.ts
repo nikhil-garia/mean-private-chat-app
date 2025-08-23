@@ -24,6 +24,7 @@ export const routes: Routes = [
         title: 'Forgot Password',
         canActivate: [loginGuard]
     },
+
     {
         path: 'chat',
         loadComponent: () => import('./pages/chat/chat.component').then((l) => l.ChatComponent),
