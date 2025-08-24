@@ -11,10 +11,10 @@
     <div class="flex-lg-column my-0 sidemenu-navigation">
       <ul role="tablist" class="side-menu-nav nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
         @if (chat.isMobile==false) {
-        <li id="pills-user-tab-container" class="nav-item">
+        <!--<li id="pills-user-tab-container" class="nav-item">
           <a href="javascript:void(0)" id="pills-user-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-user'" matTooltip="Profile" (click)="ActiveTab='pills-user';loadProfileComponent();" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-user" type="button" aria-controls="pills-user" [attr.aria-selected]="ActiveTab==='pills-user' ? true:false"><i class="bx bx-user-circle"></i>
           </a>
-        </li>
+        </li>-->
         }
         <li id="pills-chat-tab-container" class="nav-item">
           <a href="javascript:void(0)" id="pills-chat-tab" role="tab" class="nav-link"  [class.active]="ActiveTab==='pills-chat'" matTooltip="Chats" (click)="ActiveTab='pills-chat';fetchConvList();is_archive_open=false;" matTooltipPosition="right" data-bs-toggle="pill" data-bs-target="#pills-chat" type="button" aria-controls="pills-chat" [attr.aria-selected]="ActiveTab==='pills-chat' ? true:false"><i class="bx bx-conversation">
@@ -97,7 +97,7 @@
             <div class="d-flex align-items-start">
               <div class="d-flex flex-grow-1">
                 <h4 class="mb-4">Chats</h4>
-                <p class="ml-6 mb-4">({{chat.room.loggedUser.name}})</p>
+               <!--<p class="ml-6 mb-4">({{chat.room.loggedUser.name}})</p>-->
               </div>
               <div class="flex-shrink-0">
                 <!-- unread component -->
