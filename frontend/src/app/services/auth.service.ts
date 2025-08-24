@@ -41,7 +41,7 @@ export class AuthService {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_id');
       this.socketService.disconnect();
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/client-page');
       if(unhadleError){
         this.snackBar.open('Sorry, Something went wrong..', 'close', {duration: 3000});
       }else{
