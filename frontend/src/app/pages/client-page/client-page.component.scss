@@ -95,19 +95,19 @@ header {
         }
     }
 
-    .menu-icon {
-        font-size: 35px;
-        cursor: pointer;
-        position: relative;
-        width: 40px;
-        height: 35px;
-        margin-right: 10px;
-        background: linear-gradient(to right, #00aaa7, #7f42a7, #6600c5, #1f2b9c, #2a46ff, #0099ff, #00aaa7);
-        background-size: 200%;
-        animation: animationGradient 2.5s linear infinite;
-        clip-path: polygon(0 0, 82% 0, 100% 34%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
-        border-radius: 5px;
-        display: none;
+.menu-icon {
+    font-size: 35px;
+    cursor: pointer;
+    position: relative;
+    width: 40px;
+    height: 35px;
+    margin-right: 10px;
+    background: linear-gradient(to right, #00aaa7, #7f42a7, #6600c5, #1f2b9c, #2a46ff, #0099ff, #00aaa7);
+    background-size: 200%;
+    animation: animationGradient 2.5s linear infinite;
+    clip-path: polygon(0 0, 82% 0, 100% 34%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
+    border-radius: 5px;
+    display: none; /* Hidden by default, shown only on mobile */
 
         i {
             position: absolute;
@@ -229,6 +229,7 @@ header {
         font-size: 50px;
         max-width: 1000px;
         text-align: center;
+        line-height: 1.0;
         color: white;
     }
 
@@ -358,84 +359,204 @@ header {
         }
     }
 }
+  .chat-logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
 
-.signin-page-box {
-    position: fixed;
-    top: 60%;
-    width: 30%;
-    height: 60vh;
-    scale: 0;
-    filter: blur(10px);
-    z-index: 2000;
+  .animated-chat-logo {
+    width: 50px;
+    height: 50px;
+    animation: bounce 2s infinite;
+    cursor: default;
+    transition: transform 0.3s ease;
+  }
 
-    .signin-page {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: rgb(14 12 21);
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.484);
-        border-radius: 20px;
+  .animated-chat-logo:hover {
+    transform: scale(1.1);
+  }
 
-        h1 {
-            font-size: 40px;
-            font-weight: bold;
-        }
-
-        input {
-            padding: 7.5px 30px;
-            background-color: lightgray;
-            width: 60%;
-            height: 35px;
-            border: none;
-            outline: none;
-            clip-path: polygon(0 0, 93% 0, 100% 43%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
-            border-radius: 5px;
-            margin-bottom: 5%;
-        }
-
-        button {
-            width: 50%;
-            height: 40px;
-            font-size: 20px;
-            font-weight: 700;
-            background-color: #7e00d2;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            color: white;
-        }
-
-        p {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50%;
-            height: 40px;
-            font-size: 20px;
-            font-weight: 700;
-            background-color: gray;
-            border-radius: 5px;
-            cursor: pointer;
-            color: white;
-        }
-
-        div {
-            position: absolute;
-            top: 3%;
-            right: 3%;
-            font-size: 40px;
-            cursor: pointer;
-            transition: 0.3s;
-
-            &:hover {
-                opacity: 0.7;
-            }
-        }
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
     }
+    40% {
+      transform: translateY(-20px);
+    }
+    60% {
+      transform: translateY(-10px);
+    }
+  }
+.signin-page-box {
+  position: fixed;
+  top: 60%;
+  width: 30%;
+  height: 70vh;
+  scale: 0;
+  filter: blur(10px);
+  z-index: 2000;
+
+  .signin-page {
+    width: 100%;
+    /*height: 100%;*/
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: rgb(14 12 21);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.484);
+    border-radius: 20px;
+    padding: 20px;
+    padding-top: 40px;
+
+      .auth-tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        width: 80%;
+        background-color: rgba(107, 88, 116, 0.1);
+        border-radius: 10px;
+        padding: 5px;
+
+        .tab-button {
+          flex: 1;
+          padding: 10px 20px;
+          border: none;
+          background: transparent;
+          color: gray;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+
+          &.active {
+            background: linear-gradient(to right, #00aaa7, #7f42a7, #6600c5);
+            color: white;
+            box-shadow: 0 0 10px rgba(126, 0, 210, 0.3);
+          }
+
+          &:hover:not(.active) {
+            background-color: rgba(107, 88, 116, 0.2);
+            color: lightgray;
+          }
+        }
+      }
+
+      .forgot-password-link {
+        margin-bottom: 20px;
+        
+        a {
+          color: #7f42a7;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.3s ease;
+          
+          &:hover {
+            color: #00aaa7;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .login-form-link {
+        width: 80%;
+        text-align: right;
+        margin: -15px 0 20px 0;
+        
+        a {
+          color: #7f42a7;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.3s ease;
+          
+          &:hover {
+            color: #00aaa7;
+            text-decoration: underline;
+          }
+        }
+      }
+
+    .auth-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      h1 {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: white;
+      }
+
+      input {
+        padding: 12px 20px;
+        background-color: lightgray;
+        width: 80%;
+        height: 45px;
+        border: none;
+        outline: none;
+        clip-path: polygon(0 0, 93% 0, 100% 43%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+
+        &:focus {
+          background-color: white;
+          box-shadow: 0 0 10px rgba(126, 0, 210, 0.3);
+        }
+
+        &::placeholder {
+          color: #666;
+        }
+      }
+
+      button {
+        width: 60%;
+        height: 45px;
+        font-size: 18px;
+        font-weight: 700;
+        background: linear-gradient(to right, #00aaa7, #7f42a7, #6600c5);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+        clip-path: polygon(0 0, 93% 0, 100% 43%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
+
+        &:hover:not([disabled]) {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(126, 0, 210, 0.4);
+        }
+
+        &[disabled] {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .close-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      color: gray;
+      transition: 0.3s;
+      z-index: 10;
+
+      &:hover {
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+  }
 }
 
 .features-section {
@@ -451,6 +572,7 @@ header {
     h1 {
         font-size: 50px;
         max-width: 600px;
+        line-height: 1.0;
         text-align: center;
         color: white;
         margin: 100px 0;
@@ -1089,6 +1211,25 @@ footer {
     }
 }
 
+/* Hide main content when sidebar is open */
+.sidebar.open-sidebar ~ * {
+    display: none;
+}
+
+.sidebar.close-sidebar ~ * {
+    display: block;
+    animation: fadeInContent 0.5s forwards;
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 .autoDisplay {
     animation: autoDisplayAnimation;
     animation-timeline: view();
@@ -1439,7 +1580,9 @@ footer {
     }
 
     .menu-icon {
-        display: block;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
     }
 
     .hero {

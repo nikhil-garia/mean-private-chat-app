@@ -10,14 +10,14 @@ export const routes: Routes = [
     {
         path: 'client-page',
         loadComponent: () => import('./pages/client-page/client-page.component').then((c) => c.ClientPageComponent),
-        title: 'MCBrain - Home',
+        title: 'Client Landing page',
     },
     /*{
         path: 'login',
         loadComponent: () => import('./pages/login/login.component').then((l) => l.LoginComponent),
         title: 'Login',
         canActivate: [loginGuard]
-    },*/
+    },
     {
         path: 'register',
         loadComponent: () => import('./pages/register/register.component').then((l) => l.RegisterComponent),
@@ -29,7 +29,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/forgot-password/forgot-password.component').then((l) => l.ForgotPasswordComponent),
         title: 'Forgot Password',
         canActivate: [loginGuard]
-    },
+    },*/
     {
         path: 'chat',
         loadComponent: () => import('./pages/chat/chat.component').then((l) => l.ChatComponent),
