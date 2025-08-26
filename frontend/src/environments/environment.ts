@@ -3,5 +3,5 @@ export const environment={
     // apiUrl:`https://freeapi.miniprojectideas.com`
     // apiUrl:`http://localhost:4200`
     apiUrl:`http://localhost:8080`,
-    clientId:''
+    clientId:'your-google-client-id-here' // Temporary placeholder - replace with actual Google Client ID
 }
