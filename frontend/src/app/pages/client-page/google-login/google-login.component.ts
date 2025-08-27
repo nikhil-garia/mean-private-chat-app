@@ -8,7 +8,7 @@ import { ClientGoogleAuthService } from './google-auth.service';
   
 		<!-- Divider -->
 		<div class="divider">
-		  <span class="divider-text">or</span>
+		  <span class="divider-text">OR</span>
 		</div>
   
     <div class="social-login-options">

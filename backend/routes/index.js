@@ -3,6 +3,7 @@ const routes = express.Router();
 const userCon = require('../Controller/userCon');
 const populateCon = require('../Controller/populateCon');
 const chatCon = require('../Controller/chatCon');
+const contactCon = require('../Controller/contactCon');
 const {userRegValidate,userLoginValidate} = require('../utils/userValidation');
 const {ensureAuthenticated} = require('../utils/auth');
 
@@ -69,6 +70,13 @@ routes.get('/conn_bulk',populateCon.populateConnections);
 // contact
 routes.get('/get-filtered-user',ensureAuthenticated,userCon.getAllFilteredUser);
 routes.get('/turn-credentials', userCon.getTurnCred);
+
+// Contact form routes
+routes.post('/contact', contactCon.submitContactForm);
+routes.get('/contact', ensureAuthenticated, contactCon.getAllContacts);
+routes.get('/contact/:id', ensureAuthenticated, contactCon.getContactById);
+routes.patch('/contact/:id/status', ensureAuthenticated, contactCon.updateContactStatus);
+routes.delete('/contact/:id', ensureAuthenticated, contactCon.deleteContact);
 
 // =========== MEDIASOUP ROUTES =============
 // Mount mediasoup routes under /mediasoup prefix
