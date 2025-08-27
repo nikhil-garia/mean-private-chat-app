@@ -1,0 +1,98 @@
+    <section class="contact-section autoDisplay">
+  <div class="contact-gradient"></div>
+  
+  <h1>Get in Touch with Us</h1>
+  <p>Have questions or feedback? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+
+  <div class="contact-container">
+    <div class="contact-form-box">
+      <div class="contact-form" *ngIf="!submitSuccess; else successMessage">
+        <div class="form-group">
+          <input 
+            type="text" 
+            placeholder="Your Name" 
+            [(ngModel)]="contactForm.name" 
+            name="name"
+            required
+            autocomplete="name"
+            [class.error]="submitError && !contactForm.name">
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="email" 
+            placeholder="Your Email" 
+            [(ngModel)]="contactForm.email" 
+            name="email"
+            required
+            autocomplete="email"
+            [class.error]="submitError && !contactForm.email">
+        </div>
+
+        <div class="form-group">
+          <textarea 
+            placeholder="Your Message" 
+            [(ngModel)]="contactForm.message" 
+            name="message"
+            required
+            rows="5"
+            [class.error]="submitError && !contactForm.message"></textarea>
+        </div>
+
+        <div class="error-message" *ngIf="submitError">
+          <i class='bx bx-error-circle'></i>
+          <span>{{submitError}}</span>
+        </div>
+
+        <button 
+          (click)="onSubmit()" 
+          [disabled]="isSubmitting"
+          class="submit-button">
+          <span *ngIf="!isSubmitting">Send Message</span>
+          <span *ngIf="isSubmitting">Sending...</span>
+        </button>
+      </div>
+
+      <ng-template #successMessage>
+        <div class="success-message">
+          <i class='bx bx-check-circle'></i>
+          <h2>Message Sent Successfully!</h2>
+          <p>Thank you for contacting us. We'll get back to you soon.</p>
+          <button (click)="resetForm()" class="reset-button">
+            Send Another Message
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="contact-info">
+      <div class="info-card">
+        <i class='bx bx-envelope'></i>
+        <h3>Email Us</h3>
+        <p>support&#64;mcbrain.com</p>
+      </div>
+
+      <div class="info-card">
+        <i class='bx bx-phone'></i>
+        <h3>Call Us</h3>
+        <p>+1 (555) 123-4567</p>
+      </div>
+
+      <div class="info-card">
+        <i class='bx bx-time'></i>
+        <h3>Response Time</h3>
+        <p>Within 24 hours</p>
+      </div>
+
+      <div class="info-card">
+        <i class='bx bx-support'></i>
+        <h3>Support Hours</h3>
+        <p>24/7 Customer Support</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-background">
+    <img src="assets/images/features back img.png" alt="Contact Background" class="contact-bg-image">
+  </div>
+</section>

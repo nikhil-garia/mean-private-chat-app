@@ -10,7 +10,7 @@
   color: #999;
 }
 .divider::before, .divider::after {
-  content: "";
+  /*content: '';*/
   flex: 1;
   height: 1px;
   background-color: #e0e0e0;

@@ -6,12 +6,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClientGoogleLoginComponent } from './google-login/google-login.component';
+import { ContactComponent } from './contact/contact.component';
 
 @Component({
   selector: 'app-client-page',
   templateUrl: './client-page.component.html',
   styleUrls: ['./client-page.component.scss'],
-  imports: [CommonModule, FormsModule, ClientGoogleLoginComponent]
+  imports: [CommonModule, FormsModule, ClientGoogleLoginComponent, ContactComponent]
 })
 export class ClientPageComponent implements OnInit, OnDestroy {
   isSigninOpen = false;

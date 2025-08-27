@@ -15,6 +15,7 @@ var snack_bar_1 = require("@angular/material/snack-bar");
 var common_1 = require("@angular/common");
 var forms_1 = require("@angular/forms");
 var google_login_component_1 = require("./google-login/google-login.component");
+var contact_component_1 = require("./contact/contact.component");
 var ClientPageComponent = /** @class */ (function () {
     function ClientPageComponent() {
         this.isSigninOpen = false;
@@ -340,7 +341,7 @@ var ClientPageComponent = /** @class */ (function () {
             selector: 'app-client-page',
             templateUrl: './client-page.component.html',
             styleUrls: ['./client-page.component.scss'],
-            imports: [common_1.CommonModule, forms_1.FormsModule, google_login_component_1.ClientGoogleLoginComponent]
+            imports: [common_1.CommonModule, forms_1.FormsModule, google_login_component_1.ClientGoogleLoginComponent, contact_component_1.ContactComponent]
         })
     ], ClientPageComponent);
     return ClientPageComponent;
