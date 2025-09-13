@@ -33,6 +33,7 @@ const UserSchema = new Schema({
   },
   socket_id:{
     type:String,
+    index: true,
     sparse: true,
   },
   status:{
@@ -77,7 +78,6 @@ const UserSchema = new Schema({
     default: null
   }
 });
-UserSchema.index({ email: 1 }); // Ensures email lookup is fast
-UserSchema.index({ socket_id: 1 }, { sparse: true }); // For real-time apps
+
 
 module.exports = mongoose.model("users", UserSchema);

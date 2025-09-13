@@ -657,12 +657,12 @@ header .menu-icon i {
   color: lightgray;
   background: linear-gradient(to right, #00aaa7, #7f42a7, #6600c5, #1f2b9c, #2a46ff, #0099ff, #00aaa7);
   background-size: 200%;
-  animation: animationGradient 2.5s linear infinite;
+  /*animation: animationGradient 2.5s linear infinite;*/
   clip-path: polygon(0 0, 82% 0, 100% 34%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
   transition: 0.3s;
 }
 .chatApp-section .left-container .button-box button:hover {
-  color: #7e00d2;
+  color: #ffffff;
 }
 .chatApp-section .right-container {
   display: flex;
@@ -1017,12 +1017,12 @@ header .menu-icon i {
   color: lightgray;
   background: linear-gradient(to right, #00aaa7, #7f42a7, #6600c5, #1f2b9c, #2a46ff, #0099ff, #00aaa7);
   background-size: 200%;
-  animation: animationGradient 2.5s linear infinite;
+  /*animation: animationGradient 2.5s linear infinite;*/
   clip-path: polygon(0 0, 82% 0, 100% 34%, 100% 80%, 100% 99%, 0 100%, 0% 80%, 0% 20%);
   transition: 0.3s;
 }
 .roadmap-section .button-box button:hover {
-  color: #7e00d2;
+  color: #ffffff;
 }
 .roadmap-section .roadmap-gradient {
   position: absolute;
@@ -1055,7 +1055,7 @@ footer .box-icons a {
   color: gray;
   border: 0.5px solid rgba(107, 88, 116, 0.5);
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 24px;
   text-decoration: none;
   display: flex;
   align-items: center;
