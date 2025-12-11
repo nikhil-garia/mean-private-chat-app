@@ -2,31 +2,24 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'https://github.com/nikhil-garia/mean-private-chat-app.git'
+        GIT_REPO       = 'https://github.com/nikhil-garia/mean-private-chat-app.git'
         GIT_CREDENTIALS = 'github-token'
-        IMAGE = "9808nikhil/nextalk:latest"
-        GCP_VM = "34.58.92.73"
-        GCP_USER = "nikhil"
+        IMAGE          = "9808nikhil/nextalk:latest"
+        GCP_VM         = "34.58.92.73"
+        GCP_USER       = "nikhil"
     }
 
     stages {
 
-         stage('Clean Workspace') {
+        // 1️⃣ Clean Jenkins Workspace
+        stage('Clean Workspace') {
             steps {
                 deleteDir()
             }
         }
 
+        // 2️⃣ Fetch Code from GitHub
         stage('Fetch Code') {
-            steps {
-                checkout(...)
-            }
-        }
-
-        // ----------------------------
-        // FETCH CODE FROM GITHUB
-        // ----------------------------
-        stage('Fetch Code Only') {
             steps {
                 checkout([
                     $class: 'GitSCM',
