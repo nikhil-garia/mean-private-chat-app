@@ -76,8 +76,8 @@ EOF
         stage("Push Image") {
             steps {
                 withDockerRegistry([credentialsId: 'docker', url: 'https://index.docker.io/v1/']) {
-                sh "docker tag nextalk ${IMAGE}"
-                sh "docker push ${IMAGE}"
+                  sh "docker tag nextalk ${IMAGE}"
+                  sh "docker push ${IMAGE}"
                }
             }
         }
