@@ -112,18 +112,3 @@ EOF
                 }
             }
         }
-
-        // ----------------------------
-        // Sucess Failure Message
-        // ----------------------------
-        
-
-    post {
-        success {
-            echo "🚀 Nextalk deployed successfully!"
-        }
-        failure {
-            echo "❌ Deployment failed. Check Jenkins logs."
-        }
-    }
-}
