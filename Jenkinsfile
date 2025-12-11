@@ -26,11 +26,12 @@ pipeline {
         // 2️⃣ Create backend .env
         stage("Create Backend Env") {
             environment {
-                MONGO_URL = credentials("MONGO_URL")
-                STADIA_API_KEY = credentials("STADIA_API_KEY")
-                OPENAI_API_KEY = credentials("OPENAI_API_KEY")
-                GEMINI_API_KEY = credentials("GEMINI_API_KEY")
-                FCM_PROJECT_ID = credentials("FCM_PROJECT_ID")
+                MONGO_URL        = credentials("MONGO_URL")
+                STADIA_API_KEY   = credentials("STADIA_API_KEY")
+                OPENAI_API_KEY   = credentials("OPENAI_API_KEY")
+                GEMINI_API_KEY   = credentials("GEMINI_API_KEY")
+                FCM_PROJECT_ID   = credentials("FCM_PROJECT_ID")
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sh '''
@@ -39,6 +40,7 @@ pipeline {
                     echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> backend/.env
                     echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> backend/.env
                     echo "FCM_PROJECT_ID=${FCM_PROJECT_ID}" >> backend/.env
+                    echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" >> backend/.env
                     echo "NODE_ENV=production" >> backend/.env
                     echo "PORT=3000" >> backend/.env
                 '''
@@ -47,15 +49,15 @@ pipeline {
 
         // 3️⃣ Create Angular environment.prod.ts
         stage("Create Angular Env") {
-    environment {
-        API_URL = credentials("API_URL")
-        SOCKET_URL = credentials("SOCKET_URL")
-        GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
-    }
-    steps {
-        sh '''
-            mkdir -p frontend/src/environments
-            cat > frontend/src/environments/environment.prod.ts <<EOF
+            environment {
+                API_URL        = credentials("API_URL")
+                SOCKET_URL     = credentials("SOCKET_URL")
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
+            }
+            steps {
+                sh '''
+                    mkdir -p frontend/src/environments
+                    cat > frontend/src/environments/environment.prod.ts <<EOF
 export const environment = {
   production: true,
   apiUrl: '${API_URL}',
@@ -63,9 +65,9 @@ export const environment = {
   clientId: '${GOOGLE_CLIENT_ID}'
 };
 EOF
-        '''
-    }
-}
+                '''
+            }
+        }
 
         // 4️⃣ Build Docker Image
         stage("Build Docker Image") {
@@ -78,22 +80,23 @@ EOF
         stage("Push Image") {
             steps {
                 withDockerRegistry([credentialsId: 'docker', url: 'https://index.docker.io/v1/']) {
-                  sh "docker tag nextalk ${IMAGE}"
-                  sh "docker push ${IMAGE}"
-               }
+                    sh "docker tag nextalk ${IMAGE}"
+                    sh "docker push ${IMAGE}"
+                }
             }
         }
 
         // 6️⃣ Deploy to GCP VM
         stage("Deploy to GCP") {
             environment {
-                MONGO_URL = credentials("MONGO_URL")
-                STADIA_API_KEY = credentials("STADIA_API_KEY")
-                OPENAI_API_KEY = credentials("OPENAI_API_KEY")
-                GEMINI_API_KEY = credentials("GEMINI_API_KEY")
-                FCM_PROJECT_ID = credentials("FCM_PROJECT_ID")
-                API_URL = credentials("API_URL")
-                SOCKET_URL = credentials("SOCKET_URL")
+                MONGO_URL        = credentials("MONGO_URL")
+                STADIA_API_KEY   = credentials("STADIA_API_KEY")
+                OPENAI_API_KEY   = credentials("OPENAI_API_KEY")
+                GEMINI_API_KEY   = credentials("GEMINI_API_KEY")
+                FCM_PROJECT_ID   = credentials("FCM_PROJECT_ID")
+                API_URL          = credentials("API_URL")
+                SOCKET_URL       = credentials("SOCKET_URL")
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sshagent(["gcp-ssh-key"]) {
@@ -110,6 +113,7 @@ EOF
                                 -e FCM_PROJECT_ID='${FCM_PROJECT_ID}' \
                                 -e API_URL='${API_URL}' \
                                 -e SOCKET_URL='${SOCKET_URL}' \
+                                -e GOOGLE_CLIENT_ID='${GOOGLE_CLIENT_ID}' \
                                 -e NODE_ENV='production' \
                                 ${IMAGE}
                         "
