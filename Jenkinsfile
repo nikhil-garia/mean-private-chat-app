@@ -26,11 +26,12 @@ pipeline {
         // 2️⃣ Create backend .env
         stage("Create Backend Env") {
             environment {
-                MONGO_URL = credentials("MONGO_URL")
-                STADIA_API_KEY = credentials("STADIA_API_KEY")
-                OPENAI_API_KEY = credentials("OPENAI_API_KEY")
-                GEMINI_API_KEY = credentials("GEMINI_API_KEY")
-                FCM_PROJECT_ID = credentials("FCM_PROJECT_ID")
+                MONGO_URL        = credentials("MONGO_URL")
+                STADIA_API_KEY   = credentials("STADIA_API_KEY")
+                OPENAI_API_KEY   = credentials("OPENAI_API_KEY")
+                GEMINI_API_KEY   = credentials("GEMINI_API_KEY")
+                FCM_PROJECT_ID   = credentials("FCM_PROJECT_ID")
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sh '''
@@ -39,8 +40,9 @@ pipeline {
                     echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> backend/.env
                     echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> backend/.env
                     echo "FCM_PROJECT_ID=${FCM_PROJECT_ID}" >> backend/.env
+                    echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" >> backend/.env
                     echo "NODE_ENV=production" >> backend/.env
-                    echo "PORT=8080" >> backend/.env
+                    echo "PORT=3000" >> backend/.env
                 '''
             }
         }
@@ -48,8 +50,9 @@ pipeline {
         // 3️⃣ Create Angular environment.prod.ts
         stage("Create Angular Env") {
             environment {
-                API_URL = credentials("API_URL")
-                SOCKET_URL = credentials("SOCKET_URL")
+                API_URL        = credentials("API_URL")
+                SOCKET_URL     = credentials("SOCKET_URL")
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sh '''
@@ -57,8 +60,9 @@ pipeline {
                     cat > frontend/src/environments/environment.prod.ts <<EOF
 export const environment = {
   production: true,
-  API_URL: '${API_URL}',
-  SOCKET_URL: '${SOCKET_URL}'
+  apiUrl: '${API_URL}',
+  socketUrl: '${SOCKET_URL}',
+  clientId: '${GOOGLE_CLIENT_ID}'
 };
 EOF
                 '''
@@ -75,7 +79,7 @@ EOF
         // 5️⃣ Push Image to DockerHub
         stage("Push Image") {
             steps {
-                withDockerRegistry(credentialsId: "docker") {
+                withDockerRegistry([credentialsId: 'docker', url: 'https://index.docker.io/v1/']) {
                     sh "docker tag nextalk ${IMAGE}"
                     sh "docker push ${IMAGE}"
                 }
@@ -85,13 +89,14 @@ EOF
         // 6️⃣ Deploy to GCP VM
         stage("Deploy to GCP") {
             environment {
-                MONGO_URL = credentials("MONGO_URL")
-                STADIA_API_KEY = credentials("STADIA_API_KEY")
-                OPENAI_API_KEY = credentials("OPENAI_API_KEY")
-                GEMINI_API_KEY = credentials("GEMINI_API_KEY")
-                FCM_PROJECT_ID = credentials("FCM_PROJECT_ID")
-                API_URL = credentials("API_URL")
-                SOCKET_URL = credentials("SOCKET_URL")
+                MONGO_URL        = credentials("MONGO_URL")
+                STADIA_API_KEY   = credentials("STADIA_API_KEY")
+                OPENAI_API_KEY   = credentials("OPENAI_API_KEY")
+                GEMINI_API_KEY   = credentials("GEMINI_API_KEY")
+                FCM_PROJECT_ID   = credentials("FCM_PROJECT_ID")
+                API_URL          = credentials("API_URL")
+                SOCKET_URL       = credentials("SOCKET_URL")
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sshagent(["gcp-ssh-key"]) {
@@ -100,7 +105,7 @@ EOF
                             docker pull ${IMAGE} &&
                             docker stop nextalk || true &&
                             docker rm nextalk || true &&
-                            docker run -d --name nextalk -p 8080:8080 \
+                            docker run -d --name nextalk -p 3000:3000 \
                                 -e MONGO_URL='${MONGO_URL}' \
                                 -e STADIA_API_KEY='${STADIA_API_KEY}' \
                                 -e OPENAI_API_KEY='${OPENAI_API_KEY}' \
@@ -108,6 +113,7 @@ EOF
                                 -e FCM_PROJECT_ID='${FCM_PROJECT_ID}' \
                                 -e API_URL='${API_URL}' \
                                 -e SOCKET_URL='${SOCKET_URL}' \
+                                -e GOOGLE_CLIENT_ID='${GOOGLE_CLIENT_ID}' \
                                 -e NODE_ENV='production' \
                                 ${IMAGE}
                         "
