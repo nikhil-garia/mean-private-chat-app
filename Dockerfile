@@ -3,20 +3,19 @@
 ##############################################
 FROM node:20 AS frontend-build
 
-# Set working directory
 WORKDIR /app/frontend
 
-# Copy only package.json files for caching
+# Copy package JSON
 COPY frontend/package*.json ./
 
-# Install dependencies with relaxed peer checks (fix for Angular 20)
+# Install dependencies (fix Angular 20 peer conflicts)
 RUN npm install --legacy-peer-deps
 
-# Copy all frontend source
+# Copy full Angular source
 COPY frontend/ .
 
-# Build Angular for production
-RUN npm run build --configuration production
+# Build Angular project (YOUR PROJECT NAME)
+RUN npx ng build auth-angular17j --configuration production
 
 
 ##############################################
@@ -26,15 +25,15 @@ FROM node:20 AS backend-build
 
 WORKDIR /app/backend
 
-# Install backend dependencies first (better caching)
+# Install backend dependencies
 COPY backend/package*.json ./
 RUN npm install --legacy-peer-deps
 
-# Copy backend source code
+# Copy backend source
 COPY backend/ .
 
-# Copy Angular production files to backend public folder
-COPY --from=frontend-build /app/frontend/dist /app/backend/public
+# Copy Angular dist → backend/public
+COPY --from=frontend-build /app/frontend/dist/auth-angular17j /app/backend/public
 
 
 ##############################################
@@ -44,14 +43,11 @@ FROM node:20
 
 WORKDIR /app
 
-# Copy backend build from previous stage
+# Copy backend build
 COPY --from=backend-build /app/backend .
 
-# Env for production
 ENV NODE_ENV=production
 
-# Backend port
 EXPOSE 3000
 
-# Start backend server
 CMD ["node", "index.js"]
