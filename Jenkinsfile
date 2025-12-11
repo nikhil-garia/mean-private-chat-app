@@ -75,10 +75,10 @@ EOF
         // 5️⃣ Push Image to DockerHub
         stage("Push Image") {
             steps {
-                withDockerRegistry(credentialsId: "docker") {
-                    sh "docker tag nextalk ${IMAGE}"
-                    sh "docker push ${IMAGE}"
-                }
+                withDockerRegistry([credentialsId: 'docker', url: 'https://index.docker.io/v1/']) {
+                sh "docker tag nextalk ${IMAGE}"
+                sh "docker push ${IMAGE}"
+               }
             }
         }
 
