@@ -47,23 +47,25 @@ pipeline {
 
         // 3️⃣ Create Angular environment.prod.ts
         stage("Create Angular Env") {
-            environment {
-                API_URL = credentials("API_URL")
-                SOCKET_URL = credentials("SOCKET_URL")
-            }
-            steps {
-                sh '''
-                    mkdir -p frontend/src/environments
-                    cat > frontend/src/environments/environment.prod.ts <<EOF
+    environment {
+        API_URL = credentials("API_URL")
+        SOCKET_URL = credentials("SOCKET_URL")
+        GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
+    }
+    steps {
+        sh '''
+            mkdir -p frontend/src/environments
+            cat > frontend/src/environments/environment.prod.ts <<EOF
 export const environment = {
   production: true,
-  API_URL: '${API_URL}',
-  SOCKET_URL: '${SOCKET_URL}'
+  apiUrl: '${API_URL}',
+  socketUrl: '${SOCKET_URL}',
+  clientId: '${GOOGLE_CLIENT_ID}'
 };
 EOF
-                '''
-            }
-        }
+        '''
+    }
+}
 
         // 4️⃣ Build Docker Image
         stage("Build Docker Image") {
