@@ -1,56 +1,35 @@
-##############################################
-# Stage 1 — Build Angular Frontend
-##############################################
-FROM node:20 AS frontend-build
+# ============================
+# Stage 1 - Build Angular App
+# ============================
+FROM node:20 as build
 
-WORKDIR /app/frontend
+WORKDIR /app
 
-# Copy package files
-COPY frontend/package*.json ./
+# Install frontend dependencies
+COPY frontend/package.json frontend/yarn.lock ./frontend/
+RUN cd frontend && yarn install
 
-# Install dependencies (fix Angular 20 peer issues)
-RUN npm install --legacy-peer-deps
+# Build frontend
+COPY frontend ./frontend
+RUN cd frontend && yarn build --configuration production
 
-# Copy all frontend source
-COPY frontend/ .
-
-# Build Angular (auto-selects project)
-RUN npx ng build --configuration production
-
-
-##############################################
-# Stage 2 — Build Backend
-##############################################
-FROM node:20 AS backend-build
-
-WORKDIR /app/backend
-
-# Install backend dependencies
-COPY backend/package*.json ./
-RUN npm install --legacy-peer-deps
-
-# Copy backend source
-COPY backend/ .
-
-# Copy ANY Angular build output (works for all Angular versions)
-COPY --from=frontend-build /app/frontend/dist/. /app/backend/public/
-
-
-##############################################
-# Stage 3 — Final Runtime Image
-##############################################
+# ============================
+# Stage 2 - Backend + Serve Angular
+# ============================
 FROM node:20
 
 WORKDIR /app
 
-# Copy backend + frontend build
-COPY --from=backend-build /app/backend .
+# Install backend dependencies
+COPY backend/package.json backend/yarn.lock ./backend/
+RUN cd backend && yarn install
 
-# Production environment
-ENV NODE_ENV=production
+# Copy backend code
+COPY backend ./backend
 
-# Expose backend port (your backend runs on 8080)
+# Copy Angular build output
+COPY --from=build /app/frontend/dist ./backend/public
+
 EXPOSE 3000
 
-# Start backend
-CMD ["node", "index.js"]
+CMD ["node", "backend/index.js"]
