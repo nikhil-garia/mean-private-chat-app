@@ -40,7 +40,7 @@ pipeline {
                     echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> backend/.env
                     echo "FCM_PROJECT_ID=${FCM_PROJECT_ID}" >> backend/.env
                     echo "NODE_ENV=production" >> backend/.env
-                    echo "PORT=8080" >> backend/.env
+                    echo "PORT=3000" >> backend/.env
                 '''
             }
         }
@@ -100,7 +100,7 @@ EOF
                             docker pull ${IMAGE} &&
                             docker stop nextalk || true &&
                             docker rm nextalk || true &&
-                            docker run -d --name nextalk -p 8080:8080 \
+                            docker run -d --name nextalk -p 3000:3000 \
                                 -e MONGO_URL='${MONGO_URL}' \
                                 -e STADIA_API_KEY='${STADIA_API_KEY}' \
                                 -e OPENAI_API_KEY='${OPENAI_API_KEY}' \
