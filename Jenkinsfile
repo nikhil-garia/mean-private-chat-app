@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE = "9808nikhil/nextalk:latest"
         GCP_VM = "34.58.92.73"
-        GCP_USER = "nikhil"
+        GCP_USER = "ubuntu"
     }
 
     stages {
