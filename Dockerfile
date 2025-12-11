@@ -50,7 +50,7 @@ COPY --from=backend-build /app/backend .
 ENV NODE_ENV=production
 
 # Expose backend port (your backend runs on 8080)
-EXPOSE 8080
+EXPOSE 3000
 
 # Start backend
 CMD ["node", "index.js"]
