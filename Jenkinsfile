@@ -59,25 +59,26 @@ pipeline {
         // ----------------------------
         // CREATE ANGULAR environment.prod.ts
         // ----------------------------
-   stage("Create Angular Environment") {
-    withCredentials([
-        string(credentialsId: 'API_URL', variable: 'API_URL'),
-        string(credentialsId: 'SOCKET_URL', variable: 'SOCKET_URL'),
-        string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID')
-    ]) {
-        sh '''
-            mkdir -p frontend/src/environments
-            cat > frontend/src/environments/environment.prod.ts <<EOF
+        stage('Create Angular Environment') {
+            environment {
+                string(credentialsId: 'API_URL', variable: 'API_URL'),
+                string(credentialsId: 'SOCKET_URL', variable: 'SOCKET_URL'),
+                string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID')
+            }
+            steps {
+                sh '''
+                    mkdir -p frontend/src/environments
+                    cat > frontend/src/environments/environment.prod.ts <<EOF
 export const environment = {
-  production: true,
-  apiUrl: '${API_URL}',
-  socketUrl: '${SOCKET_URL}',
-  clientId: '${GOOGLE_CLIENT_ID}',
+    production: true,
+    apiUrl: '${API_URL}',
+    socketUrl: '${SOCKET_URL}'
+    clientId: '${GOOGLE_CLIENT_ID}'
 };
 EOF
-        '''
-    }
-}
+                '''
+            }
+        }
 
         // ----------------------------
         // INSTALL NPM DEPENDENCIES
