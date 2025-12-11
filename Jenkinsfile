@@ -61,9 +61,9 @@ pipeline {
         // ----------------------------
         stage('Create Angular Environment') {
             environment {
-                string(credentialsId: 'API_URL', variable: 'API_URL'),
-                string(credentialsId: 'SOCKET_URL', variable: 'SOCKET_URL'),
-                string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID')
+                API_URL = credentials('API_URL')
+                SOCKET_URL = credentials('SOCKET_URL')
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sh '''
