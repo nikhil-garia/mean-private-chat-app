@@ -63,6 +63,7 @@ pipeline {
             environment {
                 API_URL = credentials('API_URL')
                 SOCKET_URL = credentials('SOCKET_URL')
+                GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
                 sh '''
@@ -72,6 +73,7 @@ export const environment = {
     production: true,
     apiUrl: '${API_URL}',
     socketUrl: '${SOCKET_URL}'
+    clientId: '${GOOGLE_CLIENT_ID}'
 };
 EOF
                 '''
