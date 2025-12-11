@@ -116,44 +116,9 @@ EOF
         }
 
         // ----------------------------
-        // DEPLOY TO GCP VM
+        // Sucess Failure Message
         // ----------------------------
-        stage('Deploy to GCP VM') {
-            environment {
-                STADIA_API_KEY = credentials('STADIA_API_KEY')
-                OPENAI_API_KEY = credentials('OPENAI_API_KEY')
-                GEMINI_API_KEY = credentials('GEMINI_API_KEY')
-                MONGO_URL = credentials('MONGO_URL')
-                FCM_PROJECT_ID = credentials('FCM_PROJECT_ID')
-                API_URL = credentials('API_URL')
-                SOCKET_URL = credentials('SOCKET_URL')
-            }
-
-            steps {
-                sshagent(['gcp-ssh-key']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${GCP_USER}@${GCP_VM} "
-                            docker pull ${IMAGE} &&
-                            docker stop nextalk || true &&
-                            docker rm nextalk || true &&
-                            docker run -d --restart unless-stopped \
-                                --name nextalk \
-                                -p 8080:8080 \
-                                -e STADIA_API_KEY='${STADIA_API_KEY}' \
-                                -e OPENAI_API_KEY='${OPENAI_API_KEY}' \
-                                -e GEMINI_API_KEY='${GEMINI_API_KEY}' \
-                                -e MONGO_URL='${MONGO_URL}' \
-                                -e FCM_PROJECT_ID='${FCM_PROJECT_ID}' \
-                                -e API_URL='${API_URL}' \
-                                -e SOCKET_URL='${SOCKET_URL}' \
-                                -e NODE_ENV='production' \
-                                ${IMAGE}
-                        "
-                    """
-                }
-            }
-        }
-    }
+        
 
     post {
         success {
