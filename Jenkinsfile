@@ -70,8 +70,8 @@ pipeline {
                     cat > frontend/src/environments/environment.prod.ts <<EOF
 export const environment = {
     production: true,
-    API_URL: '${API_URL}',
-    SOCKET_URL: '${SOCKET_URL}'
+    apiUrl: '${API_URL}',
+    socketUrl: '${SOCKET_URL}'
 };
 EOF
                 '''
