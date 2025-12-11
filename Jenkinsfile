@@ -11,6 +11,18 @@ pipeline {
 
     stages {
 
+         stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
+        stage('Fetch Code') {
+            steps {
+                checkout(...)
+            }
+        }
+
         // ----------------------------
         // FETCH CODE FROM GITHUB
         // ----------------------------
