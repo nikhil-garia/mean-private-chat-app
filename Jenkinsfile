@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Fetch Code Only') {
             steps {
                 checkout([
@@ -19,14 +20,28 @@ pipeline {
                 ])
             }
         }
-    }
 
-    post {
-        success {
-            echo '✅ Repo fetched successfully'
+        stage('Install NPM Dependencies') {
+            steps {
+                sh "npm install"
+            }
         }
-        failure {
-            echo '❌ Fetch failed'
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t nextalk ."
+            }
+        }
+
+        stage('Tag & Push to DockerHub') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker') {
+                        sh "docker tag nextalk 9808nikhil/nextalk:latest"
+                        sh "docker push 9808nikhil/nextalk:latest"
+                    }
+                }
+            }
         }
     }
 }
