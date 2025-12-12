@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Install Angular dependencies
 COPY frontend/package*.json ./frontend/
-RUN cd frontend && npm install
+RUN cd frontend && npm install --legacy-peer-deps
 
 # Build Angular
 COPY frontend ./frontend
