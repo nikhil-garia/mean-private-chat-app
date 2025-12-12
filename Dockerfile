@@ -5,13 +5,14 @@ FROM node:20 as build
 
 WORKDIR /app
 
-# Install frontend dependencies
-COPY frontend/package.json frontend/yarn.lock ./frontend/
-RUN cd frontend && yarn install
+# Install Angular dependencies
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm install
 
-# Build frontend
+# Build Angular
 COPY frontend ./frontend
-RUN cd frontend && yarn build --configuration production
+RUN cd frontend && npm run build --prod
+
 
 # ============================
 # Stage 2 - Backend + Serve Angular
@@ -21,15 +22,15 @@ FROM node:20
 WORKDIR /app
 
 # Install backend dependencies
-COPY backend/package.json backend/yarn.lock ./backend/
-RUN cd backend && yarn install
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install
 
-# Copy backend code
+# Copy backend source
 COPY backend ./backend
 
-# Copy Angular build output
-COPY --from=build /app/frontend/dist ./backend/public
+# Copy Angular dist folder into backend/public
+COPY --from=build /app/frontend/dist /app/backend/public
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["node", "backend/index.js"]
