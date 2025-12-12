@@ -29,7 +29,8 @@ RUN cd backend && npm install
 COPY backend ./backend
 
 # Copy Angular dist folder into backend/public
-COPY --from=build /app/frontend/dist /app/backend/public
+COPY --from=build /app/frontend/dist/nextalk/browser ./backend/public
+
 
 EXPOSE 8080
 
