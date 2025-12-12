@@ -106,14 +106,14 @@ app.use((req, res, next) => {
 // =============================================
 //                   Frontend
 // =============================================
-const path = require('path');
+const path = require("path");
 
 // Serve Angular static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Angular SPA fallback route (Express 5 compatible)
-app.get("(.*)", (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Catch-all handler for SPA (MUST USE MIDDLEWARE in Express 5)
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // =============================================
