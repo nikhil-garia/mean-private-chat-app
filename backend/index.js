@@ -103,6 +103,18 @@ app.use((req, res, next) => {
   req.io = io; // Make io instance available in all route handlers
   next();
 });
+// =============================================
+//                   Frintend
+// =============================================
+const path = require('path');
+
+// Serve Angular dist folder
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Angular fallback route
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/src/index.html'));
+});
 
 // =============================================
 //                   ROUTES
