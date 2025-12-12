@@ -2,11 +2,9 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO       = 'https://github.com/nikhil-garia/mean-private-chat-app.git'
+        GIT_REPO        = 'https://github.com/nikhil-garia/mean-private-chat-app.git'
         GIT_CREDENTIALS = 'github-token'
-        IMAGE          = "9808nikhil/nextalk:latest"
-        GCP_VM         = "34.58.92.73"
-        GCP_USER       = "nikhil"
+        IMAGE           = "9808nikhil/nextalk:latest"
     }
 
     stages {
@@ -37,11 +35,11 @@ pipeline {
         // ----------------------------
         stage('Create Backend .env') {
             environment {
-                STADIA_API_KEY = credentials('STADIA_API_KEY')
-                OPENAI_API_KEY = credentials('OPENAI_API_KEY')
-                GEMINI_API_KEY = credentials('GEMINI_API_KEY')
-                MONGO_URL = credentials('MONGO_URL')
-                FCM_PROJECT_ID = credentials('FCM_PROJECT_ID')
+                STADIA_API_KEY   = credentials('STADIA_API_KEY')
+                OPENAI_API_KEY   = credentials('OPENAI_API_KEY')
+                GEMINI_API_KEY   = credentials('GEMINI_API_KEY')
+                MONGO_URL        = credentials('MONGO_URL')
+                FCM_PROJECT_ID   = credentials('FCM_PROJECT_ID')
             }
             steps {
                 sh '''
@@ -61,8 +59,8 @@ pipeline {
         // ----------------------------
         stage('Create Angular Environment') {
             environment {
-                API_URL = credentials('API_URL')
-                SOCKET_URL = credentials('SOCKET_URL')
+                API_URL         = credentials('API_URL')
+                SOCKET_URL      = credentials('SOCKET_URL')
                 GOOGLE_CLIENT_ID = credentials("GOOGLE_CLIENT_ID")
             }
             steps {
@@ -72,7 +70,7 @@ pipeline {
 export const environment = {
     production: true,
     apiUrl: '${API_URL}',
-    socketUrl: '${SOCKET_URL}'
+    socketUrl: '${SOCKET_URL}',
     clientId: '${GOOGLE_CLIENT_ID}'
 };
 EOF
@@ -112,52 +110,15 @@ EOF
             }
         }
 
-        // ----------------------------
-        // DEPLOY TO GCP VM
-        // ----------------------------
-        stage('Deploy to GCP VM') {
-            environment {
-                STADIA_API_KEY = credentials('STADIA_API_KEY')
-                OPENAI_API_KEY = credentials('OPENAI_API_KEY')
-                GEMINI_API_KEY = credentials('GEMINI_API_KEY')
-                MONGO_URL = credentials('MONGO_URL')
-                FCM_PROJECT_ID = credentials('FCM_PROJECT_ID')
-                API_URL = credentials('API_URL')
-                SOCKET_URL = credentials('SOCKET_URL')
-            }
-
-            steps {
-                sshagent(['gcp-ssh-key']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${GCP_USER}@${GCP_VM} "
-                            docker pull ${IMAGE} &&
-                            docker stop nextalk || true &&
-                            docker rm nextalk || true &&
-                            docker run -d --restart unless-stopped \
-                                --name nextalk \
-                                -p 8080:8080 \
-                                -e STADIA_API_KEY='${STADIA_API_KEY}' \
-                                -e OPENAI_API_KEY='${OPENAI_API_KEY}' \
-                                -e GEMINI_API_KEY='${GEMINI_API_KEY}' \
-                                -e MONGO_URL='${MONGO_URL}' \
-                                -e FCM_PROJECT_ID='${FCM_PROJECT_ID}' \
-                                -e API_URL='${API_URL}' \
-                                -e SOCKET_URL='${SOCKET_URL}' \
-                                -e NODE_ENV='production' \
-                                ${IMAGE}
-                        "
-                    """
-                }
-            }
-        }
+        // ❌ REMOVED: Deploy to GCP VM
     }
 
     post {
         success {
-            echo "🚀 Nextalk deployed successfully!"
+            echo "🚀 Build completed and Docker pushed successfully!"
         }
         failure {
-            echo "❌ Deployment failed. Check Jenkins logs."
+            echo "❌ Pipeline failed. Check logs."
         }
     }
 }
