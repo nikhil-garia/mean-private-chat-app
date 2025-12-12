@@ -1,35 +1,26 @@
 pipeline {
 
-    agent {
-        label 'docker'   // or 'any' — use your Jenkins agent label
-    }
+    agent { label 'docker' }
 
     environment {
         DOCKERHUB_USER = credentials('dockerhub-username')
         DOCKERHUB_PASS = credentials('dockerhub-password')
 
-        // Your DockerHub repo names
         FRONTEND_REPO = "9808nikhil/mean-chat-frontend"
         BACKEND_REPO  = "9808nikhil/mean-chat-backend"
 
-        // versioning => commit-short-sha + build-number
         VERSION = "${env.GIT_COMMIT[0..7]}-${env.BUILD_NUMBER}"
     }
 
     options {
-    timestamps()
-    buildDiscarder(logRotator(numToKeepStr: '15'))
-}
-
-wrappers {
-    colorizeOutput 'xterm'
-}
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '15'))
+        ansiColor('xterm')   // ✅ Correct for Declarative Pipelines
+    }
 
     stages {
 
-        /* -----------------------------------------
-         *  Stage 1: Checkout from SCM
-         * ----------------------------------------- */
+        /* Checkout */
         stage('Checkout') {
             steps {
                 checkout scm
@@ -37,9 +28,7 @@ wrappers {
             }
         }
 
-        /* -----------------------------------------
-         *  Stage 2: Build Frontend (Angular)
-         * ----------------------------------------- */
+        /* Frontend Build */
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
@@ -54,26 +43,19 @@ wrappers {
             }
         }
 
-        /* -----------------------------------------
-         *  Stage 3: Build Backend (Node.js)
-         * ----------------------------------------- */
+        /* Backend Build */
         stage('Build Backend') {
             steps {
                 dir('backend') {
                     sh '''
                         echo "Installing backend dependencies..."
                         yarn install --frozen-lockfile
-
-                        # If backend uses TypeScript, enable:
-                        # yarn build
                     '''
                 }
             }
         }
 
-        /* -----------------------------------------
-         *  Stage 4: Create Docker Images
-         * ----------------------------------------- */
+        /* Docker Images */
         stage('Build Docker Images') {
             steps {
                 sh '''
@@ -85,9 +67,7 @@ wrappers {
             }
         }
 
-        /* -----------------------------------------
-         *  Stage 5: Push Docker Images
-         * ----------------------------------------- */
+        /* Push Images */
         stage('Push Images') {
             steps {
                 sh '''
@@ -101,9 +81,7 @@ wrappers {
             }
         }
 
-        /* -----------------------------------------
-         *  Stage 6: Deploy to Kubernetes
-         * ----------------------------------------- */
+        /* Deploy to K8s */
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONF')]) {
@@ -127,9 +105,6 @@ wrappers {
         }
     }
 
-    /* -----------------------------------------
-     *  Notifications / Post Actions
-     * ----------------------------------------- */
     post {
         success {
             echo "🚀 Deployment successful! Version: ${VERSION}"
