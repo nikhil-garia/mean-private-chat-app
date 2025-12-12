@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        /* FRONTEND BUILD USING DOCKER (no node required on Jenkins) */
+        /* ----------- FRONTEND BUILD USING DOCKER ----------- */
         stage('Build Frontend') {
             steps {
                 sh '''
@@ -36,13 +36,13 @@ pipeline {
                     docker run --rm \
                         -v $PWD/frontend:/app \
                         -w /app \
-                        node:20-alpine \
-                        sh -c "npm install -g yarn @angular/cli && yarn install --frozen-lockfile && ng build --configuration production --output-path=dist"
+                        node:20 \
+                        sh -c "npm install -g @angular/cli && yarn install --frozen-lockfile && ng build --configuration production --output-path=dist"
                 '''
             }
         }
 
-        /* BACKEND BUILD USING DOCKER */
+        /* ----------- BACKEND BUILD USING DOCKER ----------- */
         stage('Build Backend') {
             steps {
                 sh '''
@@ -51,25 +51,25 @@ pipeline {
                     docker run --rm \
                         -v $PWD/backend:/app \
                         -w /app \
-                        node:20-alpine \
-                        sh -c "npm install -g yarn && yarn install --frozen-lockfile"
+                        node:20 \
+                        sh -c "yarn install --frozen-lockfile"
                 '''
             }
         }
 
-        /* DOCKER BUILD IMAGES */
+        /* ----------- DOCKER IMAGE BUILD ----------- */
         stage('Build Docker Images') {
             steps {
                 sh '''
                     echo "Building Docker images..."
 
-                    docker build -t ${FRONTEND_REPO}:${VERSION}  -f frontend/Dockerfile frontend
-                    docker build -t ${BACKEND_REPO}:${VERSION}   -f backend/Dockerfile backend
+                    docker build -t ${FRONTEND_REPO}:${VERSION} -f frontend/Dockerfile frontend
+                    docker build -t ${BACKEND_REPO}:${VERSION}  -f backend/Dockerfile backend
                 '''
             }
         }
 
-        /* PUSH IMAGES */
+        /* ----------- DOCKER IMAGE PUSH ----------- */
         stage('Push Docker Images') {
             steps {
                 sh '''
@@ -83,7 +83,7 @@ pipeline {
             }
         }
 
-        /* DEPLOY TO KUBERNETES */
+        /* ----------- DEPLOY TO KUBERNETES ----------- */
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONF')]) {
