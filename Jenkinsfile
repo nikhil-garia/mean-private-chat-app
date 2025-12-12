@@ -10,6 +10,7 @@ pipeline {
         BACKEND_REPO  = "9808nikhil/mean-chat-backend"
 
         VERSION = "${env.GIT_COMMIT[0..7]}-${env.BUILD_NUMBER}"
+        NODE_OPTIONS="--max_old_space_size=4096"
     }
 
     options {
@@ -33,11 +34,13 @@ pipeline {
                     echo "Building Angular frontend inside Docker..."
 
                     docker run --rm \
+                        -e NODE_OPTIONS="--max_old_space_size=4096" \
                         -v $PWD/frontend:/app \
                         -w /app \
                         node:20 \
                         sh -c "
-                            npm install -g yarn @angular/cli &&
+                            npm install -g yarn &&
+                            npm install -g @angular/cli &&
                             yarn install --frozen-lockfile &&
                             ng build --configuration production --output-path=dist
                         "
@@ -69,8 +72,8 @@ pipeline {
                 sh '''
                     echo "Building Docker images..."
 
-                    docker build -t ${FRONTEND_REPO}:${VERSION} frontend
-                    docker build -t ${BACKEND_REPO}:${VERSION}  backend
+                    docker build -t ${FRONTEND_REPO}:${VERSION} -f frontend/Dockerfile frontend
+                    docker build -t ${BACKEND_REPO}:${VERSION}  -f backend/Dockerfile backend
                 '''
             }
         }
