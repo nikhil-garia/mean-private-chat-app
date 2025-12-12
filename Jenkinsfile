@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        /* ----------- FRONTEND BUILD (using corepack + yarn) ----------- */
+        /* ----------- FRONTEND BUILD ----------- */
         stage('Build Frontend') {
             steps {
                 sh '''
@@ -42,14 +42,13 @@ pipeline {
                             corepack enable &&
                             corepack prepare yarn@stable --activate &&
                             yarn install --frozen-lockfile &&
-                            npm install -g @angular/cli &&
-                            ng build --configuration production --output-path=dist
+                            ./node_modules/.bin/ng build --configuration production --output-path=dist
                         "
                 '''
             }
         }
 
-        /* ----------- BACKEND BUILD (using corepack + yarn) ----------- */
+        /* ----------- BACKEND BUILD ----------- */
         stage('Build Backend') {
             steps {
                 sh '''
