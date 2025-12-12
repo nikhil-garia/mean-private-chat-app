@@ -15,12 +15,11 @@ pipeline {
     options {
         timestamps()
         buildDiscarder(logRotator(numToKeepStr: '15'))
-        ansiColor('xterm')   // ✅ Correct for Declarative Pipelines
+        // ❌ NO ansiColor — your Jenkins does not support it
     }
 
     stages {
 
-        /* Checkout */
         stage('Checkout') {
             steps {
                 checkout scm
@@ -28,7 +27,6 @@ pipeline {
             }
         }
 
-        /* Frontend Build */
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
@@ -43,7 +41,6 @@ pipeline {
             }
         }
 
-        /* Backend Build */
         stage('Build Backend') {
             steps {
                 dir('backend') {
@@ -55,7 +52,6 @@ pipeline {
             }
         }
 
-        /* Docker Images */
         stage('Build Docker Images') {
             steps {
                 sh '''
@@ -67,7 +63,6 @@ pipeline {
             }
         }
 
-        /* Push Images */
         stage('Push Images') {
             steps {
                 sh '''
@@ -81,7 +76,6 @@ pipeline {
             }
         }
 
-        /* Deploy to K8s */
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONF')]) {
