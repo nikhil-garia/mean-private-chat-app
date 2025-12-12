@@ -17,10 +17,13 @@ pipeline {
     }
 
     options {
-        timestamps()
-        ansiColor('xterm')
-        buildDiscarder(logRotator(numToKeepStr: '15'))
-    }
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '15'))
+}
+
+wrappers {
+    colorizeOutput 'xterm'
+}
 
     stages {
 
