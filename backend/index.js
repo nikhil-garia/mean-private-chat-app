@@ -108,11 +108,11 @@ app.use((req, res, next) => {
 // =============================================
 const path = require('path');
 
-// Serve Angular /dist folder
+// Serve Angular static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Catch-all route for SPA frontend
-app.get('*', (req, res) => {
+// Angular SPA fallback route (Express 5 compatible)
+app.get("(.*)", (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
