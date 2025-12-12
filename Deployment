@@ -20,7 +20,7 @@ pipeline {
 
                     // Run latest containers
                     sh """
-                    docker run -d --name nextalk -p 3000:3000 9808nikhil/nextalk:latest
+                    docker run -d --name nextalk -p 3000:8080 9808nikhil/nextalk:latest
                     """
                 }
             }
