@@ -104,16 +104,16 @@ app.use((req, res, next) => {
   next();
 });
 // =============================================
-//                   Frintend
+//                   Frontend
 // =============================================
 const path = require('path');
 
-// Serve Angular dist folder
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve Angular /dist folder
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Angular fallback route
+// Catch-all route for SPA frontend
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/src/index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // =============================================
