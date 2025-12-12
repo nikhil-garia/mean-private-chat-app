@@ -55,7 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 // Using resave: false and saveUninitialized: false is recommended for most apps.
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "fallback-secret",
+    secret: MY_C_KEY,
     resave: false, // Don't save session if unmodified.
     saveUninitialized: false, // Don't create a session until something is stored.
     cookie: {
@@ -102,18 +102,6 @@ const io = initializeWebSocket(server, app);
 app.use((req, res, next) => {
   req.io = io; // Make io instance available in all route handlers
   next();
-});
-// =============================================
-//                   Frontend
-// =============================================
-const path = require("path");
-
-// Serve Angular static files
-app.use(express.static(path.join(__dirname, "public")));
-
-// Catch-all handler for SPA (MUST USE MIDDLEWARE in Express 5)
-app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // =============================================
