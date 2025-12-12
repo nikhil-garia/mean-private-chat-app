@@ -15,11 +15,11 @@ pipeline {
     options {
         timestamps()
         buildDiscarder(logRotator(numToKeepStr: '15'))
-        // ❌ NO ansiColor — your Jenkins does not support it
     }
 
     stages {
 
+        /* Checkout */
         stage('Checkout') {
             steps {
                 checkout scm
@@ -27,31 +27,37 @@ pipeline {
             }
         }
 
+        /* FRONTEND BUILD USING DOCKER (no node required on Jenkins) */
         stage('Build Frontend') {
             steps {
-                dir('frontend') {
-                    sh '''
-                        echo "Installing Angular dependencies..."
-                        yarn install --frozen-lockfile
+                sh '''
+                    echo "Building Angular frontend inside Docker..."
 
-                        echo "Building Angular production bundle..."
-                        ./node_modules/.bin/ng build --configuration production --output-path=dist
-                    '''
-                }
+                    docker run --rm \
+                        -v $PWD/frontend:/app \
+                        -w /app \
+                        node:20-alpine \
+                        sh -c "npm install -g yarn @angular/cli && yarn install --frozen-lockfile && ng build --configuration production --output-path=dist"
+                '''
             }
         }
 
+        /* BACKEND BUILD USING DOCKER */
         stage('Build Backend') {
             steps {
-                dir('backend') {
-                    sh '''
-                        echo "Installing backend dependencies..."
-                        yarn install --frozen-lockfile
-                    '''
-                }
+                sh '''
+                    echo "Building backend inside Docker..."
+
+                    docker run --rm \
+                        -v $PWD/backend:/app \
+                        -w /app \
+                        node:20-alpine \
+                        sh -c "npm install -g yarn && yarn install --frozen-lockfile"
+                '''
             }
         }
 
+        /* DOCKER BUILD IMAGES */
         stage('Build Docker Images') {
             steps {
                 sh '''
@@ -63,7 +69,8 @@ pipeline {
             }
         }
 
-        stage('Push Images') {
+        /* PUSH IMAGES */
+        stage('Push Docker Images') {
             steps {
                 sh '''
                     echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
@@ -76,23 +83,20 @@ pipeline {
             }
         }
 
+        /* DEPLOY TO KUBERNETES */
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONF')]) {
                     sh '''
                         export KUBECONFIG=$KUBECONF
 
-                        echo "Updating frontend deployment..."
-                        kubectl set image deployment/frontend-app \
-                            frontend=${FRONTEND_REPO}:${VERSION} --record || true
+                        echo "Deploying to Kubernetes..."
 
-                        echo "Updating backend deployment..."
-                        kubectl set image deployment/backend-app \
-                            backend=${BACKEND_REPO}:${VERSION} --record || true
+                        kubectl set image deployment/frontend-app frontend=${FRONTEND_REPO}:${VERSION} --record || true
+                        kubectl set image deployment/backend-app backend=${BACKEND_REPO}:${VERSION} --record || true
 
-                        echo "Waiting for rollout..."
-                        kubectl rollout status deployment/frontend-app --timeout=90s || true
-                        kubectl rollout status deployment/backend-app  --timeout=90s || true
+                        kubectl rollout status deployment/frontend-app --timeout=120s || true
+                        kubectl rollout status deployment/backend-app --timeout=120s || true
                     '''
                 }
             }
@@ -104,7 +108,7 @@ pipeline {
             echo "🚀 Deployment successful! Version: ${VERSION}"
         }
         failure {
-            echo "❌ Deployment failed. Check pipeline logs."
+            echo "❌ Deployment failed. See logs above."
         }
     }
 }
