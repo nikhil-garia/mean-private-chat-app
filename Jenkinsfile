@@ -19,7 +19,6 @@ pipeline {
 
     stages {
 
-        /* Checkout */
         stage('Checkout') {
             steps {
                 checkout scm
@@ -27,7 +26,7 @@ pipeline {
             }
         }
 
-        /* ----------- FRONTEND BUILD USING DOCKER ----------- */
+        /* ----------- FRONTEND BUILD ----------- */
         stage('Build Frontend') {
             steps {
                 sh '''
@@ -37,12 +36,16 @@ pipeline {
                         -v $PWD/frontend:/app \
                         -w /app \
                         node:20 \
-                        sh -c "npm install -g @angular/cli && yarn install --frozen-lockfile && ng build --configuration production --output-path=dist"
+                        sh -c "
+                            npm install -g yarn @angular/cli &&
+                            yarn install --frozen-lockfile &&
+                            ng build --configuration production --output-path=dist
+                        "
                 '''
             }
         }
 
-        /* ----------- BACKEND BUILD USING DOCKER ----------- */
+        /* ----------- BACKEND BUILD ----------- */
         stage('Build Backend') {
             steps {
                 sh '''
@@ -52,7 +55,10 @@ pipeline {
                         -v $PWD/backend:/app \
                         -w /app \
                         node:20 \
-                        sh -c "yarn install --frozen-lockfile"
+                        sh -c "
+                            npm install -g yarn &&
+                            yarn install --frozen-lockfile
+                        "
                 '''
             }
         }
@@ -63,18 +69,18 @@ pipeline {
                 sh '''
                     echo "Building Docker images..."
 
-                    docker build -t ${FRONTEND_REPO}:${VERSION} -f frontend/Dockerfile frontend
-                    docker build -t ${BACKEND_REPO}:${VERSION}  -f backend/Dockerfile backend
+                    docker build -t ${FRONTEND_REPO}:${VERSION} frontend
+                    docker build -t ${BACKEND_REPO}:${VERSION}  backend
                 '''
             }
         }
 
-        /* ----------- DOCKER IMAGE PUSH ----------- */
+        /* ----------- PUSH IMAGES ----------- */
         stage('Push Docker Images') {
             steps {
                 sh '''
                     echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
-                    
+
                     docker push ${FRONTEND_REPO}:${VERSION}
                     docker push ${BACKEND_REPO}:${VERSION}
 
@@ -90,13 +96,13 @@ pipeline {
                     sh '''
                         export KUBECONFIG=$KUBECONF
 
-                        echo "Deploying to Kubernetes..."
+                        echo "Updating Kubernetes deployments..."
 
                         kubectl set image deployment/frontend-app frontend=${FRONTEND_REPO}:${VERSION} --record || true
                         kubectl set image deployment/backend-app backend=${BACKEND_REPO}:${VERSION} --record || true
 
                         kubectl rollout status deployment/frontend-app --timeout=120s || true
-                        kubectl rollout status deployment/backend-app --timeout=120s || true
+                        kubectl rollout status deployment/backend-app  --timeout=120s || true
                     '''
                 }
             }
