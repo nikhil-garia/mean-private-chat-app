@@ -55,7 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 // Using resave: false and saveUninitialized: false is recommended for most apps.
 app.use(
   session({
-    secret: MY_C_KEY,
+    secret: process.env.SESSION_SECRET || "fallback-secret",
     resave: false, // Don't save session if unmodified.
     saveUninitialized: false, // Don't create a session until something is stored.
     cookie: {
