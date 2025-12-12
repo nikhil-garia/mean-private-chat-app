@@ -40,6 +40,7 @@ pipeline {
                 GEMINI_API_KEY   = credentials('GEMINI_API_KEY')
                 MONGO_URL        = credentials('MONGO_URL')
                 FCM_PROJECT_ID   = credentials('FCM_PROJECT_ID')
+                SESSION_SECRET    = credentials('SESSION_SECRET')
             }
             steps {
                 sh '''
@@ -48,6 +49,7 @@ pipeline {
                     echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> backend/.env
                     echo "MONGO_URL=${MONGO_URL}" >> backend/.env
                     echo "FCM_PROJECT_ID=${FCM_PROJECT_ID}" >> backend/.env
+                    echo "SESSION_SECRET=${SESSION_SECRET}" >> backend/.env
                     echo "PORT=8080" >> backend/.env
                     echo "NODE_ENV=production" >> backend/.env
                 '''
