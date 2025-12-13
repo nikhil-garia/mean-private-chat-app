@@ -5,27 +5,23 @@ import { SocketService } from '../../services/socket.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ClientGoogleLoginComponent } from './google-login/google-login.component';
 
 @Component({
   selector: 'app-client-page',
   templateUrl: './client-page.component.html',
   styleUrls: ['./client-page.component.scss'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ClientGoogleLoginComponent]
 })
 export class ClientPageComponent implements OnInit, OnDestroy {
   isSigninOpen = false;
   isSidebarOpen = false;
-  isRegisterMode = false;
-  isForgotPasswordMode = false;
   
   loginObj: Login;
-  regObj: Reg;
-  forgotPasswordEmail: string;
   authFailError: string;
+  secretChatRoomError: string;
   isValid: boolean;
   loginLoading = false;
-  registerLoading = false;
-  forgotPasswordLoading = false;
   
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -35,9 +31,8 @@ export class ClientPageComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.loginObj = new Login();
-    this.regObj = new Reg();
-    this.forgotPasswordEmail = '';
     this.authFailError = '';
+    this.secretChatRoomError = '';
     this.isValid = false;
   }
 
@@ -129,20 +124,6 @@ export class ClientPageComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  // Toggle between login and register modes
-  setAuthMode(isRegister: boolean) {
-    this.isRegisterMode = isRegister;
-    this.isForgotPasswordMode = false;
-    this.authFailError = '';
-  }
-
-  // Method to switch to forgot password mode
-  setForgotPasswordMode() {
-    this.isForgotPasswordMode = true;
-    this.isRegisterMode = false;
-    this.authFailError = '';
-  }
-
   // Method to handle signin form submission
   onSigninSubmit() {
     this.loginLoading = true;
@@ -186,92 +167,6 @@ export class ClientPageComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
-
-  // Method to handle forgot password form submission
-  onForgotPasswordSubmit() {
-    this.forgotPasswordLoading = true;
-    this.authFailError = '';
-    
-    if (!this.forgotPasswordEmail) {
-      this.authFailError = 'Email Required';
-      this.isValid = false;
-    } else {
-      this.isValid = true;
-    }
-    
-    if (this.isValid) {
-      this.authService.forgotPassword(this.forgotPasswordEmail).subscribe((res: any) => {
-        if (res.status === 200) {
-          this.snackBar.open('Password reset link sent to your email!', '🎉', { duration: 5000 });
-          // Switch back to login mode after successful request
-          this.isForgotPasswordMode = false;
-          // Clear forgot password form
-          this.forgotPasswordEmail = '';
-          this.forgotPasswordLoading = false;
-          this.cdr.detectChanges();
-        } else {
-          this.authFailError = res.message || 'Failed to send reset link';
-          this.forgotPasswordLoading = false;
-          this.cdr.detectChanges();
-        }
-      }, error => {
-        this.forgotPasswordLoading = false;
-        console.error('Forgot password failed: ', error);
-        this.snackBar.open('Failed to send reset link.. try again', 'close', { duration: 5000 });
-        this.authFailError = error.error?.message || 'Failed to send reset link';
-        this.cdr.detectChanges();
-      });
-    } else {
-      this.forgotPasswordLoading = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  // Method to handle registration form submission
-  onRegisterSubmit() {
-    this.registerLoading = true;
-    this.authFailError = '';
-    
-    if (!this.regObj.fullName) {
-      this.authFailError = 'Full Name Required';
-      this.isValid = false;
-    } else if (!this.regObj.email) {
-      this.authFailError = 'Email Required';
-      this.isValid = false;
-    } else if (!this.regObj.password) {
-      this.authFailError = 'Password Required';
-      this.isValid = false;
-    } else {
-      this.isValid = true;
-    }
-    
-    if (this.isValid) {
-      this.authService.register('/api/v1/register', this.regObj).subscribe((res: any) => {
-        if (res.status === 200) {
-          this.snackBar.open('Registration successful! Please login to continue.', '🎉', { duration: 5000 });
-          // Switch back to login mode after successful registration
-          this.isRegisterMode = false;
-          // Clear registration form
-          this.regObj = new Reg();
-          this.registerLoading = false;
-          this.cdr.detectChanges();
-        } else {
-          this.authFailError = res.message || 'Registration failed';
-          this.registerLoading = false;
-          this.cdr.detectChanges();
-        }
-      }, error => {
-        this.registerLoading = false;
-        console.error('Registration failed: ', error);
-        this.snackBar.open('Registration failed.. try again', 'close', { duration: 5000 });
-        this.authFailError = error.error?.message || 'Registration failed';
-        this.cdr.detectChanges();
-      });
-    } else {
-      this.registerLoading = false;
-      this.cdr.detectChanges();
-    }
-  }
 }
 
 export class Login {
@@ -279,18 +174,6 @@ export class Login {
   password: string;
   
   constructor() {
-    this.email = '';
-    this.password = '';
-  }
-}
-
-export class Reg {
-  fullName: string;
-  email: string;
-  password: string;
-
-  constructor() {
-    this.fullName = '';
     this.email = '';
     this.password = '';
   }

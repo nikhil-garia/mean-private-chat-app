@@ -17,6 +17,7 @@
 
       <div class="button-box">
         <button (click)="openSignin()">CHAT ROOM</button>
+        <!--<button (click)="openSecretChatRoom()" style="margin-left: 10px;">SECRET CHAT ROOM</button>-->
       </div>
     </div>
 
@@ -58,7 +59,7 @@
 
     <h1>Discover the Endless Possibilities of AI Conversation with MCBRAIN</h1>
     <h3>Unleash the power of AI with MCBRAIN. Enhance your productivity with MCBRAIN, the ultimate OpenAI-powered chat app.</h3>
-    <button (click)="openSignin()">Get Started</button>
+    <button>Get Started</button>
 
     <div class="hero-image-box">
       <div class="robot-box">
@@ -105,137 +106,76 @@
     </div>
   </section>
 
-  <div id="signinPage" class="signin-page-box">
+  <!-- Secret Chat Room Modal -->
+  <div id="secretChatRoomPage" class="signin-page-box" *ngIf="isSecretChatRoomOpen">
     <div class="signin-page">
-      <div class="auth-tabs">
-        <button 
-          class="tab-button" 
-          [class.active]="!isRegisterMode && !isForgotPasswordMode" 
-          (click)="setAuthMode(false)">
-          Sign In
-        </button>
-        <button 
-          class="tab-button" 
-          [class.active]="isRegisterMode" 
-          (click)="setAuthMode(true)">
-          Register
-        </button>
-      </div>
-      <!-- Login Form -->
-      <div *ngIf="!isRegisterMode && !isForgotPasswordMode" class="auth-form">
-        <h1>Sign In</h1>
+      <div class="auth-form">
+          <div class="chat-logo-container">
+      <img src="assets/images/logo.png" alt="Chat Logo" class="animated-chat-logo">
+    </div>
+        <h1>Secret Chat Room</h1>
         
-        <!-- Email Input -->
-        <input 
-          type="email" 
-          placeholder="Email" 
-          [(ngModel)]="loginObj.email" 
-          name="email"
-          required
-          autocomplete="email">
-        
-        <!-- Password Input -->
-        <input 
-          type="password" 
-          placeholder="Password" 
-          [(ngModel)]="loginObj.password" 
-          name="password"
-          required
-          autocomplete="current-password">
-        
-        <!-- Forgot Password Link -->
-        <div class="forgot-password-link login-form-link">
-          <a href="javascript:void(0)" (click)="setForgotPasswordMode()">Forgot Password?</a>
-        </div>
-        
-        <!-- Error Message -->
-        <div class="error-message" *ngIf="authFailError">
-          <i class='bx bx-error-circle'></i>
-          <span>{{authFailError}}</span>
-        </div>
-        
-        <!-- Sign In Button -->
-        <button (click)="onSigninSubmit()" [disabled]="loginLoading">
-          <span *ngIf="!loginLoading">Sign in</span>
-          <span *ngIf="loginLoading">Signing In...</span>
-        </button>
-      </div>
-      <!-- Forgot Password Form -->
-      <div *ngIf="isForgotPasswordMode" class="auth-form">
-        <h1>Forgot Password</h1>
-        
-        <!-- Email Input -->
-        <input 
-          type="email" 
-          placeholder="Enter your email" 
-          [(ngModel)]="forgotPasswordEmail" 
-          name="forgotPasswordEmail"
-          required
-          autocomplete="email">
-        
-        <!-- Error Message -->
-        <div class="error-message" *ngIf="authFailError">
-          <i class='bx bx-error-circle'></i>
-          <span>{{authFailError}}</span>
-        </div>
-        
-        <!-- Submit Button -->
-        <button (click)="onForgotPasswordSubmit()" [disabled]="forgotPasswordLoading">
-          <span *ngIf="!forgotPasswordLoading">Send Reset Link</span>
-          <span *ngIf="forgotPasswordLoading">Sending...</span>
-        </button>
-        
-        <!-- Back to Login Link -->
-        <div class="forgot-password-link" style="margin-top: 15px;">  <!-- Added margin for spacing -->
-          <a href="javascript:void(0)" (click)="setAuthMode(false)">Back to Login</a>
-        </div>
-      </div>
-      
-      <!-- Registration Form -->
-      <div *ngIf="isRegisterMode" class="auth-form">
-        <h1>Create Account</h1>
-        
-        <!-- Full Name Input -->
+        <!-- Name Input -->
         <input 
           type="text" 
-          placeholder="Full Name" 
-          [(ngModel)]="regObj.fullName" 
-          name="fullName"
+          placeholder="Enter your name" 
+          [(ngModel)]="secretChatRoomObj.name" 
+          name="name"
           required
           autocomplete="name">
         
-        <!-- Email Input -->
-        <input 
-          type="email" 
-          placeholder="Email" 
-          [(ngModel)]="regObj.email" 
-          name="email"
-          required
-          autocomplete="email">
-        
-        <!-- Password Input -->
-        <input 
-          type="password" 
-          placeholder="Password" 
-          [(ngModel)]="regObj.password" 
-          name="password"
-          required
-          autocomplete="new-password">
-        
         <!-- Error Message -->
-        <div class="error-message" *ngIf="authFailError">
+        <div class="error-message" *ngIf="secretChatRoomError">
           <i class='bx bx-error-circle'></i>
-          <span>{{authFailError}}</span>
+          <span>{{secretChatRoomError}}</span>
         </div>
         
-        <!-- Register Button -->
-        <button (click)="onRegisterSubmit()" [disabled]="registerLoading">
-          <span *ngIf="!registerLoading">Create Account</span>
-          <span *ngIf="registerLoading">Creating Account...</span>
+        <!-- Create Room Button -->
+        <button (click)="onCreateSecretRoom()" [disabled]="secretChatRoomLoading">
+          <span *ngIf="!secretChatRoomLoading">Create Room</span>
+          <span *ngIf="secretChatRoomLoading">Creating Room...</span>
         </button>
       </div>
       
-      <div class="close-button" (click)="closeSignin()"><i class='bx bx-x'></i></div>
+      <div class="close-button" (click)="closeSecretChatRoom()"><i class='bx bx-x'></i></div>
+    </div>
+  </div>
+
+  <div id="signinPage" class="signin-page-box">
+    <div class="signin-page">
+      <h1>Sign In</h1>
+      
+      <!-- Email Input -->
+      <input 
+        type="email" 
+        placeholder="Email" 
+        [(ngModel)]="loginObj.email" 
+        name="email"
+        required
+        autocomplete="email">
+      
+      <!-- Password Input -->
+      <input 
+        type="password" 
+        placeholder="Password" 
+        [(ngModel)]="loginObj.password" 
+        name="password"
+        required
+        autocomplete="current-password">
+      
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="authFailError">
+        <i class='bx bx-error-circle'></i>
+        <span>{{authFailError}}</span>
+      </div>
+      
+      <!-- Sign In Button -->
+      <button (click)="onSigninSubmit()" [disabled]="loginLoading">
+        <span *ngIf="!loginLoading">Sign in</span>
+        <span *ngIf="loginLoading">Signing In...</span>
+      </button>
+      
+      <div (click)="closeSignin()"><i class='bx bx-x'></i></div>
     </div>
   </div>
 
@@ -496,7 +436,7 @@
   </section>
 
   <footer>
-    <h1>©️2025, Made with ❤️ by MiladiCode</h1>
+    <h1>©️2025, Made with ❤️ by Nikhil</h1>
     <div class="box-icons">
       <a href="#"><i class='bx bxl-discord-alt' ></i></a>
       <a href="#"><i class='bx bxl-youtube' ></i></a>
