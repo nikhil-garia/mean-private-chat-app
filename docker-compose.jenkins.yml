@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backend:/var/jenkins_home/workspace/backend
+      - ./frontend:/var/jenkins_home/workspace/frontend
+    environment:
+      - JENKINS_OPTS=--httpPort=8080 --httpsPort=-1
+      - JAVA_OPTS=-Duser.timezone=America/New_York
+    networks:
+      - jenkins_network
+
+  # Optional: MongoDB for testing
+  mongodb:
+    image: mongo:7
+    container_name: jenkins-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=chat_app
+    networks:
+      - jenkins_network
+
+volumes:
+  jenkins_home:
+  mongodb_data:
+
+networks:
+  jenkins_network:
+    driver: bridge

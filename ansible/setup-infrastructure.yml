@@ -1,0 +1,223 @@
+---
+- name: Setup Kubernetes Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    cluster_name: "chat-app-cluster"
+    aws_region: "us-east-1"
+    environment: "production"
+
+  tasks:
+    - name: Install required Python packages
+      pip:
+        name:
+          - boto3
+          - kubernetes
+          - helm3
+        state: present
+
+    - name: Create Terraform working directory
+      file:
+        path: /tmp/terraform-chat-app
+        state: directory
+        mode: '0755'
+
+    - name: Copy Terraform files to working directory
+      copy:
+        src: "{{ playbook_dir }}/../terraform/"
+        dest: /tmp/terraform-chat-app/
+
+    - name: Initialize Terraform
+      command: terraform init
+      args:
+        chdir: /tmp/terraform-chat-app
+
+    - name: Validate Terraform configuration
+      command: terraform validate
+      args:
+        chdir: /tmp/terraform-chat-app
+
+    - name: Plan Terraform changes
+      command: terraform plan -out=tfplan
+      args:
+        chdir: /tmp/terraform-chat-app
+      register: terraform_plan
+
+    - name: Display Terraform plan
+      debug:
+        var: terraform_plan
+
+    - name: Apply Terraform changes
+      command: terraform apply tfplan
+      args:
+        chdir: /tmp/terraform-chat-app
+      when: confirm_terraform_apply | default(false)
+
+    - name: Get Terraform outputs
+      command: terraform output -json
+      args:
+        chdir: /tmp/terraform-chat-app
+      register: terraform_outputs
+      changed_when: false
+
+    - name: Set Terraform outputs as facts
+      set_fact:
+        terraform_output: "{{ terraform_outputs.stdout | from_json }}"
+
+    - name: Display cluster information
+      debug:
+        msg: |
+          Cluster Name: {{ terraform_output.cluster_name.value }}
+          Region: {{ terraform_output.region.value }}
+          Endpoint: {{ terraform_output.cluster_endpoint.value }}
+
+- name: Configure kubectl
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Install kubectl
+      get_url:
+        url: https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Configure kubectl for EKS cluster
+      shell: |
+        aws eks update-kubeconfig \
+          --region {{ terraform_output.region.value }} \
+          --name {{ terraform_output.cluster_name.value }}
+      environment:
+        AWS_DEFAULT_REGION: "{{ terraform_output.region.value }}"
+
+    - name: Test kubectl connectivity
+      k8s_info:
+        api_version: v1
+        kind: Node
+      register: k8s_nodes
+
+    - name: Display nodes
+      debug:
+        var: k8s_nodes
+
+- name: Deploy Monitoring Stack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Add Helm stable repository
+      kubernetes.core.helm_repository:
+        name: prometheus-community
+        url: https://prometheus-community.github.io/helm-charts
+
+    - name: Add Grafana Helm repository
+      kubernetes.core.helm_repository:
+        name: grafana
+        url: https://grafana.github.io/helm-charts
+
+    - name: Install kube-prometheus-stack
+      kubernetes.core.helm:
+        name: monitoring
+        chart_ref: prometheus-community/kube-prometheus-stack
+        namespace: monitoring
+        create_namespace: true
+        values:
+          prometheus:
+            prometheusSpec:
+              retention: 30d
+              storageSpec:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: gp2
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 50Gi
+          grafana:
+            adminPassword: admin123
+            persistence:
+              enabled: true
+              storageClassName: gp2
+              size: 10Gi
+          alertmanager:
+            alertmanagerSpec:
+              storage:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: gp2
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+
+    - name: Install Node Exporter
+      kubernetes.core.helm:
+        name: node-exporter
+        chart_ref: prometheus-community/prometheus-node-exporter
+        namespace: monitoring
+
+    - name: Create ServiceMonitor for chat application
+      k8s:
+        state: present
+        definition:
+          apiVersion: monitoring.coreos.com/v1
+          kind: ServiceMonitor
+          metadata:
+            name: chat-app-metrics
+            namespace: chat-app
+            labels:
+              app: chat-backend
+          spec:
+            selector:
+              matchLabels:
+                app: chat-backend
+            endpoints:
+            - port: http
+              path: /metrics
+              interval: 30s
+              scrapeTimeout: 10s
+
+- name: Setup Load Balancer
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Install AWS CLI
+      get_url:
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /tmp/awscliv2.zip
+
+    - name: Extract AWS CLI
+      unarchive:
+        src: /tmp/awscliv2.zip
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Install AWS CLI
+      command: ./aws/install
+      args:
+        chdir: /tmp/aws
+
+    - name: Configure AWS CLI
+      shell: |
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+        aws configure set default.region {{ terraform_output.region.value }}
+        aws configure set default.output json
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+
+    - name: Get Load Balancer DNS
+      command: |
+        kubectl get ingress chat-app-ingress -n chat-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+      register: lb_dns
+
+    - name: Display Load Balancer DNS
+      debug:
+        msg: "Load Balancer DNS: {{ lb_dns.stdout }}"

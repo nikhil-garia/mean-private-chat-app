@@ -1,0 +1,113 @@
+# Prometheus Alert Rules for Chat Application
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alert-rules
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus-stack
+    role: alert-rules
+data:
+  chat-app-alerts.yml: |
+    groups:
+    - name: chat-app.rules
+      rules:
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job="chat-backend",status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/sec for chat backend"
+
+      # High Response Time
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="chat-backend"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s"
+
+      # Low Message Rate
+      - alert: LowMessageRate
+        expr: rate(messages_total{job="chat-backend"}[5m]) < 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low message rate detected"
+          description: "Message rate is {{ $value }} messages/sec"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes{pod=~"chat-backend.*"} / container_spec_memory_limit_bytes{pod=~"chat-backend.*"} > 0.8
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 80% for {{ $labels.pod }}"
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{pod=~"chat-backend.*"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is above 80% for {{ $labels.pod }}"
+
+      # Pod CrashLoopBackOff
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total{pod=~"chat-.*"}[10m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod is crash looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+
+      # MongoDB Connection Issues
+      - alert: MongoDBConnectionIssues
+        expr: mongodb_connections{state="current"} < 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MongoDB connection issues"
+          description: "MongoDB has no active connections"
+
+      # Service Down
+      - alert: ServiceDown
+        expr: up{job=~"chat-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} is down"
+
+      # Database Storage Space
+      - alert: DatabaseStorageSpace
+        expr: (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"}) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low storage space"
+          description: "Storage space is below 10% on {{ $labels.instance }}"
+
+      # Network Errors
+      - alert: HighNetworkErrors
+        expr: rate(container_network_receive_errors_total{pod=~"chat-.*"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High network errors"
+          description: "Network error rate is {{ $value }} errors/sec"
